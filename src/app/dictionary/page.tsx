@@ -211,8 +211,8 @@ function MapContent() {
                 </Link>
               </div>
 
-              {/* 1人物1行 3列テーブル */}
-              <table className="w-full text-left text-xs border-collapse">
+              {/* PC用: 1人物1行 3列テーブル */}
+              <table className="hidden sm:table w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-300 text-gray-700 text-[11px]">
                     <th className="py-2 px-3 font-bold w-48 border-r border-gray-200">人物</th>
@@ -269,6 +269,57 @@ function MapContent() {
                   })}
                 </tbody>
               </table>
+
+              {/* スマホ用: カードリスト形式 */}
+              <div className="block sm:hidden divide-y divide-gray-200">
+                {catFigures.map((fig, figIdx) => {
+                  const figKeywords = KEYWORDS.filter((k) => k.figureId === fig.id);
+                  const isEven = figIdx % 2 === 0;
+
+                  return (
+                    <div
+                      key={fig.id}
+                      className={`p-3 space-y-2 text-xs ${
+                        isEven ? 'bg-white' : 'bg-gray-50/50'
+                      }`}
+                    >
+                      <div className="flex items-baseline justify-between">
+                        <strong className="text-sm font-bold text-gray-900">
+                          {highlightMatch(fig.name, searchQuery)}
+                        </strong>
+                        {fig.eraDetail && (
+                          <span className="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded-xs border border-gray-200">
+                            {fig.eraDetail}
+                          </span>
+                        )}
+                      </div>
+
+                      {fig.books && fig.books.length > 0 && (
+                        <div className="text-[11px] text-gray-600 font-medium">
+                          {highlightMatch(`『${fig.books.join('』、『')}』`, searchQuery)}
+                        </div>
+                      )}
+
+                      {figKeywords.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {figKeywords.map((kw) => (
+                            <span
+                              key={kw.id}
+                              className="inline-block bg-gray-100 border border-gray-300 text-gray-900 font-bold px-1.5 py-0.5 rounded-xs text-[10px]"
+                            >
+                              {highlightMatch(kw.name, searchQuery)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="text-[11px] text-gray-700 leading-relaxed pt-0.5">
+                        {highlightMatch(fig.summary, searchQuery)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           );
         })}
