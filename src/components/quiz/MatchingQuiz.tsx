@@ -29,19 +29,30 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
   // 不正解時に選んだ誤ペア
   const [failedPair, setFailedPair] = useState<{ leftId: string; rightOptId: string } | null>(null);
   const [rightOptions, setRightOptions] = useState<{ id: string; text: string; isDummy: boolean }[]>([]);
-  // 番号入力
-  const [inputText, setInputText] = useState<string>('');
-  const [inputError, setInputError] = useState<string>('');
-  const inputRef = useRef<HTMLInputElement>(null);
   const startTimeRef = useRef<number>(Date.now());
+
+  const isAllCleared = matchedPairIds.length === question.pairs.length;
+  const isFinished = isPassed || isFailed || isAllCleared;
+
+  // 左側の未マッチ先頭を自動選択するエフェクト
+  useEffect(() => {
+    if (isFinished) {
+      setSelectedLeft(null);
+      return;
+    }
+    const remains = question.pairs.filter((p) => !matchedPairIds.includes(p.id));
+    if (remains.length > 0) {
+      setSelectedLeft(remains[0].id);
+    } else {
+      setSelectedLeft(null);
+    }
+  }, [matchedPairIds, question.pairs, isFinished]);
 
   useEffect(() => {
     startTimeRef.current = Date.now();
     setIsPassed(false);
     setIsFailed(false);
     setFailedPair(null);
-    setInputText('');
-    setInputError('');
 
     const correctRights = question.pairs.map((p) => ({
       id: p.id,
@@ -95,7 +106,7 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
     }
   }, [question, onBadgeUnlocked]);
 
-  const checkMatch = (leftId: string, rightOptId: string) => {
+  const checkMatch = useCallback((leftId: string, rightOptId: string) => {
     setAttempts((prev) => prev + 1);
 
     if (leftId === rightOptId) {
@@ -118,7 +129,7 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
       // 不一致 → 即不正解終了
       handleFail(leftId, rightOptId);
     }
-  };
+  }, [matchedPairIds, question, attempts, onBadgeUnlocked, handleFail]);
 
   const handleLeftClick = (id: string) => {
     if (matchedPairIds.includes(id) || isPassed || isFailed) return;
@@ -138,49 +149,33 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
     }
   };
 
-  // 番号入力による指定
-  const handleInputSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const parts = inputText.trim().split(/\s+/);
-    if (parts.length !== 2) {
-      setInputError('「左番号 右番号」の形式で入力してください（例: 1 3）');
-      return;
-    }
-    const leftNum = parseInt(parts[0], 10);
-    const rightNum = parseInt(parts[1], 10);
+  // キーボードイベントの登録
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat || isFinished) return;
 
-    const leftPairs = question.pairs.filter((p) => !matchedPairIds.includes(p.id));
-    const rightOpts = rightOptions.filter((o) => !matchedPairIds.includes(o.id));
+      // パスキー（P or 0）
+      if (e.key.toLowerCase() === 'p' || e.key === '0') {
+        handlePass();
+        return;
+      }
 
-    if (isNaN(leftNum) || leftNum < 1 || leftNum > leftPairs.length) {
-      setInputError(`左番号は 1〜${leftPairs.length} で指定してください`);
-      return;
-    }
-    if (isNaN(rightNum) || rightNum < 1 || rightNum > rightOpts.length) {
-      setInputError(`右番号は 1〜${rightOpts.length} で指定してください`);
-      return;
-    }
+      // 数字キー 1〜6 で右側の項目を選択してマッチング
+      const num = parseInt(e.key, 10);
+      if (!isNaN(num) && num >= 1 && num <= rightOptions.length) {
+        const targetOpt = rightOptions[num - 1];
+        if (targetOpt && !matchedPairIds.includes(targetOpt.id)) {
+          setSelectedRight(targetOpt.id);
+          if (selectedLeft) {
+            checkMatch(selectedLeft, targetOpt.id);
+          }
+        }
+      }
+    };
 
-    setInputError('');
-    setInputText('');
-
-    const leftId = leftPairs[leftNum - 1].id;
-    const rightOptId = rightOpts[rightNum - 1].id;
-
-    // 選択をUIに反映してからマッチ判定
-    setSelectedLeft(leftId);
-    setSelectedRight(rightOptId);
-    setTimeout(() => {
-      checkMatch(leftId, rightOptId);
-    }, 100);
-  };
-
-  const isAllCleared = matchedPairIds.length === question.pairs.length;
-  const isFinished = isPassed || isFailed || isAllCleared;
-
-  // 残りペア（未マッチのもの）
-  const remainingLeft = question.pairs.filter((p) => !matchedPairIds.includes(p.id));
-  const remainingRight = rightOptions.filter((o) => !matchedPairIds.includes(o.id));
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [rightOptions, matchedPairIds, selectedLeft, isFinished, handlePass, checkMatch]);
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-2 text-xs">
@@ -240,7 +235,7 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
             <div className="bg-gray-100 p-1 font-bold text-gray-700 text-center border border-gray-200 rounded-xs text-[11px]">
               思想家・人物（{question.pairs.length}名）
             </div>
-            {question.pairs.map((pair) => {
+            {question.pairs.map((pair, idx) => {
               const isMatched = matchedPairIds.includes(pair.id);
               const isSelected = selectedLeft === pair.id;
               const isFailLeft = isFailed && failedPair?.leftId === pair.id;
@@ -248,10 +243,7 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
               let style = 'bg-gray-50 border border-gray-300 hover:bg-gray-100 text-gray-900';
               if (isMatched) style = 'bg-green-100 border-2 border-green-600 text-green-950 font-bold';
               else if (isFailLeft) style = 'bg-red-100 border-2 border-red-600 text-red-950 font-bold';
-              else if (isSelected) style = 'bg-blue-100 border-2 border-blue-600 text-blue-950 font-bold';
-
-              // 残りの中でのインデックス（番号表示用）
-              const remainIdx = remainingLeft.findIndex((p) => p.id === pair.id);
+              else if (isSelected) style = 'bg-blue-100 border-2 border-blue-600 text-blue-950 font-bold ring-2 ring-blue-400';
 
               return (
                 <button
@@ -261,11 +253,12 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
                   className={`w-full p-2.5 text-left rounded-xs transition flex items-center justify-between ${style}`}
                 >
                   <span className="font-semibold">
-                    {!isMatched && !isFinished && remainIdx >= 0 && (
-                      <span className="text-gray-400 mr-1.5 font-bold">{remainIdx + 1}.</span>
+                    {!isMatched && !isFinished && (
+                      <span className="text-gray-400 mr-1.5 font-bold">{idx + 1}.</span>
                     )}
                     {pair.left}
                   </span>
+                  {isSelected && <span className="text-blue-700 font-bold animate-pulse text-[10px]">選択中</span>}
                   {isMatched && <CheckCircle2 className="w-4 h-4 text-green-700" />}
                 </button>
               );
@@ -278,7 +271,7 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
               <span>語句・概念（全6候補）</span>
               <span className="text-[10px] text-gray-500 font-normal">※3つ余る</span>
             </div>
-            {rightOptions.map((opt) => {
+            {rightOptions.map((opt, optIdx) => {
               const isMatched = matchedPairIds.includes(opt.id);
               const isSelected = selectedRight === opt.id;
               const isFailRight = isFailed && failedPair?.rightOptId === opt.id;
@@ -288,9 +281,6 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
               else if (isFailRight) style = 'bg-red-100 border-2 border-red-600 text-red-950 font-bold';
               else if (isSelected) style = 'bg-blue-100 border-2 border-blue-600 text-blue-950 font-bold';
 
-              // 残りの中でのインデックス
-              const remainIdx = remainingRight.findIndex((o) => o.id === opt.id);
-
               return (
                 <button
                   key={opt.id}
@@ -299,8 +289,8 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
                   className={`w-full p-2.5 text-left rounded-xs transition flex items-center justify-between ${style}`}
                 >
                   <span>
-                    {!isMatched && !isFinished && remainIdx >= 0 && (
-                      <span className="text-gray-400 mr-1.5 font-bold">{remainIdx + 1}.</span>
+                    {!isMatched && !isFinished && (
+                      <span className="text-gray-400 mr-1.5 font-bold">{optIdx + 1}.</span>
                     )}
                     {opt.text}
                   </span>
@@ -310,29 +300,6 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
             })}
           </div>
         </div>
-
-        {/* 番号入力フォーム（未終了時のみ） */}
-        {!isFinished && (
-          <form onSubmit={handleInputSubmit} className="flex items-center gap-2 pt-1">
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="例: 1 3　（左番号 右番号）"
-              className="flex-1 border border-gray-300 rounded-xs px-2 py-1.5 text-xs font-mono focus:outline-none focus:border-gray-500"
-            />
-            <button
-              type="submit"
-              className="px-3 py-1.5 bg-gray-700 hover:bg-gray-900 text-white font-bold text-xs rounded-xs"
-            >
-              決定
-            </button>
-          </form>
-        )}
-        {inputError && (
-          <p className="text-red-600 text-[11px] font-bold">{inputError}</p>
-        )}
 
         {/* 不正解で終了 */}
         {isFailed && (
