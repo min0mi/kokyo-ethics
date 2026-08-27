@@ -4,10 +4,12 @@ import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { UnifiedPracticeSession } from '@/components/quiz/UnifiedPracticeSession';
 import { CategoryId } from '@/types';
+import { CATEGORIES } from '@/data/categories';
 
 function PracticeContent() {
   const searchParams = useSearchParams();
   const catParam = searchParams.get('category') as CategoryId | null;
+  const groupParam = searchParams.get('group'); // 'all' | '源流思想' | '日本思想' | '西洋思想'
   const countParam = searchParams.get('count');
 
   const f2kParam = searchParams.get('f2k');
@@ -25,8 +27,16 @@ function PracticeContent() {
     pairParam !== null ||
     matchingParam !== null;
 
+  // 出題対象カテゴリの決定
+  let targetCategoryIds: CategoryId[] | undefined = undefined;
+  if (catParam) {
+    targetCategoryIds = [catParam];
+  } else if (groupParam && groupParam !== 'all') {
+    targetCategoryIds = CATEGORIES.filter((c) => c.groupName === groupParam).map((c) => c.id);
+  }
+
   const initialConfig = {
-    categoryIds: catParam ? [catParam] : undefined,
+    categoryIds: targetCategoryIds,
     questionCount: isNaN(questionCount) ? 10 : questionCount,
     enabledTypes: hasSpecificTypes
       ? {

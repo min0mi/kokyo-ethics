@@ -23,6 +23,9 @@ export default function HomePage() {
   const [totalMasteredCount, setTotalMasteredCount] = useState(0);
   const [totalQuestionsCount, setTotalQuestionsCount] = useState(0);
 
+  // 演習範囲ステート（全範囲 / 源流思想 / 日本思想 / 西洋思想）
+  const [selectedScope, setSelectedScope] = useState<'all' | '源流思想' | '日本思想' | '西洋思想'>('all');
+
   // 演習設定ステート
   const [sessionConfig, setSessionConfig] = useState<QuizSessionConfig>({
     categoryIds: AVAILABLE_CATEGORY_IDS,
@@ -35,6 +38,16 @@ export default function HomePage() {
     },
     questionCount: 10,
   });
+
+  const handleScopeChange = (scope: 'all' | '源流思想' | '日本思想' | '西洋思想') => {
+    setSelectedScope(scope);
+    if (scope === 'all') {
+      setSessionConfig((prev) => ({ ...prev, categoryIds: AVAILABLE_CATEGORY_IDS }));
+    } else {
+      const catIds = CATEGORIES.filter((c) => c.groupName === scope).map((c) => c.id);
+      setSessionConfig((prev) => ({ ...prev, categoryIds: catIds }));
+    }
+  };
 
   useEffect(() => {
     const p = UserDataStore.getProfile();
@@ -163,9 +176,40 @@ export default function HomePage() {
           <div className="bg-white border border-gray-400 rounded-xs p-3.5 space-y-2.5 text-xs text-gray-900 shadow-xs">
             <div className="flex items-center justify-between border-b border-gray-200 pb-1.5">
               <strong className="text-sm font-bold text-gray-900">
-                源流・日本思想・青年期 演習
+                共通テスト 倫理・公共 演習
               </strong>
               <span className="text-[11px] text-gray-500">人物 ⇄ 語句の対応関係特化</span>
+            </div>
+
+            {/* 出題範囲の選択（全範囲 / 源流思想 / 日本思想 / 西洋思想） */}
+            <div className="space-y-1">
+              <span className="font-bold text-gray-700 block text-[11px]">
+                出題範囲:
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                {[
+                  { key: 'all', label: '全範囲' },
+                  { key: '源流思想', label: '源流思想' },
+                  { key: '日本思想', label: '日本思想' },
+                  { key: '西洋思想', label: '西洋思想' },
+                ].map(({ key, label }) => {
+                  const isSel = selectedScope === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => handleScopeChange(key as 'all' | '源流思想' | '日本思想' | '西洋思想')}
+                      className={`py-1.5 px-2 rounded-xs border font-bold text-xs text-center transition ${
+                        isSel
+                          ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
+                          : 'bg-gray-50 text-gray-800 border-gray-300 hover:bg-gray-100'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* 問題形式 */}
@@ -230,7 +274,7 @@ export default function HomePage() {
               onClick={handleStartPracticeDirect}
               className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-center text-xs rounded-xs shadow-xs"
             >
-              演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
+              【{selectedScope === 'all' ? '全範囲' : selectedScope}】演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
             </button>
           </div>
 
