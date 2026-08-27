@@ -2,348 +2,415 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  Zap,
-  Play,
-  Sparkles,
-  BookOpen,
-  ArrowRight,
-  Clock,
-  Layers,
-  ChevronRight,
-  Brain,
-  Edit3,
-  Network,
-} from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { CATEGORIES } from '@/data/categories';
 import { QuestionGenerator } from '@/lib/generator/questionGenerator';
 import { SRSEngine } from '@/lib/srs/srsEngine';
 import { UserDataStore } from '@/lib/storage/userDataStore';
-import { Question, Badge } from '@/types';
+import { UserProfile, Question } from '@/types';
+import { BADGES } from '@/data/badges';
 import { AdBanner } from '@/components/ads/AdBanner';
-import { BadgeUnlockedModal } from '@/components/gamification/BadgeUnlockedModal';
 
 export default function HomePage() {
+  const router = useRouter();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [dueQuestions, setDueQuestions] = useState<Question[]>([]);
-  const [activeBadge, setActiveBadge] = useState<Badge | null>(null);
+  const [searchWord, setSearchWord] = useState('');
   const [categoryStats, setCategoryStats] = useState<
-    Record<string, { total: number; mastered: number; rate: number }>
+    Record<string, { total: number; mastered: number; learning: number; rate: number }>
   >({});
+  const [totalMasteredCount, setTotalMasteredCount] = useState(0);
+  const [totalQuestionsCount, setTotalQuestionsCount] = useState(0);
 
   useEffect(() => {
+    const p = UserDataStore.getProfile();
     const progressMap = UserDataStore.getProgressMap();
     const allQuestions = QuestionGenerator.getAllQuestions();
 
-    // 今日復習すべき問題を抽出
+    setProfile(p);
+    setTotalQuestionsCount(allQuestions.length);
+
+    // 今日復習すべき問題
     const due = SRSEngine.getDueQuestions(allQuestions, progressMap);
     setDueQuestions(due);
 
     // 単元別統計
-    const stats: Record<string, { total: number; mastered: number; rate: number }> = {};
+    let totalMastered = 0;
+    const stats: Record<string, { total: number; mastered: number; learning: number; rate: number }> = {};
     CATEGORIES.forEach((cat) => {
       const catQs = allQuestions.filter((q) => q.categoryId === cat.id);
       const res = SRSEngine.calculateCategoryStats(catQs, progressMap);
-      stats[cat.id] = { total: res.total, mastered: res.mastered, rate: res.rate };
+      stats[cat.id] = { total: res.total, mastered: res.mastered, learning: res.learning, rate: res.rate };
+      totalMastered += res.mastered;
     });
     setCategoryStats(stats);
+    setTotalMasteredCount(totalMastered);
   }, []);
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchWord.trim()) return;
+    router.push(`/dictionary?q=${encodeURIComponent(searchWord.trim())}`);
+  };
+
+  // ランキング簡易データ
+  const topRankers = [
+    { rank: 1, name: 'ソクラテスの弟子', xp: 4850, streak: 24 },
+    { rank: 2, name: 'イデア探求者', xp: 4120, streak: 18 },
+    { rank: 3, name: 'カントの散歩道', xp: 3740, streak: 15 },
+    { rank: 4, name: '超人ニーチェ', xp: 3200, streak: 12 },
+    { rank: 5, name: '実存サルトル', xp: 2850, streak: 9 },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-      {/* バッジ解放モーダル */}
-      <BadgeUnlockedModal badge={activeBadge} onClose={() => setActiveBadge(null)} />
-
-      {/* トップヒーロー ＆ 今日の復習ステータス */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white p-6 sm:p-10 shadow-2xl">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-          <div className="lg:col-span-2 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-indigo-200">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>共通テスト「公共、倫理」構造的記憶システム</span>
-            </div>
-
-            <h1 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
-              思想のつながりを、<br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-indigo-200">
-                脳に焼き付ける。
-              </span>
-            </h1>
-
-            <p className="text-indigo-100/80 text-xs sm:text-sm leading-relaxed max-w-xl">
-              単なる一問一答ではなく、人物・キーワード・定義・著書・エピソードを交差させて暗記。
-              忘却曲線アルゴリズムが最適な復習タイミングを自動計算します。
-            </p>
-
-            {/* クイックアクション */}
-            <div className="pt-2 flex flex-wrap gap-3">
-              <Link
-                href="/practice/speed"
-                className="py-3 px-6 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black rounded-xl shadow-lg shadow-amber-500/20 transition transform active:scale-95 text-xs sm:text-sm flex items-center gap-2"
-              >
-                <Zap className="w-4 h-4 fill-slate-950" />
-                スピード暗記（mikan風）を始める
-              </Link>
-              <Link
-                href="/practice/standard"
-                className="py-3 px-5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-xl backdrop-blur-md transition text-xs sm:text-sm flex items-center gap-2"
-              >
-                <BookOpen className="w-4 h-4" />
-                分野別演習（道場風）
-              </Link>
-            </div>
-          </div>
-
-          {/* 今日の復習カード */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 flex flex-col justify-between space-y-4">
-            <div>
-              <div className="flex items-center justify-between text-xs text-indigo-200 font-semibold mb-2">
-                <span className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-amber-300" />
-                  今日やるべき復習キュー
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] font-bold">
-                  SM-2 Algorithm
-                </span>
-              </div>
-
-              <div className="text-3xl sm:text-4xl font-black text-white mb-1">
-                {dueQuestions.length} <span className="text-sm font-normal text-indigo-200">問</span>
-              </div>
-              <p className="text-xs text-indigo-200/80">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 space-y-4">
+      {/* 最上段：今日の復習アラート ＆ 検索バー（Yahoo風トップ配置） */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        {/* 今日の復習ブロック */}
+        <div className="lg:col-span-2 bg-yellow-50 border-2 border-yellow-400 p-3.5 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="bg-red-600 text-white text-xs font-black px-2 py-0.5 rounded-xs shrink-0">
+              重要
+            </span>
+            <div className="text-xs text-gray-900">
+              <strong className="text-sm font-bold text-red-600">
+                本日の忘却曲線 復習キュー: {dueQuestions.length} 問
+              </strong>
+              <p className="text-gray-600 text-[11px] mt-0.5">
                 {dueQuestions.length > 0
-                  ? '忘却曲線に基づき、今日復習すると記憶定着率が最も高まる問題です。'
-                  : '今日の復習は完了しています！新規の単元学習に進みましょう。'}
+                  ? 'SM-2アルゴリズムにより本日復習期日に達した問題です。'
+                  : '今日の復習は完了しています。未習得の単元を進めましょう！'}
               </p>
             </div>
-
-            <Link
-              href={dueQuestions.length > 0 ? '/practice/speed?mode=due' : '/practice/speed'}
-              className="w-full py-3 bg-white text-indigo-900 hover:bg-indigo-50 rounded-xl font-bold text-center text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5"
-            >
-              <Play className="w-4 h-4 fill-indigo-900" />
-              {dueQuestions.length > 0 ? '復習キューを開始する' : '新しい問題を解く'}
-            </Link>
           </div>
+
+          <Link
+            href={dueQuestions.length > 0 ? '/practice/speed?mode=due' : '/practice/speed'}
+            className="w-full sm:w-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-sm text-center shadow-xs shrink-0"
+          >
+            {dueQuestions.length > 0 ? '復習を開始する（mikan風）' : '全問ランダム特訓'}
+          </Link>
+        </div>
+
+        {/* 用語・人物クイック検索バー */}
+        <div className="bg-white border border-gray-300 p-3 rounded-sm">
+          <form onSubmit={handleSearchSubmit} className="space-y-1.5">
+            <label className="block text-[11px] font-bold text-gray-700">
+              🔍 思想家・キーワード・著書の図鑑検索
+            </label>
+            <div className="flex gap-1.5">
+              <input
+                type="text"
+                value={searchWord}
+                onChange={(e) => setSearchWord(e.target.value)}
+                placeholder="例: イデア、カント、無知の知"
+                className="flex-1 px-2.5 py-1.5 border border-gray-300 rounded-sm text-xs focus:outline-hidden focus:border-blue-600"
+              />
+              <button
+                type="submit"
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-sm"
+              >
+                検索
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
-      {/* トップ広告枠 */}
-      <AdBanner label="Sponsor" />
+      {/* 2カラム構成：左側メイン（演習モード＆全単元一覧表） / 右側（ユーザー進捗＆ランキング＆広告） */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* ===================== 左側 メインコンテンツ (8/12) ===================== */}
+        <div className="lg:col-span-8 space-y-4">
+          {/* 1. 演習形式から選ぶ（6つの問題モード一覧） */}
+          <div className="bg-white border border-gray-300 rounded-sm overflow-hidden">
+            <div className="bg-gray-100 px-3 py-2 border-b border-gray-300 flex items-center justify-between">
+              <h2 className="text-xs font-bold text-gray-800">
+                ■ 演習モード一覧（問題形式から選ぶ）
+              </h2>
+              <span className="text-[11px] text-gray-500">目的に合わせて選択</span>
+            </div>
 
-      {/* 5つの演習モード選択セクション */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
-              特訓モードを選ぶ
-            </h2>
-            <p className="text-xs text-gray-500">目的に応じた多彩な出題形式で飽きずに完全網羅</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* モード1: mikan風スピード暗記 */}
-          <Link
-            href="/practice/speed"
-            className="group relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl border border-gray-200/80 hover:border-indigo-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between"
-          >
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition">
-                <Zap className="w-6 h-6 fill-amber-500 text-amber-500" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 px-2 py-0.5 bg-amber-50 rounded-full inline-block">
-                mikanスタイル
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition">
-                スピード暗記特訓
-              </h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                1問3秒でサクサク回す4択カード演習。人物・キーワード・著書をテンポよく反射レベルで即答。
-              </p>
-            </div>
-            <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-indigo-600">
-              <span>演習を開始する</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
-
-          {/* モード2: 過去問道場風詳細演習 */}
-          <Link
-            href="/practice/standard"
-            className="group relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl border border-gray-200/80 hover:border-indigo-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between"
-          >
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition">
-                <BookOpen className="w-6 h-6 text-indigo-600" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 px-2 py-0.5 bg-indigo-50 rounded-full inline-block">
-                道場スタイル
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition">
-                共テ実践・深堀り道場
-              </h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                全問題に「判断語句のひっかけ解説」付き。共通テスト特有の紛らわしい選択肢の見分け方を伝授。
-              </p>
-            </div>
-            <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-indigo-600">
-              <span>演習を開始する</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
-
-          {/* モード3: 線つなぎマッチング */}
-          <Link
-            href="/practice/matching"
-            className="group relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl border border-gray-200/80 hover:border-indigo-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between"
-          >
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-600 flex items-center justify-center group-hover:scale-110 transition">
-                <Network className="w-6 h-6 text-violet-600" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-violet-600 px-2 py-0.5 bg-violet-50 rounded-full inline-block">
-                相関マップ
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition">
-                線つなぎマッチング
-              </h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                人物とキーワード・著書を左右タップで対応づけるパズル感覚の演習。思想の相関関係を立体的に整理。
-              </p>
-            </div>
-            <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-indigo-600">
-              <span>演習を開始する</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
-
-          {/* モード4: キーワード記述マスター */}
-          <Link
-            href="/practice/typing"
-            className="group relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl border border-gray-200/80 hover:border-indigo-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between"
-          >
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition">
-                <Edit3 className="w-6 h-6 text-emerald-600" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 px-2 py-0.5 bg-emerald-50 rounded-full inline-block">
-                完全定着
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition">
-                キーワード記述マスター
-              </h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                定義や人物名から用語を直接入力。うろ覚えを徹底排除し、記述・スペルまで正確に定着させます。
-              </p>
-            </div>
-            <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-indigo-600">
-              <span>演習を開始する</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
-
-          {/* モード5: 分類想起トレーニング */}
-          <Link
-            href="/practice/recall"
-            className="group relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl border border-gray-200/80 hover:border-indigo-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between"
-          >
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center group-hover:scale-110 transition">
-                <Brain className="w-6 h-6 text-cyan-600" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-600 px-2 py-0.5 bg-cyan-50 rounded-full inline-block">
-                アクティブリコール
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition">
-                分類想起セルフチェック
-              </h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                「〇〇に属する人物を3人答えよ」などの高次想起問題。模範解答を確認して自己評価を行います。
-              </p>
-            </div>
-            <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-indigo-600">
-              <span>演習を開始する</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
-
-          {/* モード6: 思想・用語図鑑 */}
-          <Link
-            href="/dictionary"
-            className="group relative bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl border border-gray-200/80 hover:border-indigo-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between"
-          >
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-600 flex items-center justify-center group-hover:scale-110 transition">
-                <Layers className="w-6 h-6 text-rose-600" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 px-2 py-0.5 bg-rose-50 rounded-full inline-block">
-                ナレッジベース
-              </span>
-              <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition">
-                思想・用語図鑑
-              </h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                共テ頻出の哲学者・キーワード・著書・エピソードを体系的に検索・閲覧できるデジタルナレッジ図鑑。
-              </p>
-            </div>
-            <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-indigo-600">
-              <span>図鑑を開く</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* 単元別マスター状況セクション */}
-      <section className="space-y-4 pt-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
-              単元別マスター進捗
-            </h2>
-            <p className="text-xs text-gray-500">分野ごとの定着度と忘却曲線のステータス</p>
-          </div>
-          <Link
-            href="/stats"
-            className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
-          >
-            詳細分析 <ChevronRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {CATEGORIES.slice(0, 8).map((cat) => {
-            const stat = categoryStats[cat.id] || { total: 0, mastered: 0, rate: 0 };
-            return (
+            <div className="grid grid-cols-2 sm:grid-cols-3 divide-x divide-y divide-gray-200 text-xs">
               <Link
-                key={cat.id}
-                href={`/practice/standard?category=${cat.id}`}
-                className="bg-white rounded-2xl p-4 border border-gray-200/80 hover:border-indigo-300 shadow-xs hover:shadow-md transition group"
+                href="/practice/speed"
+                className="p-3 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
               >
-                <div className="flex items-center justify-between text-xs font-bold mb-2">
-                  <span className="text-gray-800 truncate">{cat.shortName}</span>
-                  <span className="text-indigo-600 font-extrabold">{stat.rate}%</span>
+                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
+                  <span>⚡ スピード暗記</span>
+                  <span className="text-[10px] bg-yellow-100 text-yellow-800 px-1 rounded-xs">mikan風</span>
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden mb-2">
-                  <div
-                    className="bg-indigo-600 h-1.5 rounded-full transition-all duration-500"
-                    style={{ width: `${stat.rate}%` }}
-                  />
-                </div>
-                <div className="flex items-center justify-between text-[10px] text-gray-400">
-                  <span>{cat.era}</span>
-                  <span>
-                    {stat.mastered} / {stat.total}問
-                  </span>
-                </div>
+                <p className="text-[11px] text-gray-500 leading-tight">
+                  1問3秒で4択即答。キーボード[1-4]対応・連続コンボ。
+                </p>
               </Link>
-            );
-          })}
+
+              <Link
+                href="/practice/standard"
+                className="p-3 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
+              >
+                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
+                  <span>📖 共テ実践道場</span>
+                  <span className="text-[10px] bg-blue-100 text-blue-800 px-1 rounded-xs">詳細解説</span>
+                </div>
+                <p className="text-[11px] text-gray-500 leading-tight">
+                  判断語句のひっかけ解説付き。共通テスト本番対策。
+                </p>
+              </Link>
+
+              <Link
+                href="/practice/matching"
+                className="p-3 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
+              >
+                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
+                  <span>🔗 線つなぎ</span>
+                  <span className="text-[10px] bg-purple-100 text-purple-800 px-1 rounded-xs">相関整理</span>
+                </div>
+                <p className="text-[11px] text-gray-500 leading-tight">
+                  人物とキーワード・主著を左右タップでペアリング。
+                </p>
+              </Link>
+
+              <Link
+                href="/practice/typing"
+                className="p-3 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
+              >
+                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
+                  <span>✍️ キーワード記述</span>
+                  <span className="text-[10px] bg-green-100 text-green-800 px-1 rounded-xs">完全定着</span>
+                </div>
+                <p className="text-[11px] text-gray-500 leading-tight">
+                  定義から用語をキーボード入力。スペルまで暗記。
+                </p>
+              </Link>
+
+              <Link
+                href="/practice/recall"
+                className="p-3 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
+              >
+                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
+                  <span>🧠 分類想起</span>
+                  <span className="text-[10px] bg-cyan-100 text-cyan-800 px-1 rounded-xs">自己採点</span>
+                </div>
+                <p className="text-[11px] text-gray-500 leading-tight">
+                  「〇〇派3人答えよ」などのアクティブリコール。
+                </p>
+              </Link>
+
+              <Link
+                href="/dictionary"
+                className="p-3 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
+              >
+                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
+                  <span>📚 思想・用語図鑑</span>
+                  <span className="text-[10px] bg-gray-200 text-gray-800 px-1 rounded-xs">全項目</span>
+                </div>
+                <p className="text-[11px] text-gray-500 leading-tight">
+                  哲学者・用語・著書・エピソードの検索＆一覧。
+                </p>
+              </Link>
+            </div>
+          </div>
+
+          {/* 2. 単元別・時代別 全演習ダイレクト一覧表（Yahooニュース一覧・道場風テーブル） */}
+          <div className="bg-white border border-gray-300 rounded-sm overflow-hidden">
+            <div className="bg-gray-100 px-3 py-2 border-b border-gray-300 flex items-center justify-between">
+              <h2 className="text-xs font-bold text-gray-800">
+                ■ 全16単元別 演習メニュー一覧（時代・分野から直接選ぶ）
+              </h2>
+              <span className="text-[11px] text-gray-500">
+                マスター率: {totalMasteredCount} / {totalQuestionsCount} 問
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-[11px]">
+                    <th className="py-2 px-3 font-semibold">単元・分野名</th>
+                    <th className="py-2 px-2 font-semibold w-24">時代区分</th>
+                    <th className="py-2 px-2 font-semibold w-20 text-center">定着率</th>
+                    <th className="py-2 px-3 font-semibold text-right">即時演習リンク</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {CATEGORIES.map((cat, idx) => {
+                    const st = categoryStats[cat.id] || { total: 0, mastered: 0, learning: 0, rate: 0 };
+                    return (
+                      <tr key={cat.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50 hover:bg-blue-50/40'}>
+                        <td className="py-2.5 px-3">
+                          <Link
+                            href={`/practice/standard?category=${cat.id}`}
+                            className="font-bold text-blue-700 hover:underline block"
+                          >
+                            {cat.name}
+                          </Link>
+                          <span className="text-[10px] text-gray-500 line-clamp-1">
+                            {cat.description}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-2 text-[11px] text-gray-500">
+                          {cat.era}
+                        </td>
+                        <td className="py-2.5 px-2 text-center">
+                          <div className="font-bold text-gray-800 text-[11px]">{st.rate}%</div>
+                          <div className="w-14 bg-gray-200 h-1 rounded-full mx-auto overflow-hidden">
+                            <div
+                              className="bg-blue-600 h-1 rounded-full"
+                              style={{ width: `${st.rate}%` }}
+                            />
+                          </div>
+                        </td>
+                        <td className="py-2.5 px-3 text-right">
+                          <div className="inline-flex items-center gap-1">
+                            <Link
+                              href={`/practice/speed?category=${cat.id}`}
+                              className="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-[10px] rounded-xs"
+                              title="スピード暗記モード"
+                            >
+                              4択
+                            </Link>
+                            <Link
+                              href={`/practice/matching?category=${cat.id}`}
+                              className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white font-bold text-[10px] rounded-xs"
+                              title="線つなぎマッチング"
+                            >
+                              線つなぎ
+                            </Link>
+                            <Link
+                              href={`/practice/typing?category=${cat.id}`}
+                              className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] rounded-xs"
+                              title="キーワード記述"
+                            >
+                              記述
+                            </Link>
+                            <Link
+                              href={`/practice/recall?category=${cat.id}`}
+                              className="px-2 py-1 bg-cyan-700 hover:bg-cyan-800 text-white font-bold text-[10px] rounded-xs"
+                              title="分類想起"
+                            >
+                              想起
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-      </section>
+
+        {/* ===================== 右側 サイドバー (4/12) ===================== */}
+        <div className="lg:col-span-4 space-y-4">
+          {/* 1. ユーザー学習サマリー */}
+          <div className="bg-white border border-gray-300 rounded-sm p-3.5 space-y-2.5 text-xs">
+            <div className="font-bold text-gray-800 border-b border-gray-200 pb-1.5 flex items-center justify-between">
+              <span>👤 あなたの学習成績</span>
+              <Link href="/stats" className="text-[11px] text-blue-700 hover:underline">
+                詳細分析 »
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <div className="bg-gray-50 p-2 rounded-xs border border-gray-200">
+                <span className="text-gray-500 block">連続学習日数</span>
+                <strong className="text-base text-orange-600">{profile?.streakDays || 1} 日</strong>
+              </div>
+              <div className="bg-gray-50 p-2 rounded-xs border border-gray-200">
+                <span className="text-gray-500 block">獲得経験値</span>
+                <strong className="text-base text-blue-700">{profile?.xp || 0} XP</strong>
+              </div>
+              <div className="bg-gray-50 p-2 rounded-xs border border-gray-200">
+                <span className="text-gray-500 block">総解答数</span>
+                <strong className="text-base text-gray-800">{profile?.totalAnswered || 0} 問</strong>
+              </div>
+              <div className="bg-gray-50 p-2 rounded-xs border border-gray-200">
+                <span className="text-gray-500 block">定着完了 (Mastered)</span>
+                <strong className="text-base text-emerald-600">{totalMasteredCount} 問</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. 全国ランキング TOP5 */}
+          <div className="bg-white border border-gray-300 rounded-sm p-3.5 space-y-2 text-xs">
+            <div className="font-bold text-gray-800 border-b border-gray-200 pb-1.5 flex items-center justify-between">
+              <span>🏆 全国ランキング (TOP 5)</span>
+              <Link href="/ranking" className="text-[11px] text-blue-700 hover:underline">
+                全体を見る »
+              </Link>
+            </div>
+
+            <div className="space-y-1.5">
+              {topRankers.map((r) => (
+                <div key={r.rank} className="flex items-center justify-between text-xs py-0.5">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`w-4 h-4 text-center font-bold text-[10px] leading-4 rounded-xs ${
+                        r.rank === 1
+                          ? 'bg-yellow-400 text-black'
+                          : r.rank === 2
+                          ? 'bg-gray-300 text-black'
+                          : r.rank === 3
+                          ? 'bg-amber-700 text-white'
+                          : 'text-gray-500'
+                      }`}
+                    >
+                      {r.rank}
+                    </span>
+                    <span className="font-semibold text-gray-800">{r.name}</span>
+                  </div>
+                  <span className="font-bold text-blue-700 text-[11px]">{r.xp} XP</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. バッジ獲得状況ミニ */}
+          <div className="bg-white border border-gray-300 rounded-sm p-3.5 space-y-2 text-xs">
+            <div className="font-bold text-gray-800 border-b border-gray-200 pb-1.5 flex items-center justify-between">
+              <span>🏅 バッジコレクション</span>
+              <Link href="/badges" className="text-[11px] text-blue-700 hover:underline">
+                全13種 »
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-4 gap-1.5 pt-1 text-center">
+              {BADGES.slice(0, 8).map((b) => {
+                const isUnlocked = profile?.unlockedBadgeIds.includes(b.id);
+                return (
+                  <div
+                    key={b.id}
+                    className={`p-1 rounded-xs border text-[10px] truncate ${
+                      isUnlocked
+                        ? 'bg-yellow-50 border-yellow-300 text-yellow-900 font-bold'
+                        : 'bg-gray-50 border-gray-200 text-gray-400'
+                    }`}
+                    title={`${b.name}: ${b.description}`}
+                  >
+                    {isUnlocked ? '★' : '🔒'} {b.name}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 4. スポンサー広告枠 (Yahoo風) */}
+          <AdBanner format="rectangle" label="Sponsor Link" />
+
+          {/* 5. サイトのご案内・お知らせ */}
+          <div className="bg-white border border-gray-300 rounded-sm p-3 space-y-1.5 text-xs text-gray-600">
+            <div className="font-bold text-gray-800 border-b border-gray-200 pb-1">
+              📢 共通テスト対策の進め方
+            </div>
+            <ul className="list-disc pl-4 space-y-1 text-[11px] text-gray-700">
+              <li>まずは「スピード暗記」で重要人物とキーワードを即答化。</li>
+              <li>間違えやすい選択肢は「共テ道場」で判断語句の根拠を確認。</li>
+              <li>毎日「今日の復習」を消化することで忘却曲線を克服。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

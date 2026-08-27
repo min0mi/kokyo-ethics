@@ -3,20 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Flame,
-  Zap,
-  Volume2,
-  VolumeX,
-  BookOpen,
-  Trophy,
-  Award,
-  BarChart3,
-  Sparkles,
-  Menu,
-  X,
-  GraduationCap,
-} from 'lucide-react';
+import { Volume2, VolumeX, Flame } from 'lucide-react';
 import { UserDataStore } from '@/lib/storage/userDataStore';
 import { UserProfile } from '@/types';
 import { sounds } from '@/lib/sound';
@@ -25,14 +12,12 @@ export const Header: React.FC = () => {
   const pathname = usePathname();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const p = UserDataStore.getProfile();
     setProfile(p);
     setIsMuted(sounds.getMuted());
 
-    // プロファイル更新イベントのリスナー
     const handleStorage = () => {
       setProfile(UserDataStore.getProfile());
     };
@@ -52,142 +37,78 @@ export const Header: React.FC = () => {
   };
 
   const navLinks = [
-    { href: '/', label: '学習ダッシュボード', icon: Sparkles },
-    { href: '/dictionary', label: '思想・用語図鑑', icon: BookOpen },
-    { href: '/ranking', label: '全国ランキング', icon: Trophy },
-    { href: '/badges', label: 'バッジ実績', icon: Award },
-    { href: '/stats', label: '習熟度・分析', icon: BarChart3 },
+    { href: '/', label: 'トップ・総合ポータル' },
+    { href: '/practice/speed', label: 'スピード暗記' },
+    { href: '/practice/standard', label: '共テ道場演習' },
+    { href: '/practice/matching', label: '線つなぎ' },
+    { href: '/practice/typing', label: '記述' },
+    { href: '/practice/recall', label: '分類想起' },
+    { href: '/dictionary', label: '用語図鑑' },
+    { href: '/ranking', label: 'ランキング' },
+    { href: '/badges', label: 'バッジ' },
+    { href: '/stats', label: '学習分析' },
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* ロゴ */}
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition font-bold text-lg sm:text-xl tracking-tight"
-            >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
-                <GraduationCap className="w-6 h-6" />
-              </div>
-              <div className="flex flex-col">
-                <span className="leading-tight text-gray-900 font-extrabold text-base sm:text-lg">
-                  公共倫理<span className="text-indigo-600">パーフェクトマスター</span>
-                </span>
-                <span className="text-[10px] text-gray-400 font-normal">共通テスト構造的暗記道場</span>
-              </div>
-            </Link>
-          </div>
+    <header className="w-full bg-white border-b-2 border-red-600 shadow-xs">
+      {/* 最上段：ロゴ ＆ ユーザーステータス */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-baseline gap-1.5">
+            <span className="text-xl sm:text-2xl font-black text-red-600 tracking-tight">公共・倫理</span>
+            <span className="text-base sm:text-lg font-bold text-gray-800">パーフェクトマスター</span>
+            <span className="hidden sm:inline-block text-[11px] text-gray-500 font-normal ml-1">
+              [共通テスト構造的暗記道場]
+            </span>
+          </Link>
+        </div>
 
-          {/* PC向け ナビリンク */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition ${
-                    isActive
-                      ? 'bg-indigo-50 text-indigo-700 font-bold'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
+        {/* ユーザーステータス */}
+        <div className="flex items-center gap-3 text-xs">
+          {profile && (
+            <div className="flex items-center gap-3 bg-gray-100 px-3 py-1 rounded-sm border border-gray-300">
+              <span className="font-bold text-gray-700">{profile.username}</span>
+              <span className="flex items-center gap-0.5 text-orange-600 font-bold">
+                <Flame className="w-3.5 h-3.5 fill-orange-500" />
+                {profile.streakDays}日連続
+              </span>
+              <span className="text-blue-700 font-bold">Lv.{profile.level}</span>
+              <span className="text-gray-600">({profile.xp} XP)</span>
+            </div>
+          )}
 
-          {/* ユーザー進捗ステータス (ストリーク & レベル) */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {profile && (
-              <>
-                {/* 連続日数 (ストリーク) */}
-                <div
-                  className="flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-200/80 rounded-full text-amber-800 text-xs font-bold shadow-xs cursor-default"
-                  title="連続学習日数"
-                >
-                  <Flame className="w-4 h-4 text-orange-500 fill-orange-500 animate-bounce" />
-                  <span>{profile.streakDays}日</span>
-                </div>
-
-                {/* レベル & XP */}
-                <div
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-full text-indigo-900 text-xs font-bold"
-                  title={`累計XP: ${profile.xp} XP`}
-                >
-                  <Zap className="w-3.5 h-3.5 text-indigo-600 fill-indigo-600" />
-                  <span>Lv.{profile.level}</span>
-                  <span className="text-[10px] text-indigo-500 font-normal">({profile.xp} XP)</span>
-                </div>
-              </>
-            )}
-
-            {/* 音声トグル */}
-            <button
-              onClick={toggleSound}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition"
-              title={isMuted ? '効果音をONにする' : '効果音をミュートする'}
-              aria-label="Toggle sound"
-            >
-              {isMuted ? (
-                <VolumeX className="w-5 h-5 text-gray-400" />
-              ) : (
-                <Volume2 className="w-5 h-5 text-indigo-600" />
-              )}
-            </button>
-
-            {/* スマホ用メニューボタン */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
-              aria-label="Menu"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+          <button
+            onClick={toggleSound}
+            className="px-2 py-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-sm text-gray-700 flex items-center gap-1 text-[11px]"
+            title={isMuted ? '効果音をON' : '効果音をミュート'}
+          >
+            {isMuted ? <VolumeX className="w-3.5 h-3.5 text-gray-400" /> : <Volume2 className="w-3.5 h-3.5 text-blue-600" />}
+            <span>音:{isMuted ? '切' : '入'}</span>
+          </button>
         </div>
       </div>
 
-      {/* スマホ用展開メニュー */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-b border-gray-200 bg-white px-4 pt-2 pb-4 space-y-1 shadow-lg animate-in slide-in-from-top-2">
-          {profile && (
-            <div className="px-3 py-2 mb-2 bg-indigo-50/70 rounded-lg flex items-center justify-between text-xs">
-              <span className="font-semibold text-gray-700">{profile.username}</span>
-              <div className="flex items-center gap-2 font-bold text-indigo-700">
-                <span>Lv.{profile.level}</span>
-                <span>{profile.xp} XP</span>
-              </div>
-            </div>
-          )}
+      {/* ナビゲーションバー (Yahoo風のタブ・メニューバー) */}
+      <nav className="bg-gray-100 border-t border-gray-300 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-2 flex items-center whitespace-nowrap text-xs font-semibold">
           {navLinks.map((link) => {
-            const Icon = link.icon;
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
+                className={`px-3 py-2 border-r border-gray-200 transition ${
                   isActive
-                    ? 'bg-indigo-600 text-white font-bold'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-white text-red-600 font-bold border-b-2 border-b-red-600 -mb-px'
+                    : 'text-gray-700 hover:bg-gray-200 hover:text-blue-700'
                 }`}
               >
-                <Icon className="w-5 h-5" />
                 {link.label}
               </Link>
             );
           })}
         </div>
-      )}
+      </nav>
     </header>
   );
 };
-

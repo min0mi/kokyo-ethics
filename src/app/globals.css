@@ -2,18 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-6px); }
-    40%, 80% { transform: translateX(6px); }
-  }
-  .animate-shake {
-    animation: shake 0.4s ease-in-out;
-  }
+/* Yahoo!風のシンプル・軽量・高視認性スタイル */
+body {
+  background-color: #f0f2f5;
+  color: #1f2937;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-body {
-  background-color: #f8fafc;
-  color: #0f172a;
+/* リンクのデフォルト挙動 */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 軽いホバー下線（Yahoo風） */
+.portal-link:hover {
+  text-decoration: underline;
+  color: #0033cc;
 }
