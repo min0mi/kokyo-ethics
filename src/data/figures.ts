@@ -1366,7 +1366,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: ["tanaka_shozo"],
   },
   {
-    id: 'wm_764626',
+    id: 'wm_494731',
     name: 'ダ・ヴィンチ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1377,7 +1377,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_661785',
+    id: 'wm_802433',
     name: 'ピコ・デラ・ミランドラ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1388,7 +1388,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_952547',
+    id: 'wm_380862',
     name: 'エラスムス',
     englishName: '',
     categoryId: 'western_modern',
@@ -1399,7 +1399,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_243197',
+    id: 'wm_619769',
     name: 'マキャヴェリ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1410,7 +1410,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_950399',
+    id: 'wm_45720',
     name: 'ボッティチェリ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1421,7 +1421,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_405960',
+    id: 'wm_564590',
     name: 'ミケランジェロ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1432,7 +1432,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_875362',
+    id: 'wm_604876',
     name: 'ラファエロ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1443,7 +1443,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_812649',
+    id: 'wm_38502',
     name: 'トマス・モア',
     englishName: '',
     categoryId: 'western_modern',
@@ -1454,7 +1454,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_877816',
+    id: 'wm_633598',
     name: 'シェイクスピア',
     englishName: '',
     categoryId: 'western_modern',
@@ -1465,7 +1465,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_495985',
+    id: 'wm_663573',
     name: 'セルバンテス',
     englishName: '',
     categoryId: 'western_modern',
@@ -1476,7 +1476,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_952004',
+    id: 'wm_65252',
     name: 'カンパッネラ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1487,7 +1487,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_208618',
+    id: 'wm_261216',
     name: 'ダンテ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1498,7 +1498,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_268350',
+    id: 'wm_249595',
     name: 'ペトラルカ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1509,7 +1509,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_68476',
+    id: 'wm_972346',
     name: 'ボッカチオ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1520,7 +1520,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_807759',
+    id: 'wm_570050',
     name: 'ルター',
     englishName: '',
     categoryId: 'western_modern',
@@ -1531,7 +1531,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_96311',
+    id: 'wm_158429',
     name: 'カルヴァン',
     englishName: '',
     categoryId: 'western_modern',
@@ -1542,7 +1542,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_221704',
+    id: 'wm_136688',
     name: 'モンテーニュ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1553,7 +1553,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_946803',
+    id: 'wm_919638',
     name: 'パスカル',
     englishName: '',
     categoryId: 'western_modern',
@@ -1564,7 +1564,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_716634',
+    id: 'wm_115710',
     name: 'コペルニクス',
     englishName: '',
     categoryId: 'western_modern',
@@ -1575,7 +1575,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_685128',
+    id: 'wm_920278',
     name: 'ガリレイ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1586,7 +1586,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_84942',
+    id: 'wm_846410',
     name: 'ケプラー',
     englishName: '',
     categoryId: 'western_modern',
@@ -1597,7 +1597,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_522029',
+    id: 'wm_101020',
     name: 'ジョルダーノ・ブルーノ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1608,7 +1608,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_7947',
+    id: 'wm_742338',
     name: 'ニュートン',
     englishName: '',
     categoryId: 'western_modern',
@@ -1619,7 +1619,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_91734',
+    id: 'wm_824971',
     name: 'ベーコン',
     englishName: '',
     categoryId: 'western_modern',
@@ -1630,7 +1630,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_935447',
+    id: 'wm_302192',
     name: 'デカルト',
     englishName: '',
     categoryId: 'western_modern',
@@ -1641,7 +1641,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_628925',
+    id: 'wm_703616',
     name: 'スピノザ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1652,7 +1652,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_744744',
+    id: 'wm_839285',
     name: 'ライプニッツ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1663,7 +1663,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_14810',
+    id: 'wm_249404',
     name: 'ロック',
     englishName: '',
     categoryId: 'western_modern',
@@ -1674,7 +1674,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_565788',
+    id: 'wm_892030',
     name: 'バークリー',
     englishName: '',
     categoryId: 'western_modern',
@@ -1685,7 +1685,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_759295',
+    id: 'wm_447384',
     name: 'ヒューム',
     englishName: '',
     categoryId: 'western_modern',
@@ -1696,7 +1696,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_563964',
+    id: 'wm_432033',
     name: 'ホッブズ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1707,7 +1707,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_43084',
+    id: 'wm_892983',
     name: 'ルソー',
     englishName: '',
     categoryId: 'western_modern',
@@ -1718,7 +1718,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_419600',
+    id: 'wm_969291',
     name: 'モンテスキュー',
     englishName: '',
     categoryId: 'western_modern',
@@ -1729,7 +1729,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_183985',
+    id: 'wm_365386',
     name: 'ヴォルテール',
     englishName: '',
     categoryId: 'western_modern',
@@ -1740,7 +1740,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_673087',
+    id: 'wm_549414',
     name: 'カント',
     englishName: '',
     categoryId: 'western_modern',
@@ -1751,7 +1751,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_784508',
+    id: 'wm_144639',
     name: 'フィヒテ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1762,7 +1762,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_725009',
+    id: 'wm_211300',
     name: 'ヘーゲル',
     englishName: '',
     categoryId: 'western_modern',
@@ -1773,7 +1773,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_428742',
+    id: 'wm_648073',
     name: 'ベンサム',
     englishName: '',
     categoryId: 'western_modern',
@@ -1784,7 +1784,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_563874',
+    id: 'wm_803677',
     name: 'ミル',
     englishName: '',
     categoryId: 'western_modern',
@@ -1795,7 +1795,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_123581',
+    id: 'wm_235546',
     name: 'サンシモン',
     englishName: '',
     categoryId: 'western_modern',
@@ -1806,7 +1806,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_957339',
+    id: 'wm_51414',
     name: 'オーウェン',
     englishName: '',
     categoryId: 'western_modern',
@@ -1817,7 +1817,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_564094',
+    id: 'wm_37607',
     name: 'フーリエ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1828,7 +1828,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_746001',
+    id: 'wm_100376',
     name: 'マルクス',
     englishName: '',
     categoryId: 'western_modern',
@@ -1839,7 +1839,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_931005',
+    id: 'wm_851834',
     name: 'ベルンシュタイン',
     englishName: '',
     categoryId: 'western_modern',
@@ -1850,7 +1850,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_439102',
+    id: 'wm_269210',
     name: 'ウェップ夫妻、バーナード・ショウ',
     englishName: '',
     categoryId: 'western_modern',
@@ -1861,7 +1861,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_708339',
+    id: 'wm_212427',
     name: 'レーニン',
     englishName: '',
     categoryId: 'western_modern',
@@ -1872,7 +1872,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_526673',
+    id: 'wm_329531',
     name: '毛沢東',
     englishName: '',
     categoryId: 'western_modern',
@@ -1883,7 +1883,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_611796',
+    id: 'wm_678809',
     name: 'コント',
     englishName: '',
     categoryId: 'western_modern',
@@ -1894,7 +1894,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_668275',
+    id: 'wm_671548',
     name: 'ダーウィン',
     englishName: '',
     categoryId: 'western_modern',
@@ -1905,7 +1905,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wm_262510',
+    id: 'wm_220769',
     name: 'スペンサー',
     englishName: '',
     categoryId: 'western_modern',
@@ -1916,7 +1916,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_908993',
+    id: 'wc_607783',
     name: 'フッサール',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -1927,7 +1927,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_173199',
+    id: 'wc_55805',
     name: 'メルロ・ポンティ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -1938,7 +1938,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_632270',
+    id: 'wc_899163',
     name: 'キルケゴール',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -1949,7 +1949,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_980617',
+    id: 'wc_531204',
     name: 'ニーチェ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -1960,7 +1960,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_666803',
+    id: 'wc_401430',
     name: 'ヤスパース',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -1971,7 +1971,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_623075',
+    id: 'wc_663303',
     name: 'ハイデガー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -1982,7 +1982,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_170431',
+    id: 'wc_129746',
     name: 'サルトル',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -1993,7 +1993,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_425283',
+    id: 'wc_769100',
     name: 'ショーペンハウアー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2004,7 +2004,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_769717',
+    id: 'wc_893039',
     name: 'シモーヌヴェイユ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2015,7 +2015,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_960746',
+    id: 'wc_513097',
     name: 'ボーヴォワール',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2026,7 +2026,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_543933',
+    id: 'wc_668056',
     name: 'ドストエフスキー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2037,7 +2037,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_449687',
+    id: 'wc_179083',
     name: 'カミュ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2048,7 +2048,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_960836',
+    id: 'wc_283453',
     name: 'マルセル',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2059,7 +2059,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_975367',
+    id: 'wc_870577',
     name: 'パース',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2070,7 +2070,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_459103',
+    id: 'wc_834095',
     name: 'ジェームズ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2081,7 +2081,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_284361',
+    id: 'wc_158427',
     name: 'デューイ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2092,7 +2092,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_252537',
+    id: 'wc_416577',
     name: 'ローティ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2103,7 +2103,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_412061',
+    id: 'wc_188263',
     name: 'トルストイ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2114,7 +2114,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_643131',
+    id: 'wc_71711',
     name: 'ロマン・ロラン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2125,7 +2125,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_483526',
+    id: 'wc_58084',
     name: 'ラッセル、アインシュタイン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2136,7 +2136,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_347216',
+    id: 'wc_221239',
     name: 'ガンディー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2147,7 +2147,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_819592',
+    id: 'wc_170446',
     name: 'キング牧師',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2158,7 +2158,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_726835',
+    id: 'wc_328800',
     name: 'シュヴァイツァー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2169,7 +2169,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_6456',
+    id: 'wc_978921',
     name: 'マザーテレサ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2180,7 +2180,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_164642',
+    id: 'wc_37820',
     name: 'ウィトゲンシュタイン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2191,7 +2191,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_174417',
+    id: 'wc_476107',
     name: 'ホルクハイマー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2202,7 +2202,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_788062',
+    id: 'wc_956324',
     name: 'アドルノ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2213,7 +2213,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_96290',
+    id: 'wc_526745',
     name: 'ベンヤミン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2224,7 +2224,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_562744',
+    id: 'wc_695415',
     name: 'フロム',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2235,7 +2235,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_760086',
+    id: 'wc_196005',
     name: 'ハーバーマス',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2246,7 +2246,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_356745',
+    id: 'wc_33820',
     name: 'アーレント',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2257,7 +2257,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_402304',
+    id: 'wc_302459',
     name: 'フランクル',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2268,7 +2268,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_741211',
+    id: 'wc_626988',
     name: 'レヴィナス',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2279,7 +2279,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_194348',
+    id: 'wc_173400',
     name: 'ソシュール',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2290,7 +2290,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_207598',
+    id: 'wc_56018',
     name: 'レヴィ＝ストロース',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2301,7 +2301,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_385059',
+    id: 'wc_945153',
     name: 'ラカン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2312,7 +2312,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_104854',
+    id: 'wc_670543',
     name: 'ドゥルーズ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2323,7 +2323,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_969843',
+    id: 'wc_294704',
     name: 'フーコー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2334,7 +2334,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_594797',
+    id: 'wc_115017',
     name: 'デリダ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2345,7 +2345,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_991776',
+    id: 'wc_338533',
     name: 'リオタール',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2356,7 +2356,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_974704',
+    id: 'wc_639650',
     name: 'ボードリヤール',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2367,7 +2367,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_22103',
+    id: 'wc_967519',
     name: 'サイード',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2378,7 +2378,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_895285',
+    id: 'wc_341847',
     name: 'ロールズ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2389,7 +2389,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_270729',
+    id: 'wc_740698',
     name: 'セン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2400,7 +2400,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_436393',
+    id: 'wc_116882',
     name: 'ノージック',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2411,7 +2411,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_20182',
+    id: 'wc_803930',
     name: 'マッキンタイア',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2422,7 +2422,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_473662',
+    id: 'wc_524835',
     name: 'サンデル',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2433,7 +2433,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_961237',
+    id: 'wc_299773',
     name: 'ポッゲ、ベイツ、ネグリ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2444,7 +2444,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_174307',
+    id: 'wc_188743',
     name: 'キテイ、ギリガン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2455,7 +2455,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_443801',
+    id: 'wc_860895',
     name: 'ウェーバー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2466,7 +2466,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_899743',
+    id: 'wc_336846',
     name: 'オルテガ',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2477,7 +2477,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_817625',
+    id: 'wc_474747',
     name: 'リースマン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2488,7 +2488,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_433911',
+    id: 'wc_436873',
     name: 'ポパー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2499,7 +2499,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_610973',
+    id: 'wc_786580',
     name: 'クワイン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2510,7 +2510,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_300751',
+    id: 'wc_770426',
     name: 'クーン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2521,7 +2521,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_769575',
+    id: 'wc_802155',
     name: 'リップマン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2532,7 +2532,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_588494',
+    id: 'wc_98228',
     name: 'ブーアスティン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2543,7 +2543,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_279667',
+    id: 'wc_703308',
     name: 'レオポルド',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2554,7 +2554,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_851992',
+    id: 'wc_535557',
     name: 'カーソン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2565,7 +2565,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_834369',
+    id: 'wc_738079',
     name: 'ボールディング',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2576,7 +2576,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_658955',
+    id: 'wc_730394',
     name: 'ハーディン',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2587,7 +2587,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_495685',
+    id: 'wc_400032',
     name: 'シンガー',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2598,7 +2598,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_592352',
+    id: 'wc_990750',
     name: 'ヨナス',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2609,7 +2609,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_199326',
+    id: 'wc_985732',
     name: 'ネス',
     englishName: '',
     categoryId: 'western_contemporary',
@@ -2620,7 +2620,7 @@ export const FIGURES: Figure[] = [
     contrastFigureIds: [],
   },
   {
-    id: 'wc_793300',
+    id: 'wc_554138',
     name: 'コルボーン',
     englishName: '',
     categoryId: 'western_contemporary',

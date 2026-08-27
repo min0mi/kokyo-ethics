@@ -233,6 +233,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
               figureId={question.figureId}
               keywordId={question.keywordId}
               selectedWrongOption={selectedOption}
+              correctAnswerText={question.correctAnswer}
               isPassed={isPassed}
             />
 

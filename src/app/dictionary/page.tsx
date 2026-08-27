@@ -144,53 +144,65 @@ function MapContent() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {catFigures.map((fig, idx) => {
+                  {catFigures.map((fig, figIdx) => {
                     const figKeywords = KEYWORDS.filter((k) => k.figureId === fig.id);
+                    const rowCount = figKeywords.length > 0 ? figKeywords.length : 1;
+                    const isEven = figIdx % 2 === 0;
 
-                    return (
+                    if (figKeywords.length === 0) {
+                      return (
+                        <tr key={fig.id} className={isEven ? 'bg-white' : 'bg-gray-50/40'}>
+                          <td className="py-2.5 px-3 align-top border-r border-gray-200 space-y-1">
+                            <strong className="text-sm font-bold text-gray-900 block">
+                              {highlightMatch(fig.name, searchQuery)}
+                            </strong>
+                            {fig.books && fig.books.length > 0 && (
+                              <div className="text-[11px] text-gray-600 font-medium leading-snug">
+                                {highlightMatch(`『${fig.books.join('』、『')}』`, searchQuery)}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-2.5 px-3 align-top border-r border-gray-200 text-gray-400 text-[11px]">-</td>
+                          <td className="py-2.5 px-3 align-top text-gray-600 text-[11px]">{fig.summary}</td>
+                        </tr>
+                      );
+                    }
+
+                    return figKeywords.map((kw, kwIdx) => (
                       <tr
-                        key={fig.id}
-                        className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}
+                        key={kw.id}
+                        className={`${isEven ? 'bg-white' : 'bg-gray-50/40'} ${
+                          kwIdx > 0 ? 'border-t border-gray-100' : ''
+                        }`}
                       >
-                        {/* 1. 人物 */}
-                        <td className="py-2.5 px-3 align-top border-r border-gray-200 space-y-1">
-                          <strong className="text-sm font-bold text-gray-900 block">
-                            {highlightMatch(fig.name, searchQuery)}
-                          </strong>
-                          {fig.books && fig.books.length > 0 && (
-                            <div className="text-[11px] text-gray-600 font-medium leading-snug">
-                              {highlightMatch(`『${fig.books.join('』、『')}』`, searchQuery)}
-                            </div>
-                          )}
-                        </td>
+                        {/* 1. 人物セル (最初の行のみ rowSpan で描画) */}
+                        {kwIdx === 0 && (
+                          <td
+                            rowSpan={rowCount}
+                            className="py-2.5 px-3 align-top border-r border-gray-200 space-y-1 bg-inherit"
+                          >
+                            <strong className="text-sm font-bold text-gray-900 block">
+                              {highlightMatch(fig.name, searchQuery)}
+                            </strong>
+                            {fig.books && fig.books.length > 0 && (
+                              <div className="text-[11px] text-gray-600 font-medium leading-snug">
+                                {highlightMatch(`『${fig.books.join('』、『')}』`, searchQuery)}
+                              </div>
+                            )}
+                          </td>
+                        )}
 
                         {/* 2. 対応キーワード */}
-                        <td className="py-2.5 px-3 align-top border-r border-gray-200 space-y-1">
-                          {figKeywords.length === 0 ? (
-                            <span className="text-gray-400 text-[11px]">-</span>
-                          ) : (
-                            figKeywords.map((kw) => (
-                              <div key={kw.id} className="font-bold text-gray-900 py-0.5 leading-snug">
-                                {highlightMatch(kw.name, searchQuery)}
-                              </div>
-                            ))
-                          )}
+                        <td className="py-1.5 px-3 align-top border-r border-gray-200 font-bold text-gray-900 leading-snug">
+                          ・{highlightMatch(kw.name, searchQuery)}
                         </td>
 
                         {/* 3. 説明 */}
-                        <td className="py-2.5 px-3 align-top space-y-1">
-                          {figKeywords.length === 0 ? (
-                            <span className="text-gray-400 text-[11px]">{fig.summary}</span>
-                          ) : (
-                            figKeywords.map((kw) => (
-                              <div key={kw.id} className="text-gray-700 text-[11px] py-0.5 leading-relaxed">
-                                {highlightMatch(kw.definition, searchQuery)}
-                              </div>
-                            ))
-                          )}
+                        <td className="py-1.5 px-3 align-top text-gray-700 text-[11px] leading-relaxed">
+                          {highlightMatch(kw.definition, searchQuery)}
                         </td>
                       </tr>
-                    );
+                    ));
                   })}
                 </tbody>
               </table>
