@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Question, CategoryId, QuizSessionConfig, Badge, ChoiceQuestion, MatchingQuestion, TypingQuestion, RecallQuestion } from '@/types';
+import { Question, CategoryId, QuizSessionConfig, Badge, ChoiceQuestion, MatchingQuestion, RecallQuestion } from '@/types';
 import { QuestionGenerator, AVAILABLE_CATEGORY_IDS } from '@/lib/generator/questionGenerator';
 import { CATEGORIES } from '@/data/categories';
 import { ChoiceQuiz } from './ChoiceQuiz';
 import { MatchingQuiz } from './MatchingQuiz';
-import { TypingQuiz } from './TypingQuiz';
 import { RecallQuiz } from './RecallQuiz';
 import { QuizResult } from './QuizResult';
 import { BadgeUnlockedModal } from '@/components/gamification/BadgeUnlockedModal';
@@ -28,7 +27,6 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
       oddOneOut: initialConfig?.enabledTypes?.oddOneOut ?? true,
       pairValidation: initialConfig?.enabledTypes?.pairValidation ?? true,
       matching: initialConfig?.enabledTypes?.matching ?? true,
-      typing: initialConfig?.enabledTypes?.typing ?? true,
     },
     questionCount: initialConfig?.questionCount || 10,
   });
@@ -132,7 +130,6 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
               { key: 'oddOneOut', label: '仲間はずれ' },
               { key: 'pairValidation', label: 'ペア正誤判定' },
               { key: 'matching', label: '線つなぎ（6択）' },
-              { key: 'typing', label: '用語記述' },
             ].map(({ key, label }) => (
               <label
                 key={key}
@@ -260,13 +257,6 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
                 onComplete={handleNextQuestion}
                 onBadgeUnlocked={(b) => setActiveBadge(b)}
               />
-            ) : currentQ.type === 'fill_in_keyword' ? (
-              <TypingQuiz
-                key={currentQ.id}
-                question={currentQ as TypingQuestion}
-                onComplete={handleNextQuestion}
-                onBadgeUnlocked={(b) => setActiveBadge(b)}
-              />
             ) : currentQ.type === 'recall_classification' ? (
               <RecallQuiz
                 key={currentQ.id}
@@ -294,7 +284,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
           correctCount={correctCount}
           xpEarned={totalXp}
           onRetry={() => startSessionWithConfig(config)}
-          modeTitle="源流思想 演習"
+          modeTitle="演習"
         />
       )}
     </div>

@@ -1,7 +1,6 @@
 import {
   ChoiceQuestion,
   MatchingQuestion,
-  TypingQuestion,
   Question,
   CategoryId,
   MatchingPair,
@@ -16,6 +15,7 @@ export const AVAILABLE_CATEGORY_IDS: CategoryId[] = [
   'islam',
   'indian_buddhism',
   'chinese_philosophy',
+  'japan_buddhism_thought',
   'adolescence_public',
 ];
 
@@ -159,16 +159,22 @@ export class QuestionGenerator {
       if (categoryId && f.categoryId !== categoryId) return false;
       if (!AVAILABLE_CATEGORY_IDS.includes(f.categoryId)) return false;
       const kws = KEYWORDS.filter((k) => k.figureId === f.id);
-      return kws.length >= 3; // 3つ以上語句を持つ人物
+      return kws.length >= 2; // 2つ以上語句を持つ人物
     });
 
     targetFigures.forEach((figure) => {
       const myKeywords = KEYWORDS.filter((k) => k.figureId === figure.id);
-      if (myKeywords.length < 3) return;
+      if (myKeywords.length === 0) return;
 
-      // 自身の語句から3つ抽出
-      const correctThreeKws = shuffle(myKeywords).slice(0, 3);
-      const correctThreeNames = correctThreeKws.map((k) => k.name);
+      // 自身の語句
+      let ownKwNames = myKeywords.map((k) => k.name);
+      if (ownKwNames.length < 3) {
+        // 2つの場合は複製等せず、同じ人物のメイン概念等ではなく他の単元を埋める
+        const extraDummyOwn = KEYWORDS.filter((k) => k.categoryId === figure.categoryId && k.figureId !== figure.id);
+        if (extraDummyOwn.length === 0) return;
+      }
+      ownKwNames = shuffle(ownKwNames).slice(0, 3);
+      if (ownKwNames.length < 3) return;
 
       // 仲間はずれ（他人の語句：対比相手優先）
       let candidateFigures = FIGURES.filter((f) => f.id !== figure.id);
@@ -186,7 +192,7 @@ export class QuestionGenerator {
       const oddKeyword = shuffle(otherKws)[0];
       const correctAnswer = oddKeyword.name; // これが正解（対応しない語句）
 
-      const options = shuffle([...correctThreeNames, correctAnswer]);
+      const options = shuffle([...ownKwNames, correctAnswer]);
 
       questions.push({
         id: `q_odd_${figure.id}_${oddKeyword.id}`,
@@ -198,7 +204,7 @@ export class QuestionGenerator {
         context: `${figure.eraDetail} / ${figure.mainConcept}`,
         options,
         correctAnswer,
-        explanation: `【正解】「${oddKeyword.name}」は【${randomOtherFig.name}】に対応します。\n※ ${figure.name}の語句: ${myKeywords.map((k) => k.name).join('、')}`,
+        explanation: `【正解】「${oddKeyword.name}」は【${randomOtherFig.name}】に対応します。\n※ ${figure.name}の対応語句: ${myKeywords.map((k) => k.name).join('、')}`,
       });
     });
 
@@ -232,7 +238,6 @@ export class QuestionGenerator {
 
       for (const fig of otherFigures) {
         if (wrongPairs.length >= 3) break;
-        // figに対して、別の人物のキーワードをあてがう
         const anotherFig = shuffle(targetFigures.filter((f) => f.id !== fig.id))[0];
         if (!anotherFig) continue;
         const anotherKws = KEYWORDS.filter((k) => k.figureId === anotherFig.id);
@@ -316,44 +321,7 @@ export class QuestionGenerator {
   }
 
   /**
-   * 形式6: 用語記述問題
-   */
-  static generateTypingQuestions(categoryId?: CategoryId): TypingQuestion[] {
-    const questions: TypingQuestion[] = [];
-    const targetKeywords = KEYWORDS.filter((k) => {
-      if (categoryId) return k.categoryId === categoryId;
-      return AVAILABLE_CATEGORY_IDS.includes(k.categoryId);
-    });
-
-    targetKeywords.forEach((kw) => {
-      const figure = FIGURES.find((f) => f.id === kw.figureId);
-      if (!figure) return;
-
-      // 括弧部分を除いたメイン単語も正答に含める
-      const cleanName = kw.name.replace(/（.*?）|\(.*?\)/g, '').trim();
-      const acceptableAnswers = Array.from(
-        new Set([kw.name, cleanName, kw.reading].filter(Boolean))
-      );
-
-      questions.push({
-        id: `q_type_${kw.id}`,
-        type: 'fill_in_keyword',
-        categoryId: kw.categoryId,
-        figureId: figure.id,
-        keywordId: kw.id,
-        prompt: `「${figure.name}」に対応する次の語句を入力せよ。\n\n「${kw.definition}」`,
-        context: `${figure.name} (${figure.eraDetail})`,
-        correctAnswers: acceptableAnswers,
-        displayHint: `${kw.name.slice(0, 1)}... (${kw.name.length}文字)`,
-        explanation: `【正解】「${kw.name}」 ⇄ ${figure.name}\n${kw.definition}`,
-      });
-    });
-
-    return questions;
-  }
-
-  /**
-   * 全問題プールを生成
+   * 全問題プールを生成（記述式を完全廃止）
    */
   static getAllQuestions(categoryId?: CategoryId): Question[] {
     return [
@@ -362,7 +330,6 @@ export class QuestionGenerator {
       ...this.generateOddOneOut(categoryId),
       ...this.generatePairValidation(categoryId),
       ...this.generateMatchingQuestions(categoryId),
-      ...this.generateTypingQuestions(categoryId),
     ];
   }
 
@@ -387,9 +354,6 @@ export class QuestionGenerator {
       }
       if (config.enabledTypes.matching) {
         pool.push(...this.generateMatchingQuestions(catId));
-      }
-      if (config.enabledTypes.typing) {
-        pool.push(...this.generateTypingQuestions(catId));
       }
     });
 

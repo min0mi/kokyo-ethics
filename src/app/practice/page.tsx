@@ -15,7 +15,6 @@ function PracticeContent() {
   const oddParam = searchParams.get('odd');
   const pairParam = searchParams.get('pair');
   const matchingParam = searchParams.get('matching');
-  const typingParam = searchParams.get('typing');
 
   const questionCount = countParam ? parseInt(countParam, 10) : 10;
 
@@ -24,8 +23,7 @@ function PracticeContent() {
     k2fParam !== null ||
     oddParam !== null ||
     pairParam !== null ||
-    matchingParam !== null ||
-    typingParam !== null;
+    matchingParam !== null;
 
   const initialConfig = {
     categoryIds: catParam ? [catParam] : undefined,
@@ -37,7 +35,6 @@ function PracticeContent() {
           oddOneOut: oddParam === '1',
           pairValidation: pairParam === '1',
           matching: matchingParam === '1',
-          typing: typingParam === '1',
         }
       : undefined,
   };

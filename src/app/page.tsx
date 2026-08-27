@@ -31,7 +31,6 @@ export default function HomePage() {
       oddOneOut: true,
       pairValidation: true,
       matching: true,
-      typing: true,
     },
     questionCount: 10,
   });
@@ -89,7 +88,6 @@ export default function HomePage() {
     params.set('odd', sessionConfig.enabledTypes.oddOneOut ? '1' : '0');
     params.set('pair', sessionConfig.enabledTypes.pairValidation ? '1' : '0');
     params.set('matching', sessionConfig.enabledTypes.matching ? '1' : '0');
-    params.set('typing', sessionConfig.enabledTypes.typing ? '1' : '0');
     router.push(`/practice?${params.toString()}`);
   };
 
@@ -164,7 +162,7 @@ export default function HomePage() {
           <div className="bg-white border border-gray-400 rounded-xs p-3.5 space-y-2.5 text-xs text-gray-900 shadow-xs">
             <div className="flex items-center justify-between border-b border-gray-200 pb-1.5">
               <strong className="text-sm font-bold text-gray-900">
-                源流思想・青年期 演習
+                源流・日本思想・青年期 演習
               </strong>
               <span className="text-[11px] text-gray-500">人物 ⇄ 語句の対応関係特化</span>
             </div>
@@ -181,7 +179,6 @@ export default function HomePage() {
                   { key: 'oddOneOut', label: '仲間はずれ' },
                   { key: 'pairValidation', label: 'ペア正誤判定' },
                   { key: 'matching', label: '線つなぎ（6択）' },
-                  { key: 'typing', label: '用語記述' },
                 ].map(({ key, label }) => (
                   <label
                     key={key}

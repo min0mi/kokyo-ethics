@@ -69,10 +69,10 @@ export const CATEGORIES: ExtendedCategory[] = [
     name: '日本思想（古代〜近代）',
     shortName: '日本思想',
     era: '古代〜近代',
-    description: '聖徳太子、平安仏教、鎌倉新仏教、江戸儒学・国学、近代啓蒙思想',
+    description: '聖徳太子、平安仏教、鎌倉新仏教、江戸儒学・国学、近代啓蒙思想、京都学派',
     iconName: 'Torii',
-    orderIndex: 6,
-    isAvailable: false,
+    orderIndex: 7,
+    isAvailable: true,
     groupName: '日本思想',
   },
   {

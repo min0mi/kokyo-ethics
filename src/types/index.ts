@@ -92,7 +92,6 @@ export type QuestionType =
   | 'odd_one_out'       // 仲間はずれ（対応しない語句）
   | 'pair_validation'   // ペア正誤判定
   | 'matching_lines'    // 線つなぎ（6択）
-  | 'fill_in_keyword'   // 記述
   | 'recall_classification';
 
 export interface BaseQuestion {
@@ -156,7 +155,6 @@ export interface QuizSessionConfig {
     oddOneOut: boolean;
     pairValidation: boolean;
     matching: boolean;
-    typing: boolean;
   };
   questionCount: number; // 5, 10, 20, 30, または全問(999)
 }
