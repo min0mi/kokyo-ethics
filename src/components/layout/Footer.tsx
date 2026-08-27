@@ -10,10 +10,6 @@ export const Footer: React.FC = () => {
           <span>|</span>
           <Link href="/dictionary" className="hover:underline hover:text-blue-700">思想・人物対応表</Link>
           <span>|</span>
-          <Link href="/guide" className="hover:underline hover:text-blue-700">使い方</Link>
-          <span>|</span>
-          <Link href="/ranking" className="hover:underline hover:text-blue-700">全国ランキング</Link>
-          <span>|</span>
           <Link href="/badges" className="hover:underline hover:text-blue-700">バッジ実績</Link>
           <span>|</span>
           <Link href="/stats" className="hover:underline hover:text-blue-700">学習進捗・グラフ</Link>
