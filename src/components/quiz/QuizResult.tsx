@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { RotateCcw, Home } from 'lucide-react';
 import { AdBanner } from '@/components/ads/AdBanner';
 import { UserDataStore } from '@/lib/storage/userDataStore';
+import { ShareButtons } from '@/components/share/ShareButtons';
 
 interface QuizResultProps {
   totalQuestions: number;
@@ -24,6 +25,9 @@ export const QuizResult: React.FC<QuizResultProps> = ({
   modeTitle,
 }) => {
   const accuracy = Math.round((correctCount / totalQuestions) * 100) || 0;
+  const timeStr = elapsedSeconds ? UserDataStore.formatStudyTime(elapsedSeconds) : '数秒';
+
+  const shareText = `【公共倫理パーフェクトマスター.com】で演習をクリア！\n正答率: ${accuracy}% (${correctCount}/${totalQuestions}問)\n学習時間: ${timeStr} (+${xpEarned}XP)\n#共通テスト #倫理 #公共 #大学受験`;
 
   return (
     <div className="w-full max-w-xl mx-auto bg-white border border-gray-300 rounded-xs p-6 space-y-4 text-center text-gray-900 shadow-xs">
@@ -49,7 +53,7 @@ export const QuizResult: React.FC<QuizResultProps> = ({
             <tr className="border-b border-gray-200 bg-gray-50">
               <td className="p-2.5 font-bold text-gray-600">今回の学習時間</td>
               <td className="p-2.5 font-black text-sm text-gray-800">
-                {UserDataStore.formatStudyTime(elapsedSeconds)}
+                {timeStr}
               </td>
             </tr>
           )}
@@ -59,6 +63,12 @@ export const QuizResult: React.FC<QuizResultProps> = ({
           </tr>
         </tbody>
       </table>
+
+      {/* シェアエリア */}
+      <div className="p-2.5 bg-gray-50 border border-gray-200 rounded-xs flex flex-col sm:flex-row items-center justify-between gap-2">
+        <span className="font-bold text-gray-700 text-[11px]">結果をシェアする:</span>
+        <ShareButtons text={shareText} buttonLabel="𝕏 で結果をシェア" />
+      </div>
 
       {/* 広告枠 */}
       <AdBanner format="rectangle" label="Sponsor" />

@@ -8,6 +8,7 @@ import { CATEGORIES } from '@/data/categories';
 import { UserProfile } from '@/types';
 import { AdBanner } from '@/components/ads/AdBanner';
 import { DailyLineChart } from '@/components/stats/DailyLineChart';
+import { ShareButtons } from '@/components/share/ShareButtons';
 
 export default function StatsPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -78,16 +79,25 @@ export default function StatsPage() {
   return (
     <div className="max-w-5xl mx-auto px-3 py-5 space-y-4">
       {/* ページヘッダー */}
-      <div className="border-b border-gray-300 pb-2">
-        <span className="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-300">
-          学習進捗・忘却曲線
-        </span>
-        <h1 className="text-xl font-bold text-gray-900 mt-1">
-          学習習熟度・忘却曲線分析
-        </h1>
-        <p className="text-xs text-gray-500 mt-0.5">
-          日別の学習問題数推移（全期間対応）および SuperMemo-2 (SM-2) アルゴリズムに基づく記憶定着フェーズの可視化
-        </p>
+      <div className="border-b border-gray-300 pb-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <div>
+          <span className="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-300">
+            学習進捗・忘却曲線
+          </span>
+          <h1 className="text-xl font-bold text-gray-900 mt-1">
+            学習習熟度・忘却曲線分析
+          </h1>
+          <p className="text-xs text-gray-500 mt-0.5">
+            日別の学習問題数推移および SuperMemo-2 (SM-2) アルゴリズムに基づく記憶定着フェーズの可視化
+          </p>
+        </div>
+
+        {profile && (
+          <ShareButtons
+            text={`【公共倫理パーフェクトマスター.com】で学習中！\n連続学習: ${profile.streakDays}日 | 総解答数: ${profile.totalAnswered}問 | 定着完了: ${counts.mastered}問\n#共通テスト #倫理 #公共`}
+            buttonLabel="𝕏 で進捗をシェア"
+          />
+        )}
       </div>
 
       {/* サマリーカード */}

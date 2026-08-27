@@ -10,6 +10,7 @@ import { UserDataStore } from '@/lib/storage/userDataStore';
 import { UserProfile, Question, QuizSessionConfig } from '@/types';
 import { AdBanner } from '@/components/ads/AdBanner';
 import { DailyLineChart } from '@/components/stats/DailyLineChart';
+import { ShareButtons } from '@/components/share/ShareButtons';
 
 export default function HomePage() {
   const router = useRouter();
@@ -352,6 +353,14 @@ export default function HomePage() {
                   {UserDataStore.formatStudyTime(profile?.totalStudyTimeSeconds || 0)}
                 </strong>
               </div>
+            </div>
+
+            {/* シェアボタン */}
+            <div className="pt-1 border-t border-gray-100 flex justify-end">
+              <ShareButtons
+                text={`【公共倫理パーフェクトマスター.com】で学習中！\n連続学習: ${profile?.streakDays || 1}日 | 解答数: ${profile?.totalAnswered || 0}問 | 定着数: ${totalMasteredCount}問\n#共通テスト #倫理 #公共`}
+                buttonLabel="𝕏 で記録をシェア"
+              />
             </div>
           </div>
 

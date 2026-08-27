@@ -4,7 +4,6 @@ import React, { useState, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { FIGURES } from '@/data/figures';
 import { KEYWORDS } from '@/data/keywords';
-import { BOOKS } from '@/data/books';
 import { CATEGORIES } from '@/data/categories';
 import { CategoryId } from '@/types';
 import Link from 'next/link';
@@ -147,7 +146,6 @@ function MapContent() {
                 <tbody className="divide-y divide-gray-200">
                   {catFigures.map((fig, idx) => {
                     const figKeywords = KEYWORDS.filter((k) => k.figureId === fig.id);
-                    const figBooks = BOOKS.filter((b) => b.figureId === fig.id);
 
                     return (
                       <tr
@@ -155,19 +153,13 @@ function MapContent() {
                         className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}
                       >
                         {/* 1. 人物 */}
-                        <td className="py-2.5 px-3 align-top border-r border-gray-200 space-y-0.5">
+                        <td className="py-2.5 px-3 align-top border-r border-gray-200 space-y-1">
                           <strong className="text-sm font-bold text-gray-900 block">
                             {highlightMatch(fig.name, searchQuery)}
                           </strong>
-                          <span className="text-[10px] text-gray-500 block">
-                            {highlightMatch(fig.eraDetail, searchQuery)}
-                          </span>
-                          <p className="text-[11px] text-gray-700 font-medium pt-0.5">
-                            {highlightMatch(fig.mainConcept, searchQuery)}
-                          </p>
-                          {figBooks.length > 0 && (
-                            <div className="text-[10px] text-gray-500 pt-0.5">
-                              著書: {figBooks.map((b) => b.title).join(', ')}
+                          {fig.books && fig.books.length > 0 && (
+                            <div className="text-[11px] text-gray-600 font-medium leading-snug">
+                              {highlightMatch(`『${fig.books.join('』、『')}』`, searchQuery)}
                             </div>
                           )}
                         </td>

@@ -3,7 +3,6 @@
 import React from 'react';
 import { FIGURES } from '@/data/figures';
 import { KEYWORDS } from '@/data/keywords';
-import { BOOKS } from '@/data/books';
 import { Figure, Keyword } from '@/types';
 
 interface FigureDictRowCardProps {
@@ -51,7 +50,6 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
 
   if (!correctFig) return null;
 
-  const correctBooks = BOOKS.filter((b) => b.figureId === correctFig?.id);
   const correctKws = KEYWORDS.filter((k) => k.figureId === correctFig?.id);
 
   return (
@@ -87,15 +85,9 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
                 <strong className="font-bold text-gray-900 block text-xs">
                   {correctFig.name}
                 </strong>
-                <span className="text-[10px] text-gray-500 block">
-                  {correctFig.eraDetail}
-                </span>
-                <p className="text-gray-700 font-medium">
-                  {correctFig.mainConcept}
-                </p>
-                {correctBooks.length > 0 && (
-                  <div className="text-[9px] text-gray-500">
-                    著: {correctBooks.map((b) => b.title).join(', ')}
+                {correctFig.books && correctFig.books.length > 0 && (
+                  <div className="text-[10px] text-gray-600 font-medium">
+                    『{correctFig.books.join('』、『')}』
                   </div>
                 )}
               </td>
@@ -144,12 +136,11 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
                   <strong className="font-bold text-gray-900 block text-xs">
                     {wrongFig.name}
                   </strong>
-                  <span className="text-[10px] text-gray-500 block">
-                    {wrongFig.eraDetail}
-                  </span>
-                  <p className="text-gray-700 font-medium">
-                    {wrongFig.mainConcept}
-                  </p>
+                  {wrongFig.books && wrongFig.books.length > 0 && (
+                    <div className="text-[10px] text-gray-600 font-medium">
+                      『{wrongFig.books.join('』、『')}』
+                    </div>
+                  )}
                 </td>
 
                 {/* キーワード */}

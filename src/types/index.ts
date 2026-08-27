@@ -48,6 +48,7 @@ export interface Figure {
   eraDetail: string;
   mainConcept: string;
   summary: string;
+  books?: string[]; // 主著・代表的著作
   tags?: string[];
   contrastFigureIds?: string[]; // 共テ頻出の対比人物ID
   relations?: FigureRelation[]; // 思想の有機的相関・系譜
