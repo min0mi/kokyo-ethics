@@ -1,0 +1,4 @@
+# Google AdSense ads.txt
+# 本番公開後、ご自身のGoogle AdSenseパブリッシャーID（pub-xxxxxxxxxxxxxxxx）に書き換えてください。
+google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+
