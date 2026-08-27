@@ -147,7 +147,7 @@ export default function HomePage() {
                 value={searchWord}
                 onChange={(e) => setSearchWord(e.target.value)}
                 placeholder="例: エピクロス、仁（未入力でEnterも可）"
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-xs text-xs focus:outline-hidden focus:border-gray-500"
+                className="flex-1 px-2 py-1 border border-gray-300 rounded-xs text-base sm:text-xs focus:outline-hidden focus:border-gray-500"
               />
               <button
                 type="submit"

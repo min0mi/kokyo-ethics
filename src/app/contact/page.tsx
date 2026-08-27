@@ -39,7 +39,7 @@ export default function ContactPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="例: 受験生A"
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base sm:text-sm font-semibold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
@@ -50,7 +50,7 @@ export default function ContactPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="example@example.com"
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base sm:text-sm font-semibold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
@@ -59,7 +59,7 @@ export default function ContactPage() {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base sm:text-sm font-semibold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
             >
               <option value="feedback">サイトへのご意見・ご要望</option>
               <option value="typo">問題文・解説の誤植や修正依頼</option>
@@ -76,7 +76,7 @@ export default function ContactPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="ご意見や気になる点をご記入ください..."
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base sm:text-sm font-semibold focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 

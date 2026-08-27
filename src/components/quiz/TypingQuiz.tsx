@@ -108,7 +108,7 @@ export const TypingQuiz: React.FC<TypingQuizProps> = ({
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
             placeholder="用語を入力してEnter..."
-            className="w-full p-2.5 text-sm font-bold border border-gray-300 rounded-sm focus:outline-hidden focus:border-blue-600"
+            className="w-full p-2.5 text-base sm:text-sm font-bold border border-gray-300 rounded-sm focus:outline-hidden focus:border-blue-600"
             autoFocus
           />
 

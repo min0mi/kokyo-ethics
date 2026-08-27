@@ -123,7 +123,7 @@ function MapContent() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="ひらがな・カタカナ・人物・語句で検索..."
-            className="w-full px-2.5 py-1.5 border border-gray-300 rounded-xs text-xs focus:outline-hidden focus:border-gray-500 shadow-inner"
+            className="w-full px-2.5 py-1.5 border border-gray-300 rounded-xs text-base sm:text-xs focus:outline-hidden focus:border-gray-500 shadow-inner"
           />
         </div>
       </div>
