@@ -2,7 +2,6 @@ import {
   ChoiceQuestion,
   MatchingQuestion,
   TypingQuestion,
-  RecallQuestion,
   Question,
   CategoryId,
   MatchingPair,
@@ -10,9 +9,6 @@ import {
 } from '@/types';
 import { FIGURES } from '@/data/figures';
 import { KEYWORDS } from '@/data/keywords';
-import { BOOKS } from '@/data/books';
-import { EPISODES } from '@/data/episodes';
-import { CATEGORIES } from '@/data/categories';
 
 export const AVAILABLE_CATEGORY_IDS: CategoryId[] = [
   'greek',
@@ -34,7 +30,8 @@ function shuffle<T>(array: T[]): T[] {
 
 export class QuestionGenerator {
   /**
-   * 人物 → キーワード選択問題（対比ペア優先交叉 ＆ 正答重複防止）
+   * 形式1: 人物 ➔ 語句
+   * 例: 「ソクラテス」に対応する語句はどれか？
    */
   static generateFigureToKeyword(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
@@ -49,38 +46,28 @@ export class QuestionGenerator {
 
       const correctAnswer = kw.name;
 
-      // 1. 対比ペア（ひっかけ対象）のキーワードを最優先で取得
-      let contrastDistractors: string[] = [];
+      // 1. 対比ペアのキーワードを最優先
+      let contrastKws: string[] = [];
       if (figure.contrastFigureIds && figure.contrastFigureIds.length > 0) {
-        const contrastKeywords = KEYWORDS.filter((k) =>
+        contrastKws = KEYWORDS.filter((k) =>
           figure.contrastFigureIds?.includes(k.figureId)
         ).map((k) => k.name);
-        contrastDistractors = shuffle(contrastKeywords);
       }
 
-      // 2. 同一カテゴリ内の他キーワード
-      const sameCatKeywords = KEYWORDS.filter(
+      // 2. 同単元の他キーワード
+      const sameCatKws = KEYWORDS.filter(
         (k) => k.id !== kw.id && k.categoryId === kw.categoryId && k.figureId !== figure.id
       ).map((k) => k.name);
 
-      // 3. 他カテゴリのキーワード
-      const otherCatKeywords = KEYWORDS.filter(
-        (k) => k.categoryId !== kw.categoryId
-      ).map((k) => k.name);
+      // 3. 他単元のキーワード
+      const otherCatKws = KEYWORDS.filter((k) => k.categoryId !== kw.categoryId).map((k) => k.name);
 
-      // プールを合成し、重複と正答を完全排除
-      const rawPool = [
-        ...contrastDistractors,
-        ...shuffle(sameCatKeywords),
-        ...shuffle(otherCatKeywords),
-      ];
+      const rawPool = [...shuffle(contrastKws), ...shuffle(sameCatKws), ...shuffle(otherCatKws)];
+      const distractors = Array.from(new Set(rawPool))
+        .filter((t) => t !== correctAnswer && !t.includes(correctAnswer) && !correctAnswer.includes(t))
+        .slice(0, 3);
 
-      const cleanDistractors = Array.from(new Set(rawPool)).filter(
-        (text) => text !== correctAnswer && !text.includes(correctAnswer) && !correctAnswer.includes(text)
-      );
-
-      const distractors = cleanDistractors.slice(0, 3);
-      if (distractors.length < 3) return; // 選択肢が足りない場合はスキップ
+      if (distractors.length < 3) return;
 
       const options = shuffle([correctAnswer, ...distractors]);
 
@@ -90,12 +77,11 @@ export class QuestionGenerator {
         categoryId: kw.categoryId,
         figureId: figure.id,
         keywordId: kw.id,
-        prompt: `【${figure.name}】が説いた思想・キーワードとして最も適切なものはどれか。`,
+        prompt: `「${figure.name}」に対応する語句はどれか？`,
         context: `${figure.eraDetail} / ${figure.mainConcept}`,
         options,
         correctAnswer,
-        explanation: `【正解】${kw.name}\n\n[人物の解説: ${figure.name}]\n${figure.summary}\n\n[語句の意味: ${kw.name}]\n${kw.explanation}`,
-        commonTestHint: kw.commonTestPoint,
+        explanation: `【正解】「${kw.name}」 ⇄ ${figure.name}\n${kw.definition}`,
       });
     });
 
@@ -103,7 +89,8 @@ export class QuestionGenerator {
   }
 
   /**
-   * キーワード → 人物選択問題（対比ペア優先交叉 ＆ 正答重複防止）
+   * 形式2: 語句 ➔ 人物
+   * 例: 「アパテイア（不動心）」に対応する人物は誰か？
    */
   static generateKeywordToFigure(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
@@ -118,35 +105,29 @@ export class QuestionGenerator {
 
       const correctAnswer = figure.name;
 
-      // 対比相手の人物を最優先
-      let contrastDistractors: string[] = [];
+      // 1. 対比ペアの思想家
+      let contrastFigNames: string[] = [];
       if (figure.contrastFigureIds && figure.contrastFigureIds.length > 0) {
-        contrastDistractors = FIGURES.filter((f) =>
-          figure.contrastFigureIds?.includes(f.id)
-        ).map((f) => f.name);
+        contrastFigNames = FIGURES.filter((f) => figure.contrastFigureIds?.includes(f.id)).map(
+          (f) => f.name
+        );
       }
 
-      // 同一カテゴリ内の他人物
-      const sameCatFigures = FIGURES.filter(
-        (f) => f.id !== figure.id && f.categoryId === kw.categoryId
+      // 2. 同単元の他思想家
+      const sameCatFigs = FIGURES.filter(
+        (f) => f.id !== figure.id && f.categoryId === figure.categoryId
       ).map((f) => f.name);
 
-      // 他カテゴリの人物
-      const otherFigures = FIGURES.filter(
-        (f) => f.id !== figure.id && f.categoryId !== kw.categoryId
-      ).map((f) => f.name);
-
-      const rawPool = [
-        ...shuffle(contrastDistractors),
-        ...shuffle(sameCatFigures),
-        ...shuffle(otherFigures),
-      ];
-
-      const cleanDistractors = Array.from(new Set(rawPool)).filter(
-        (name) => name !== correctAnswer
+      // 3. 他単元の思想家
+      const otherCatFigs = FIGURES.filter((f) => f.categoryId !== figure.categoryId).map(
+        (f) => f.name
       );
 
-      const distractors = cleanDistractors.slice(0, 3);
+      const rawPool = [...shuffle(contrastFigNames), ...shuffle(sameCatFigs), ...shuffle(otherCatFigs)];
+      const distractors = Array.from(new Set(rawPool))
+        .filter((name) => name !== correctAnswer)
+        .slice(0, 3);
+
       if (distractors.length < 3) return;
 
       const options = shuffle([correctAnswer, ...distractors]);
@@ -157,12 +138,11 @@ export class QuestionGenerator {
         categoryId: kw.categoryId,
         figureId: figure.id,
         keywordId: kw.id,
-        prompt: `「${kw.name}」を提唱・展開した人物は誰か。`,
-        context: `定義: ${kw.definition}`,
+        prompt: `「${kw.name}」に対応する人物は誰か？`,
+        context: kw.definition,
         options,
         correctAnswer,
-        explanation: `【正解】${figure.name}\n\n「${kw.name}」は${figure.name}の重要概念です。\n${kw.explanation}`,
-        commonTestHint: kw.commonTestPoint,
+        explanation: `【正解】${figure.name} ⇄ 「${kw.name}」\n${figure.mainConcept}`,
       });
     });
 
@@ -170,159 +150,55 @@ export class QuestionGenerator {
   }
 
   /**
-   * キーワードの意味・判断語句正誤問題
+   * 形式3: 仲間はずれ（対応しない語句）
+   * 例: 「プラトン」に対応しない語句はどれか？
    */
-  static generateKeywordMeaning(categoryId?: CategoryId): ChoiceQuestion[] {
+  static generateOddOneOut(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
-    const targetKeywords = KEYWORDS.filter((k) => {
-      if (categoryId) return k.categoryId === categoryId;
-      return AVAILABLE_CATEGORY_IDS.includes(k.categoryId);
+    const targetFigures = FIGURES.filter((f) => {
+      if (categoryId && f.categoryId !== categoryId) return false;
+      if (!AVAILABLE_CATEGORY_IDS.includes(f.categoryId)) return false;
+      const kws = KEYWORDS.filter((k) => k.figureId === f.id);
+      return kws.length >= 3; // 3つ以上語句を持つ人物
     });
 
-    targetKeywords.forEach((kw) => {
-      const figure = FIGURES.find((f) => f.id === kw.figureId);
-      const figureName = figure ? `（${figure.name}）` : '';
-      const correctAnswer = kw.definition;
+    targetFigures.forEach((figure) => {
+      const myKeywords = KEYWORDS.filter((k) => k.figureId === figure.id);
+      if (myKeywords.length < 3) return;
 
-      // 対比相手の定義を優先
-      let contrastDistractors: string[] = [];
-      if (figure?.contrastFigureIds) {
-        contrastDistractors = KEYWORDS.filter((k) =>
-          figure.contrastFigureIds?.includes(k.figureId)
-        ).map((k) => k.definition);
+      // 自身の語句から3つ抽出
+      const correctThreeKws = shuffle(myKeywords).slice(0, 3);
+      const correctThreeNames = correctThreeKws.map((k) => k.name);
+
+      // 仲間はずれ（他人の語句：対比相手優先）
+      let candidateFigures = FIGURES.filter((f) => f.id !== figure.id);
+      if (figure.contrastFigureIds && figure.contrastFigureIds.length > 0) {
+        const contrasts = FIGURES.filter((f) => figure.contrastFigureIds?.includes(f.id));
+        if (contrasts.length > 0) candidateFigures = contrasts;
       }
 
-      const sameCat = KEYWORDS.filter(
-        (k) => k.id !== kw.id && k.categoryId === kw.categoryId
-      ).map((k) => k.definition);
+      const randomOtherFig = shuffle(candidateFigures)[0];
+      if (!randomOtherFig) return;
 
-      const otherCat = KEYWORDS.filter(
-        (k) => k.categoryId !== kw.categoryId
-      ).map((k) => k.definition);
+      const otherKws = KEYWORDS.filter((k) => k.figureId === randomOtherFig.id);
+      if (otherKws.length === 0) return;
 
-      const rawPool = [
-        ...shuffle(contrastDistractors),
-        ...shuffle(sameCat),
-        ...shuffle(otherCat),
-      ];
+      const oddKeyword = shuffle(otherKws)[0];
+      const correctAnswer = oddKeyword.name; // これが正解（対応しない語句）
 
-      const cleanDistractors = Array.from(new Set(rawPool)).filter(
-        (def) => def !== correctAnswer
-      );
-
-      const distractors = cleanDistractors.slice(0, 3);
-      if (distractors.length < 3) return;
-
-      const options = shuffle([correctAnswer, ...distractors]);
+      const options = shuffle([...correctThreeNames, correctAnswer]);
 
       questions.push({
-        id: `q_km_${kw.id}`,
-        type: 'keyword_meaning',
-        categoryId: kw.categoryId,
-        figureId: kw.figureId,
-        keywordId: kw.id,
-        prompt: `「${kw.name}」${figureName}の意味・内容として最も適切なものはどれか。`,
-        options,
-        correctAnswer,
-        explanation: `【正解】${kw.definition}\n\n[詳細解説]\n${kw.explanation}`,
-        commonTestHint: kw.commonTestPoint,
-      });
-    });
-
-    return questions;
-  }
-
-  /**
-   * 人物 ⇄ 著書選択問題
-   */
-  static generateBookQuestions(categoryId?: CategoryId): ChoiceQuestion[] {
-    const questions: ChoiceQuestion[] = [];
-    const targetBooks = BOOKS.filter((b) => {
-      if (categoryId) return b.categoryId === categoryId;
-      return AVAILABLE_CATEGORY_IDS.includes(b.categoryId);
-    });
-
-    targetBooks.forEach((book) => {
-      const figure = FIGURES.find((f) => f.id === book.figureId);
-      if (!figure) return;
-
-      // 著書問題
-      const otherBooks = BOOKS.filter((b) => b.id !== book.id).map((b) => b.title);
-      const cleanBookDistractors = Array.from(new Set(otherBooks)).filter(
-        (t) => t !== book.title
-      );
-      const bookDistractors = shuffle(cleanBookDistractors).slice(0, 3);
-      if (bookDistractors.length === 3) {
-        questions.push({
-          id: `q_f2b_${book.id}`,
-          type: 'figure_to_book',
-          categoryId: book.categoryId,
-          figureId: figure.id,
-          bookId: book.id,
-          prompt: `【${figure.name}】が著した著作として最も適切なものはどれか。`,
-          options: shuffle([book.title, ...bookDistractors]),
-          correctAnswer: book.title,
-          explanation: `【正解】${book.title}（著: ${figure.name}）\n\n${book.description}`,
-        });
-      }
-
-      // 著者あて問題
-      const otherFigures = FIGURES.filter((f) => f.id !== figure.id).map((f) => f.name);
-      const cleanFigDistractors = Array.from(new Set(otherFigures)).filter(
-        (n) => n !== figure.name
-      );
-      const figDistractors = shuffle(cleanFigDistractors).slice(0, 3);
-      if (figDistractors.length === 3) {
-        questions.push({
-          id: `q_b2f_${book.id}`,
-          type: 'book_to_figure',
-          categoryId: book.categoryId,
-          figureId: figure.id,
-          bookId: book.id,
-          prompt: `著作${book.title}の著者として正しいものはどれか。`,
-          context: book.description,
-          options: shuffle([figure.name, ...figDistractors]),
-          correctAnswer: figure.name,
-          explanation: `【正解】${figure.name}\n\n${book.title}は${figure.name}の代表的著作です。\n${book.description}`,
-        });
-      }
-    });
-
-    return questions;
-  }
-
-  /**
-   * エピソード問題
-   */
-  static generateEpisodeQuestions(categoryId?: CategoryId): ChoiceQuestion[] {
-    const questions: ChoiceQuestion[] = [];
-    const targetEpisodes = EPISODES.filter((e) => {
-      if (categoryId) return e.categoryId === categoryId;
-      return AVAILABLE_CATEGORY_IDS.includes(e.categoryId);
-    });
-
-    targetEpisodes.forEach((ep) => {
-      const figure = FIGURES.find((f) => f.id === ep.figureId);
-      if (!figure) return;
-
-      const otherFigures = FIGURES.filter((f) => f.id !== figure.id).map((f) => f.name);
-      const cleanDistractors = Array.from(new Set(otherFigures)).filter(
-        (n) => n !== figure.name
-      );
-      const figDistractors = shuffle(cleanDistractors).slice(0, 3);
-      if (figDistractors.length < 3) return;
-
-      questions.push({
-        id: `q_ep_${ep.id}`,
-        type: 'figure_to_episode',
-        categoryId: ep.categoryId,
+        id: `q_odd_${figure.id}_${oddKeyword.id}`,
+        type: 'odd_one_out',
+        categoryId: figure.categoryId,
         figureId: figure.id,
-        episodeId: ep.id,
-        prompt: `次のエピソードにまつわる思想家は誰か。\n\n「${ep.description}」`,
-        context: `エピソード: ${ep.title}`,
-        options: shuffle([figure.name, ...figDistractors]),
-        correctAnswer: figure.name,
-        explanation: `【正解】${figure.name}\n\n[背景と要点]\n${ep.keyTakeaway}`,
+        keywordId: oddKeyword.id,
+        prompt: `「${figure.name}」に対応【しない】語句はどれか？`,
+        context: `${figure.eraDetail} / ${figure.mainConcept}`,
+        options,
+        correctAnswer,
+        explanation: `【正解】「${oddKeyword.name}」は【${randomOtherFig.name}】に対応します。\n※ ${figure.name}の語句: ${myKeywords.map((k) => k.name).join('、')}`,
       });
     });
 
@@ -330,51 +206,109 @@ export class QuestionGenerator {
   }
 
   /**
-   * 線つなぎマッチング問題（6択・余り選択肢）
+   * 形式4: ペア正誤判定
+   * 例: 人物と語句の組み合わせとして【正しいもの】はどれか？
+   */
+  static generatePairValidation(categoryId?: CategoryId): ChoiceQuestion[] {
+    const questions: ChoiceQuestion[] = [];
+    const targetFigures = FIGURES.filter((f) => {
+      if (categoryId && f.categoryId !== categoryId) return false;
+      return AVAILABLE_CATEGORY_IDS.includes(f.categoryId);
+    });
+
+    if (targetFigures.length < 4) return [];
+
+    targetFigures.forEach((correctFig) => {
+      const correctKws = KEYWORDS.filter((k) => k.figureId === correctFig.id);
+      if (correctKws.length === 0) return;
+      const correctKw = shuffle(correctKws)[0];
+
+      const correctPair = `${correctFig.name} ── ${correctKw.name}`;
+
+      // 誤りペアを3つ生成（対比思想家との入れ替えひっかけ）
+      const otherFigures = shuffle(targetFigures.filter((f) => f.id !== correctFig.id));
+      const wrongPairs: string[] = [];
+      const wrongNotes: string[] = [];
+
+      for (const fig of otherFigures) {
+        if (wrongPairs.length >= 3) break;
+        // figに対して、別の人物のキーワードをあてがう
+        const anotherFig = shuffle(targetFigures.filter((f) => f.id !== fig.id))[0];
+        if (!anotherFig) continue;
+        const anotherKws = KEYWORDS.filter((k) => k.figureId === anotherFig.id);
+        if (anotherKws.length === 0) continue;
+        const wrongKw = shuffle(anotherKws)[0];
+
+        const pairStr = `${fig.name} ── ${wrongKw.name}`;
+        if (!wrongPairs.includes(pairStr)) {
+          wrongPairs.push(pairStr);
+          wrongNotes.push(`・${pairStr}（※「${wrongKw.name}」は${anotherFig.name}）`);
+        }
+      }
+
+      if (wrongPairs.length < 3) return;
+
+      const options = shuffle([correctPair, ...wrongPairs]);
+
+      questions.push({
+        id: `q_pair_${correctFig.id}_${correctKw.id}`,
+        type: 'pair_validation',
+        categoryId: correctFig.categoryId,
+        figureId: correctFig.id,
+        keywordId: correctKw.id,
+        prompt: `人物と語句の組み合わせとして【正しいもの】はどれか？`,
+        context: `${correctFig.name} 関連`,
+        options,
+        correctAnswer: correctPair,
+        explanation: `【正解】${correctPair}\n\n[誤りの組み合わせ]\n${wrongNotes.join('\n')}`,
+      });
+    });
+
+    return questions;
+  }
+
+  /**
+   * 形式5: 線つなぎ問題（3組対応 ＋ 3つのダミーで計6選択肢）
    */
   static generateMatchingQuestions(categoryId?: CategoryId): MatchingQuestion[] {
     const questions: MatchingQuestion[] = [];
-    const targetCatIds = categoryId ? [categoryId] : AVAILABLE_CATEGORY_IDS;
+    const targetCategories = categoryId ? [categoryId] : AVAILABLE_CATEGORY_IDS;
 
-    targetCatIds.forEach((catId) => {
-      const cat = CATEGORIES.find((c) => c.id === catId);
-      if (!cat) return;
+    targetCategories.forEach((catId) => {
+      const figuresInCat = FIGURES.filter((f) => f.categoryId === catId);
+      if (figuresInCat.length < 3) return;
 
-      const catFigures = FIGURES.filter((f) => f.categoryId === catId);
-      if (catFigures.length < 3) return;
+      const shuffledFigs = shuffle(figuresInCat);
+      for (let i = 0; i <= shuffledFigs.length - 3; i += 3) {
+        const group = shuffledFigs.slice(i, i + 3);
+        const pairs: MatchingPair[] = [];
+        let valid = true;
 
-      // 3名の人物を選出
-      const selectedFigures = shuffle(catFigures).slice(0, 3);
-      const pairs: MatchingPair[] = [];
-
-      selectedFigures.forEach((fig) => {
-        const kw = KEYWORDS.find((k) => k.figureId === fig.id);
-        const bk = BOOKS.find((b) => b.figureId === fig.id);
-
-        if (kw) {
+        group.forEach((fig) => {
+          const kws = KEYWORDS.filter((k) => k.figureId === fig.id);
+          if (kws.length === 0) {
+            valid = false;
+            return;
+          }
+          const chosenKw = shuffle(kws)[0];
           pairs.push({
-            id: fig.id,
+            id: `pair_${fig.id}_${chosenKw.id}`,
             left: fig.name,
-            right: kw.name,
+            right: chosenKw.name,
           });
-        } else if (bk) {
-          pairs.push({
-            id: fig.id,
-            left: fig.name,
-            right: bk.title,
+        });
+
+        if (valid && pairs.length === 3) {
+          questions.push({
+            id: `q_match_${catId}_${i}`,
+            type: 'matching_lines',
+            categoryId: catId,
+            prompt: `左列の「人物」と、右列の対応する「語句」を線でつなげ。`,
+            context: `3組を選択（余り選択肢あり）`,
+            pairs,
+            explanation: `【正解の対応関係】\n${pairs.map((p) => `・${p.left} ⇄ ${p.right}`).join('\n')}`,
           });
         }
-      });
-
-      if (pairs.length >= 3) {
-        questions.push({
-          id: `q_match_${cat.id}_${Date.now()}`,
-          type: 'matching_lines',
-          categoryId: cat.id,
-          prompt: `【${cat.shortName}】思想家と、その人物が説いたキーワード・主著を正しく組み合わせよ。（※右側の候補全6個中、正解は3個で3個が余ります）`,
-          pairs,
-          explanation: `各思想家と主要概念の対応関係を正確に記憶することが、共通テストの得点源となります。`,
-        });
       }
     });
 
@@ -382,7 +316,7 @@ export class QuestionGenerator {
   }
 
   /**
-   * キーワード記述問題
+   * 形式6: 用語記述問題
    */
   static generateTypingQuestions(categoryId?: CategoryId): TypingQuestion[] {
     const questions: TypingQuestion[] = [];
@@ -393,25 +327,25 @@ export class QuestionGenerator {
 
     targetKeywords.forEach((kw) => {
       const figure = FIGURES.find((f) => f.id === kw.figureId);
-      const figureName = figure ? figure.name : '';
+      if (!figure) return;
 
-      const cleanName = kw.name.replace(/（.*?）/g, '').trim();
-      const reading = kw.reading;
-      const full = kw.name.trim();
-      const correctAnswers = Array.from(new Set([cleanName, reading, full]));
+      // 括弧部分を除いたメイン単語も正答に含める
+      const cleanName = kw.name.replace(/（.*?）|\(.*?\)/g, '').trim();
+      const acceptableAnswers = Array.from(
+        new Set([kw.name, cleanName, kw.reading].filter(Boolean))
+      );
 
       questions.push({
         id: `q_type_${kw.id}`,
         type: 'fill_in_keyword',
         categoryId: kw.categoryId,
-        figureId: kw.figureId,
+        figureId: figure.id,
         keywordId: kw.id,
-        prompt: `以下の説明文が表す思想用語・キーワードを記述せよ。\n（提唱者: ${figureName}）`,
-        context: kw.definition,
-        correctAnswers,
-        displayHint: `頭文字: ${reading.charAt(0)} / ${reading.length}文字`,
-        explanation: `【正解】${kw.name}（読み: ${kw.reading}）\n\n${kw.explanation}`,
-        commonTestHint: kw.commonTestPoint,
+        prompt: `「${figure.name}」に対応する次の語句を入力せよ。\n\n「${kw.definition}」`,
+        context: `${figure.name} (${figure.eraDetail})`,
+        correctAnswers: acceptableAnswers,
+        displayHint: `${kw.name.slice(0, 1)}... (${kw.name.length}文字)`,
+        explanation: `【正解】「${kw.name}」 ⇄ ${figure.name}\n${kw.definition}`,
       });
     });
 
@@ -419,124 +353,37 @@ export class QuestionGenerator {
   }
 
   /**
-   * 分類想起問題
-   */
-  static generateRecallQuestions(categoryId?: CategoryId): RecallQuestion[] {
-    const questions: RecallQuestion[] = [];
-
-    const recallPresets = [
-      {
-        id: 'recall_greek_trio',
-        categoryId: 'greek' as CategoryId,
-        targetCategoryName: '古代ギリシャの代表的哲学者（アテネ三代）',
-        requiredCount: 3,
-        expectedAnswers: ['ソクラテス', 'プラトン', 'アリストテレス'],
-        modelAnswerDetails: [
-          { name: 'ソクラテス', note: '無知の知、魂への配慮、問答法' },
-          { name: 'プラトン', note: 'イデア論、四元徳、哲人政治、アカデメイア' },
-          { name: 'アリストテレス', note: '形相と質料、中庸、ポリス的動物、観照' },
-        ],
-      },
-      {
-        id: 'recall_hellenism',
-        categoryId: 'greek' as CategoryId,
-        targetCategoryName: 'ヘレニズム期の代表学派（エピクロス派・ストア派）の祖',
-        requiredCount: 2,
-        expectedAnswers: ['エピクロス', 'ゼノン'],
-        modelAnswerDetails: [
-          { name: 'エピクロス（エピクロス派）', note: 'アタラクシア（平静心）、精神的快楽、隠れて生きよ' },
-          { name: 'ゼノン（ストア派）', note: 'アパテイア（不動心）、禁欲主義、自然に従え、世界市民' },
-        ],
-      },
-      {
-        id: 'recall_chinese_confucian',
-        categoryId: 'chinese_philosophy' as CategoryId,
-        targetCategoryName: '中国儒家の代表的思想家',
-        requiredCount: 3,
-        expectedAnswers: ['孔子', '孟子', '荀子'],
-        modelAnswerDetails: [
-          { name: '孔子', note: '仁と礼、徳治主義、克己復礼、論語' },
-          { name: '孟子', note: '性善説、四端の心、王道政治、易姓革命' },
-          { name: '荀子', note: '性悪説、礼治主義、化性起偽' },
-        ],
-      },
-      {
-        id: 'recall_chinese_masters',
-        categoryId: 'chinese_philosophy' as CategoryId,
-        targetCategoryName: '諸子百家の各派開祖（儒家・道家・墨家・法家）',
-        requiredCount: 4,
-        expectedAnswers: ['孔子', '老子', '墨子', '韓非子'],
-        modelAnswerDetails: [
-          { name: '孔子（儒家）', note: '仁と礼、徳治主義' },
-          { name: '老子（道家）', note: '無為自然、道（タオ）、上善如水' },
-          { name: '墨子（墨家）', note: '兼愛交利、非攻、節用' },
-          { name: '韓非子（法家）', note: '法治主義、信賞必罰' },
-        ],
-      },
-      {
-        id: 'recall_buddhism_mahayana',
-        categoryId: 'indian_buddhism' as CategoryId,
-        targetCategoryName: 'インド大乗仏教の主要論師（中観派・唯識派）',
-        requiredCount: 2,
-        expectedAnswers: ['ナーガールジュナ（竜樹）', '世親（ヴァスバンドゥ）'],
-        modelAnswerDetails: [
-          { name: 'ナーガールジュナ（竜樹）', note: '中観派、空（シューニャター）、八不中道' },
-          { name: '世親（ヴァスバンドゥ）・無着', note: '唯識派、阿頼耶識、唯識三十頌' },
-        ],
-      },
-    ];
-
-    recallPresets.forEach((item) => {
-      if (categoryId && item.categoryId !== categoryId) return;
-
-      questions.push({
-        id: `q_recall_${item.id}`,
-        type: 'recall_classification',
-        categoryId: item.categoryId,
-        prompt: `【想起トレーニング】「${item.targetCategoryName}」に該当する人物を【${item.requiredCount}人】頭の中で思い浮かべよ。`,
-        context: `思い浮かべたら「模範解答を表示する」を押して自己評価を行ってください。`,
-        targetCategoryName: item.targetCategoryName,
-        requiredCount: item.requiredCount,
-        expectedAnswers: item.expectedAnswers,
-        modelAnswerDetails: item.modelAnswerDetails,
-        explanation: `思想史の全体像を把握するため、特定の学派・流派ごとに人物と概念をグループ化して想起するトレーニングです。`,
-      });
-    });
-
-    return questions;
-  }
-
-  /**
-   * 全問題プールを取得（源流思想を基本対象とする）
+   * 全問題プールを生成
    */
   static getAllQuestions(categoryId?: CategoryId): Question[] {
     return [
       ...this.generateFigureToKeyword(categoryId),
       ...this.generateKeywordToFigure(categoryId),
-      ...this.generateKeywordMeaning(categoryId),
-      ...this.generateBookQuestions(categoryId),
-      ...this.generateEpisodeQuestions(categoryId),
+      ...this.generateOddOneOut(categoryId),
+      ...this.generatePairValidation(categoryId),
       ...this.generateMatchingQuestions(categoryId),
       ...this.generateTypingQuestions(categoryId),
-      ...this.generateRecallQuestions(categoryId),
     ];
   }
 
   /**
-   * 統一演習用: ユーザー設定（形式のON/OFF、単元、問題数）に基づき演習問題を抽出
+   * カスタムセッション（問題数・形式・単元）の生成
    */
   static generateCustomSession(config: QuizSessionConfig): Question[] {
     const pool: Question[] = [];
 
     config.categoryIds.forEach((catId) => {
-      if (config.enabledTypes.choice) {
-        pool.push(
-          ...this.generateFigureToKeyword(catId),
-          ...this.generateKeywordToFigure(catId),
-          ...this.generateKeywordMeaning(catId),
-          ...this.generateBookQuestions(catId),
-          ...this.generateEpisodeQuestions(catId)
-        );
+      if (config.enabledTypes.figureToKeyword) {
+        pool.push(...this.generateFigureToKeyword(catId));
+      }
+      if (config.enabledTypes.keywordToFigure) {
+        pool.push(...this.generateKeywordToFigure(catId));
+      }
+      if (config.enabledTypes.oddOneOut) {
+        pool.push(...this.generateOddOneOut(catId));
+      }
+      if (config.enabledTypes.pairValidation) {
+        pool.push(...this.generatePairValidation(catId));
       }
       if (config.enabledTypes.matching) {
         pool.push(...this.generateMatchingQuestions(catId));
@@ -544,13 +391,10 @@ export class QuestionGenerator {
       if (config.enabledTypes.typing) {
         pool.push(...this.generateTypingQuestions(catId));
       }
-      if (config.enabledTypes.recall) {
-        pool.push(...this.generateRecallQuestions(catId));
-      }
     });
 
     const shuffled = shuffle(pool);
-    if (config.questionCount >= 900) {
+    if (config.questionCount >= 999) {
       return shuffled;
     }
     return shuffled.slice(0, config.questionCount);

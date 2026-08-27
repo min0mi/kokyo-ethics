@@ -31,10 +31,10 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
     setCanInput(false);
     isTransitioningRef.current = false;
 
-    // 前問のキー連打・長押し持ち越しを防ぐため 200ms クールダウン
+    // 前問のキー連打持ち越しを防ぐため 150ms クールダウン
     const initTimer = setTimeout(() => {
       setCanInput(true);
-    }, 200);
+    }, 150);
 
     return () => {
       clearTimeout(initTimer);
@@ -72,10 +72,10 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
       if (isCorrect) {
         sounds.playCorrect();
         isTransitioningRef.current = true;
-        // 正解時は 0.45 秒後に自動送り
+        // 正解時は 0.38 秒後に自動送り（サクサク快適テンポ）
         timerRef.current = setTimeout(() => {
           handleNext(true);
-        }, 450);
+        }, 380);
       } else {
         sounds.playWrong();
       }
@@ -88,10 +88,10 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
     [canInput, isAnswered, question, onBadgeUnlocked, handleNext]
   );
 
-  // キーボード操作
+  // キーボード操作 [1-4] or [Space/Enter]
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat) return; // 長押し無視
+      if (e.repeat) return;
 
       if (!isAnswered && canInput) {
         if (['1', '2', '3', '4'].includes(e.key)) {
@@ -101,7 +101,6 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
           }
         }
       } else if (isAnswered) {
-        // 不正解時の次へ進む
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
           e.preventDefault();
           if (!isTransitioningRef.current) {
@@ -116,38 +115,47 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
   }, [canInput, isAnswered, question, selectedOption, handleSelectOption, handleNext]);
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-2 text-xs">
+    <div className="w-full max-w-2xl mx-auto space-y-2 text-xs">
       {/* 問題カード */}
-      <div className="bg-white border border-gray-300 rounded-xs p-3.5 sm:p-5 space-y-3">
-        <div className="flex items-center justify-between text-[11px] pb-1.5 border-b border-gray-200">
+      <div className="bg-white border border-gray-300 rounded-xs p-4 space-y-3 shadow-xs">
+        {/* 問題種別ラベル */}
+        <div className="flex items-center justify-between text-[11px] pb-1 border-b border-gray-200">
           <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 font-bold rounded-xs border border-gray-300">
-            {question.context || '4択問題'}
+            {question.type === 'figure_to_keyword'
+              ? '人物 ➔ 語句'
+              : question.type === 'keyword_to_figure'
+              ? '語句 ➔ 人物'
+              : question.type === 'odd_one_out'
+              ? '仲間はずれ判定'
+              : question.type === 'pair_validation'
+              ? 'ペア正誤判定'
+              : '対応問題'}
           </span>
           <span className="text-gray-500">
             {isAnswered && selectedOption !== question.correctAnswer
-              ? 'Enterキーまたは次へボタンで進行'
-              : '選択肢をクリック [1-4]'}
+              ? 'Enterキーで次へ'
+              : 'キー [1-4] で選択'}
           </span>
         </div>
 
-        {/* 問題文 */}
-        <h3 className="text-sm sm:text-base font-bold text-gray-900 leading-snug whitespace-pre-line">
+        {/* 問題文（短く本質的） */}
+        <h3 className="text-base sm:text-lg font-bold text-gray-900 leading-snug py-1">
           {question.prompt}
         </h3>
 
-        {/* 4択選択肢 */}
+        {/* 4択選択肢（大きくタップしやすいボタン） */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {question.options.map((option, idx) => {
             const isSelected = selectedOption === option;
             const isCorrect = option === question.correctAnswer;
 
-            let style = 'bg-gray-50 border border-gray-300 text-gray-800 hover:bg-blue-50 hover:border-blue-500';
+            let style = 'bg-gray-50 border border-gray-300 text-gray-900 hover:bg-gray-100';
 
             if (isAnswered) {
               if (isCorrect) {
-                style = 'bg-green-100 border-2 border-green-600 text-green-900 font-bold';
+                style = 'bg-green-100 border-2 border-green-600 text-green-950 font-bold';
               } else if (isSelected) {
-                style = 'bg-red-100 border-2 border-red-500 text-red-900 font-bold';
+                style = 'bg-red-100 border-2 border-red-500 text-red-950 font-bold';
               } else {
                 style = 'bg-gray-50 border border-gray-200 text-gray-400';
               }
@@ -159,19 +167,19 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
                 type="button"
                 disabled={isAnswered || !canInput}
                 onClick={() => handleSelectOption(option)}
-                className={`w-full text-left p-2.5 rounded-xs transition text-xs flex items-center justify-between ${style}`}
+                className={`w-full text-left p-3 rounded-xs transition text-xs flex items-center justify-between min-h-[46px] ${style}`}
               >
                 <div className="flex items-center gap-2">
                   <span className="w-4 h-4 bg-white border border-gray-400 rounded-xs flex items-center justify-center font-bold text-[10px] shrink-0">
                     {idx + 1}
                   </span>
-                  <span className="line-clamp-2 leading-tight font-semibold">{option}</span>
+                  <span className="leading-tight font-semibold">{option}</span>
                 </div>
 
                 {isAnswered && (
                   <div className="shrink-0 ml-1">
-                    {isCorrect && <CheckCircle2 className="w-3.5 h-3.5 text-green-700" />}
-                    {isSelected && !isCorrect && <XCircle className="w-3.5 h-3.5 text-red-600" />}
+                    {isCorrect && <CheckCircle2 className="w-4 h-4 text-green-700" />}
+                    {isSelected && !isCorrect && <XCircle className="w-4 h-4 text-red-600" />}
                   </div>
                 )}
               </button>
@@ -179,29 +187,19 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
           })}
         </div>
 
-        {/* 不正解時の解説エリア（スクロール不要な配置） */}
+        {/* 不正解時：1行の淡白な対比メモ（スクロール不要） */}
         {isAnswered && selectedOption !== question.correctAnswer && (
-          <div className="pt-2.5 border-t border-gray-200 space-y-2 text-xs">
-            <div className="bg-red-50 border border-red-300 p-2 rounded-xs text-red-900 font-bold flex items-center justify-between">
-              <span>【不正解】 正解: 「{question.correctAnswer}」</span>
-              <span className="text-[10px] text-gray-500 font-normal">復習キューに保存</span>
-            </div>
-
-            <div className="bg-gray-50 border border-gray-200 p-2.5 rounded-xs text-gray-800 text-[11px] leading-relaxed max-h-32 overflow-y-auto whitespace-pre-line">
+          <div className="pt-2 border-t border-gray-200 space-y-2 text-xs">
+            <div className="bg-gray-100 border border-gray-300 p-2.5 rounded-xs text-gray-900 whitespace-pre-line leading-relaxed font-medium">
               {question.explanation}
-              {question.commonTestHint && (
-                <div className="mt-1.5 pt-1.5 border-t border-gray-200 text-yellow-900 font-semibold">
-                  [判断ポイント] {question.commonTestHint}
-                </div>
-              )}
             </div>
 
             <button
               type="button"
               onClick={() => handleNext(false)}
-              className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xs text-xs flex items-center justify-center gap-1 shadow-xs"
+              className="w-full py-2.5 bg-gray-800 hover:bg-black text-white font-bold rounded-xs text-xs flex items-center justify-center gap-1 shadow-xs"
             >
-              <span>次の問題へ進む (Space / Enter)</span>
+              <span>次の問題へ (Space / Enter)</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>

@@ -84,17 +84,15 @@ export interface Episode {
 }
 
 // ==========================================
-// 問題形式の型定義
+// 問題形式の型定義（人物・語句の対応関係特化）
 // ==========================================
 export type QuestionType =
-  | 'figure_to_keyword'
-  | 'keyword_to_figure'
-  | 'keyword_meaning'
-  | 'figure_to_book'
-  | 'book_to_figure'
-  | 'figure_to_episode'
-  | 'matching_lines'
-  | 'fill_in_keyword'
+  | 'figure_to_keyword' // 人物 ➔ 語句
+  | 'keyword_to_figure' // 語句 ➔ 人物
+  | 'odd_one_out'       // 仲間はずれ（対応しない語句）
+  | 'pair_validation'   // ペア正誤判定
+  | 'matching_lines'    // 線つなぎ（6択）
+  | 'fill_in_keyword'   // 記述
   | 'recall_classification';
 
 export interface BaseQuestion {
@@ -153,10 +151,12 @@ export type Question =
 export interface QuizSessionConfig {
   categoryIds: CategoryId[];
   enabledTypes: {
-    choice: boolean;
+    figureToKeyword: boolean;
+    keywordToFigure: boolean;
+    oddOneOut: boolean;
+    pairValidation: boolean;
     matching: boolean;
     typing: boolean;
-    recall: boolean;
   };
   questionCount: number; // 5, 10, 20, 30, または全問(999)
 }

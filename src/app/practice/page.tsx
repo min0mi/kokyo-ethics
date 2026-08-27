@@ -10,28 +10,34 @@ function PracticeContent() {
   const catParam = searchParams.get('category') as CategoryId | null;
   const countParam = searchParams.get('count');
 
-  const choiceParam = searchParams.get('choice');
+  const f2kParam = searchParams.get('f2k');
+  const k2fParam = searchParams.get('k2f');
+  const oddParam = searchParams.get('odd');
+  const pairParam = searchParams.get('pair');
   const matchingParam = searchParams.get('matching');
   const typingParam = searchParams.get('typing');
-  const recallParam = searchParams.get('recall');
 
   const questionCount = countParam ? parseInt(countParam, 10) : 10;
 
   const hasSpecificTypes =
-    choiceParam !== null ||
+    f2kParam !== null ||
+    k2fParam !== null ||
+    oddParam !== null ||
+    pairParam !== null ||
     matchingParam !== null ||
-    typingParam !== null ||
-    recallParam !== null;
+    typingParam !== null;
 
   const initialConfig = {
     categoryIds: catParam ? [catParam] : undefined,
     questionCount: isNaN(questionCount) ? 10 : questionCount,
     enabledTypes: hasSpecificTypes
       ? {
-          choice: choiceParam === '1',
+          figureToKeyword: f2kParam === '1',
+          keywordToFigure: k2fParam === '1',
+          oddOneOut: oddParam === '1',
+          pairValidation: pairParam === '1',
           matching: matchingParam === '1',
           typing: typingParam === '1',
-          recall: recallParam === '1',
         }
       : undefined,
   };
@@ -50,4 +56,3 @@ export default function PracticePage() {
     </Suspense>
   );
 }
-

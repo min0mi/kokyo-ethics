@@ -26,10 +26,12 @@ export default function HomePage() {
   const [sessionConfig, setSessionConfig] = useState<QuizSessionConfig>({
     categoryIds: AVAILABLE_CATEGORY_IDS,
     enabledTypes: {
-      choice: true,
+      figureToKeyword: true,
+      keywordToFigure: true,
+      oddOneOut: true,
+      pairValidation: true,
       matching: true,
       typing: true,
-      recall: true,
     },
     questionCount: 10,
   });
@@ -82,10 +84,12 @@ export default function HomePage() {
   const handleStartPracticeDirect = () => {
     const params = new URLSearchParams();
     params.set('count', sessionConfig.questionCount.toString());
-    params.set('choice', sessionConfig.enabledTypes.choice ? '1' : '0');
+    params.set('f2k', sessionConfig.enabledTypes.figureToKeyword ? '1' : '0');
+    params.set('k2f', sessionConfig.enabledTypes.keywordToFigure ? '1' : '0');
+    params.set('odd', sessionConfig.enabledTypes.oddOneOut ? '1' : '0');
+    params.set('pair', sessionConfig.enabledTypes.pairValidation ? '1' : '0');
     params.set('matching', sessionConfig.enabledTypes.matching ? '1' : '0');
     params.set('typing', sessionConfig.enabledTypes.typing ? '1' : '0');
-    params.set('recall', sessionConfig.enabledTypes.recall ? '1' : '0');
     router.push(`/practice?${params.toString()}`);
   };
 
@@ -139,13 +143,13 @@ export default function HomePage() {
                 value={searchWord}
                 onChange={(e) => setSearchWord(e.target.value)}
                 placeholder="例: エピクロス、仁（未入力でEnterも可）"
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-xs text-xs focus:outline-hidden focus:border-blue-600"
+                className="flex-1 px-2 py-1 border border-gray-300 rounded-xs text-xs focus:outline-hidden focus:border-gray-500"
               />
               <button
                 type="submit"
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xs"
+                className="px-3 py-1 bg-gray-800 hover:bg-black text-white text-xs font-bold rounded-xs"
               >
-                マップ開く
+                対応表開く
               </button>
             </div>
           </form>
@@ -157,12 +161,12 @@ export default function HomePage() {
         {/* ===================== 左側 メインコンテンツ (8/12) ===================== */}
         <div className="lg:col-span-8 space-y-3">
           {/* ★ 1. 演習設定パネル ★ */}
-          <div className="bg-white border-2 border-blue-600 rounded-xs p-3.5 space-y-2.5 text-xs">
+          <div className="bg-white border border-gray-400 rounded-xs p-3.5 space-y-2.5 text-xs text-gray-900 shadow-xs">
             <div className="flex items-center justify-between border-b border-gray-200 pb-1.5">
               <strong className="text-sm font-bold text-gray-900">
-                源流思想 演習
+                源流思想・青年期 演習
               </strong>
-              <span className="text-[11px] text-gray-500">源流思想 5単元対象</span>
+              <span className="text-[11px] text-gray-500">人物 ⇄ 語句の対応関係特化</span>
             </div>
 
             {/* 問題形式 */}
@@ -170,46 +174,28 @@ export default function HomePage() {
               <span className="font-bold text-gray-700 block text-[11px]">
                 出題形式:
               </span>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                <label className="flex items-center gap-1.5 p-1.5 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
-                  <input
-                    type="checkbox"
-                    checked={sessionConfig.enabledTypes.choice}
-                    onChange={() => toggleType('choice')}
-                    className="rounded-xs"
-                  />
-                  <span className="font-bold text-gray-800 text-[11px]">4択問題</span>
-                </label>
-
-                <label className="flex items-center gap-1.5 p-1.5 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
-                  <input
-                    type="checkbox"
-                    checked={sessionConfig.enabledTypes.matching}
-                    onChange={() => toggleType('matching')}
-                    className="rounded-xs"
-                  />
-                  <span className="font-bold text-gray-800 text-[11px]">線つなぎ</span>
-                </label>
-
-                <label className="flex items-center gap-1.5 p-1.5 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
-                  <input
-                    type="checkbox"
-                    checked={sessionConfig.enabledTypes.typing}
-                    onChange={() => toggleType('typing')}
-                    className="rounded-xs"
-                  />
-                  <span className="font-bold text-gray-800 text-[11px]">記述</span>
-                </label>
-
-                <label className="flex items-center gap-1.5 p-1.5 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
-                  <input
-                    type="checkbox"
-                    checked={sessionConfig.enabledTypes.recall}
-                    onChange={() => toggleType('recall')}
-                    className="rounded-xs"
-                  />
-                  <span className="font-bold text-gray-800 text-[11px]">想起</span>
-                </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                {[
+                  { key: 'figureToKeyword', label: '人物 ➔ 語句' },
+                  { key: 'keywordToFigure', label: '語句 ➔ 人物' },
+                  { key: 'oddOneOut', label: '仲間はずれ' },
+                  { key: 'pairValidation', label: 'ペア正誤判定' },
+                  { key: 'matching', label: '線つなぎ（6択）' },
+                  { key: 'typing', label: '用語記述' },
+                ].map(({ key, label }) => (
+                  <label
+                    key={key}
+                    className="flex items-center gap-1.5 p-1.5 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-gray-100"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={sessionConfig.enabledTypes[key as keyof QuizSessionConfig['enabledTypes']]}
+                      onChange={() => toggleType(key as keyof QuizSessionConfig['enabledTypes'])}
+                      className="rounded-xs"
+                    />
+                    <span className="font-bold text-gray-800 text-[11px]">{label}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
@@ -229,7 +215,7 @@ export default function HomePage() {
                       onClick={() => setSessionConfig((prev) => ({ ...prev, questionCount: count }))}
                       className={`px-3 py-1 border rounded-xs font-bold text-xs ${
                         isSelected
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? 'bg-gray-800 text-white border-gray-800'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                       }`}
                     >
@@ -282,7 +268,7 @@ export default function HomePage() {
                           ? 'bg-gray-50/60 opacity-50'
                           : idx % 2 === 0
                           ? 'bg-white'
-                          : 'bg-gray-50/40 hover:bg-blue-50/40'
+                          : 'bg-gray-50/40 hover:bg-gray-100/60'
                       }
                     >
                       {/* 1. 単元名 */}
@@ -301,7 +287,7 @@ export default function HomePage() {
                           <div className="flex items-center justify-center gap-2">
                             <div className="w-16 bg-gray-200 h-1.5 rounded-full overflow-hidden">
                               <div
-                                className="bg-blue-600 h-1.5 rounded-full"
+                                className="bg-gray-800 h-1.5 rounded-full"
                                 style={{ width: `${st.rate}%` }}
                               />
                             </div>
@@ -319,7 +305,7 @@ export default function HomePage() {
                         {isAvailable ? (
                           <Link
                             href={`/practice?category=${cat.id}&count=10`}
-                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] rounded-xs"
+                            className="px-2.5 py-1 bg-gray-800 hover:bg-black text-white font-bold text-[11px] rounded-xs"
                           >
                             演習
                           </Link>
