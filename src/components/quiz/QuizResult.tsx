@@ -50,12 +50,20 @@ export const QuizResult: React.FC<QuizResultProps> = ({
             <td className="p-2.5 font-black text-sm text-blue-700">{accuracy}%</td>
           </tr>
           {elapsedSeconds !== undefined && elapsedSeconds > 0 && (
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <td className="p-2.5 font-bold text-gray-600">今回の学習時間</td>
-              <td className="p-2.5 font-black text-sm text-gray-800">
-                {timeStr}
-              </td>
-            </tr>
+            <>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <td className="p-2.5 font-bold text-gray-600">今回の学習時間</td>
+                <td className="p-2.5 font-black text-sm text-gray-800">
+                  {timeStr}
+                </td>
+              </tr>
+              <tr className="border-b border-gray-200">
+                <td className="p-2.5 font-bold text-gray-600">平均解答速度</td>
+                <td className="p-2.5 font-black text-sm text-orange-700">
+                  {(elapsedSeconds / totalQuestions).toFixed(1)} 秒 / 問
+                </td>
+              </tr>
+            </>
           )}
           <tr className="bg-yellow-50/50">
             <td className="p-2.5 font-bold text-gray-600">獲得経験値</td>

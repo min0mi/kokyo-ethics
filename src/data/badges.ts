@@ -119,6 +119,32 @@ export const BADGES: Badge[] = [
     targetValue: 50,
   },
 
+  // 平均解答速度（セッション完了）バッジ
+  {
+    id: 'speed_demon',
+    name: 'Speed Demon',
+    description: '平均解答速度2.0秒以内で10問以上の演習をクリアした',
+    icon: 'Sparkles',
+    category: 'speed',
+    targetValue: 2.0,
+  },
+  {
+    id: 'swift_mind',
+    name: 'Swift Mind',
+    description: '平均解答速度3.5秒以内で10問以上の演習をクリアした',
+    icon: 'Zap',
+    category: 'speed',
+    targetValue: 3.5,
+  },
+  {
+    id: 'steady_thinker',
+    name: 'Steady Thinker',
+    description: '平均解答速度5.0秒以内で10問以上の演習をクリアした',
+    icon: 'Gauge',
+    category: 'speed',
+    targetValue: 5.0,
+  },
+
   // その他の実績バッジ
   {
     id: 'speed_perfect_10',
@@ -169,4 +195,3 @@ export const BADGES: Badge[] = [
     targetValue: 10,
   },
 ];
-

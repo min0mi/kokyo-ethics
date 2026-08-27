@@ -9,6 +9,7 @@ import { MatchingQuiz } from './MatchingQuiz';
 import { RecallQuiz } from './RecallQuiz';
 import { QuizResult } from './QuizResult';
 import { BadgeUnlockedModal } from '@/components/gamification/BadgeUnlockedModal';
+import { UserDataStore } from '@/lib/storage/userDataStore';
 
 interface UnifiedPracticeProps {
   initialConfig?: Partial<QuizSessionConfig>;
@@ -75,6 +76,11 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
       if (currentIndex < questions.length - 1) {
         setCurrentIndex((prev) => prev + 1);
       } else {
+        const elapsedSec = (Date.now() - sessionStartTimeRef.current) / 1000;
+        const newBadges = UserDataStore.recordSessionComplete(elapsedSec, questions.length);
+        if (newBadges.length > 0) {
+          setActiveBadge(newBadges[0]);
+        }
         setIsCompleted(true);
       }
     },

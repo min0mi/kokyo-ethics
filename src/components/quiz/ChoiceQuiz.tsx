@@ -22,7 +22,6 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
   const [isAnswered, setIsAnswered] = useState(false);
   const [isPassed, setIsPassed] = useState(false);
   const [canInput, setCanInput] = useState(false);
-  const [speedFeedback, setSpeedFeedback] = useState<'Excellent!' | 'Great!' | 'Good!' | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isTransitioningRef = useRef<boolean>(false);
@@ -34,7 +33,6 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
     setIsAnswered(false);
     setIsPassed(false);
     setCanInput(false);
-    setSpeedFeedback(null);
     isTransitioningRef.current = false;
     questionStartTimeRef.current = Date.now();
 
@@ -99,14 +97,10 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
         sounds.playCorrect();
         isTransitioningRef.current = true;
 
-        if (res.speedRating === 'excellent') setSpeedFeedback('Excellent!');
-        else if (res.speedRating === 'great') setSpeedFeedback('Great!');
-        else if (res.speedRating === 'good') setSpeedFeedback('Good!');
-
-        // 自動送りのディレイを少し長め（750ms）にして、フィードバックを視認可能にする
+        // 正解時は 0.38 秒後に自動送り（サクサク快適テンポ）
         timerRef.current = setTimeout(() => {
           handleNext(true);
-        }, 750);
+        }, 380);
       } else {
         sounds.playWrong();
       }
@@ -148,14 +142,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
   }, [canInput, isAnswered, question, selectedOption, isPassed, handleSelectOption, handlePass, handleNext]);
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-2 text-xs relative">
-      {speedFeedback && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
-          <div className="bg-yellow-400 text-yellow-950 font-black text-2xl px-6 py-3 rounded-xs border-2 border-yellow-600 shadow-xl animate-bounce">
-            {speedFeedback}
-          </div>
-        </div>
-      )}
+    <div className="w-full max-w-2xl mx-auto space-y-2 text-xs">
       {/* 問題カード */}
       <div className="bg-white border border-gray-300 rounded-xs p-4 space-y-3 shadow-xs">
         {/* 問題種別ラベル ＆ パスボタン */}

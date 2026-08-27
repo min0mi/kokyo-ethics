@@ -29,28 +29,21 @@ export const AdBanner: React.FC<AdBannerProps> = ({
     }
   }, [isProd, clientPublisherId]);
 
+  if (!clientPublisherId) return null;
+
   return (
     <div className={`my-2 w-full bg-white border border-gray-300 p-2 text-center rounded-sm ${className}`}>
       <span className="text-[10px] text-gray-400 font-bold block mb-1">
         [{label}]
       </span>
-
-      {isProd && clientPublisherId ? (
-        <ins
-          className="adsbygoogle block w-full text-center"
-          style={{ display: 'block' }}
-          data-ad-client={clientPublisherId}
-          data-ad-slot={slotId}
-          data-ad-format={format}
-          data-full-width-responsive="true"
-        />
-      ) : (
-        <div className="w-full bg-gray-50 border border-dashed border-gray-300 p-2 text-center">
-          <p className="text-[11px] text-gray-500 font-semibold">
-            Google AdSense 広告スペース（審査通過後に配信）
-          </p>
-        </div>
-      )}
+      <ins
+        className="adsbygoogle block w-full text-center"
+        style={{ display: 'block' }}
+        data-ad-client={clientPublisherId}
+        data-ad-slot={slotId}
+        data-ad-format={format}
+        data-full-width-responsive="true"
+      />
     </div>
   );
 };

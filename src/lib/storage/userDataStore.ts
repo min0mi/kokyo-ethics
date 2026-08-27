@@ -284,4 +284,43 @@ export class UserDataStore {
     this.saveProfile(profile);
     return profile;
   }
+
+  /**
+   * 演習セッション全体が完了した際の記録とバッジ判定
+   */
+  static recordSessionComplete(
+    sessionSeconds: number,
+    questionCount: number
+  ): Badge[] {
+    const profile = this.getProfile();
+    const averageSpeed = sessionSeconds / questionCount;
+
+    const newlyUnlockedBadges: Badge[] = [];
+
+    BADGES.forEach((badge) => {
+      if (profile.unlockedBadgeIds.includes(badge.id)) return;
+
+      let isUnlocked = false;
+      if (badge.id === 'speed_demon' && averageSpeed <= 2.0 && questionCount >= 10) {
+        isUnlocked = true;
+      } else if (badge.id === 'swift_mind' && averageSpeed <= 3.5 && questionCount >= 10) {
+        isUnlocked = true;
+      } else if (badge.id === 'steady_thinker' && averageSpeed <= 5.0 && questionCount >= 10) {
+        isUnlocked = true;
+      }
+
+      if (isUnlocked) {
+        profile.unlockedBadgeIds.push(badge.id);
+        badge.unlockedAt = new Date().toISOString();
+        newlyUnlockedBadges.push(badge);
+        profile.xp += 50;
+      }
+    });
+
+    if (newlyUnlockedBadges.length > 0) {
+      this.saveProfile(profile);
+    }
+
+    return newlyUnlockedBadges;
+  }
 }
