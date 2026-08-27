@@ -13,8 +13,17 @@ export const BadgeUnlockedModal: React.FC<BadgeModalProps> = ({ badge, onClose }
   useEffect(() => {
     if (badge) {
       sounds.playFanfare();
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClose();
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
     }
-  }, [badge]);
+  }, [badge, onClose]);
 
   if (!badge) return null;
 

@@ -152,7 +152,21 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
   // キーボードイベントの登録
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat || isFinished) return;
+      if (e.repeat) return;
+
+      if (isFinished) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (isFailed) {
+            onComplete({ correct: 0, total: 1, xp: 1 });
+          } else if (isPassed) {
+            onComplete({ correct: 0, total: 1, xp: 2 });
+          } else if (isAllCleared) {
+            onComplete({ correct: 1, total: 1, xp: 25 });
+          }
+        }
+        return;
+      }
 
       // パスキー（P or 0）
       if (e.key.toLowerCase() === 'p' || e.key === '0') {
@@ -175,7 +189,7 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [rightOptions, matchedPairIds, selectedLeft, isFinished, handlePass, checkMatch]);
+  }, [rightOptions, matchedPairIds, selectedLeft, isFinished, handlePass, checkMatch, isFailed, isPassed, isAllCleared, onComplete]);
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-2 text-xs">
@@ -307,22 +321,33 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
             <div className="p-2 bg-red-50 border border-red-300 font-bold rounded-xs text-red-800">
               不正解 — 対応が間違っています。正解の組み合わせ:
             </div>
-            <table className="w-full text-left text-[11px] border border-gray-300 bg-white">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-gray-600">
-                  <th className="py-1 px-2.5 font-bold w-32 border-r border-gray-200">人物</th>
-                  <th className="py-1 px-2.5 font-bold">対応キーワード</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {question.pairs.map((p) => (
-                  <tr key={p.id}>
-                    <td className="py-1.5 px-2.5 font-bold border-r border-gray-200">{p.left}</td>
-                    <td className="py-1.5 px-2.5 text-gray-900">{p.right}</td>
+            <div className="hidden sm:block">
+              <table className="w-full text-left text-[11px] border border-gray-300 bg-white">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200 text-gray-600">
+                    <th className="py-1 px-2.5 font-bold w-32 border-r border-gray-200">人物</th>
+                    <th className="py-1 px-2.5 font-bold">対応キーワード</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {question.pairs.map((p) => (
+                    <tr key={p.id}>
+                      <td className="py-1.5 px-2.5 font-bold border-r border-gray-200">{p.left}</td>
+                      <td className="py-1.5 px-2.5 text-gray-900">{p.right}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="block sm:hidden space-y-1.5 border border-gray-300 bg-white p-2.5 rounded-xs">
+              {question.pairs.map((p) => (
+                <div key={p.id} className="flex flex-col gap-0.5 border-b border-gray-100 pb-1.5 last:border-0 last:pb-0">
+                  <div className="font-bold text-gray-900 text-xs">{p.left}</div>
+                  <div className="text-blue-700 font-bold text-[11px]">➔ {p.right}</div>
+                </div>
+              ))}
+            </div>
 
             <button
               type="button"
@@ -341,22 +366,33 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
             <div className="p-2 bg-gray-100 border border-gray-300 font-bold rounded-xs text-gray-800">
               【パス】 正解の人物・語句の組み合わせ:
             </div>
-            <table className="w-full text-left text-[11px] border border-gray-300 bg-white">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-gray-600">
-                  <th className="py-1 px-2.5 font-bold w-32 border-r border-gray-200">人物</th>
-                  <th className="py-1 px-2.5 font-bold">対応キーワード</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {question.pairs.map((p) => (
-                  <tr key={p.id} className="bg-green-50/30">
-                    <td className="py-1.5 px-2.5 font-bold border-r border-gray-200">{p.left}</td>
-                    <td className="py-1.5 px-2.5 font-bold text-gray-900">{p.right}</td>
+            <div className="hidden sm:block">
+              <table className="w-full text-left text-[11px] border border-gray-300 bg-white">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200 text-gray-600">
+                    <th className="py-1 px-2.5 font-bold w-32 border-r border-gray-200">人物</th>
+                    <th className="py-1 px-2.5 font-bold">対応キーワード</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {question.pairs.map((p) => (
+                    <tr key={p.id} className="bg-green-50/30">
+                      <td className="py-1.5 px-2.5 font-bold border-r border-gray-200">{p.left}</td>
+                      <td className="py-1.5 px-2.5 font-bold text-gray-900">{p.right}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="block sm:hidden space-y-1.5 border border-gray-300 bg-white p-2.5 rounded-xs">
+              {question.pairs.map((p) => (
+                <div key={p.id} className="flex flex-col gap-0.5 border-b border-gray-100 pb-1.5 last:border-0 last:pb-0">
+                  <div className="font-bold text-gray-900 text-xs">{p.left}</div>
+                  <div className="text-blue-700 font-bold text-[11px]">➔ {p.right}</div>
+                </div>
+              ))}
+            </div>
 
             <button
               type="button"

@@ -102,7 +102,8 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
       </div>
 
       {/* 2行対比テーブル（1人物1行: 誤答 ＋ 正答） */}
-      <div className="border border-gray-300 rounded-xs overflow-hidden bg-white shadow-xs">
+      {/* 2行対比テーブル（PC用） */}
+      <div className="hidden sm:block border border-gray-300 rounded-xs overflow-hidden bg-white shadow-xs">
         <table className="w-full text-left text-[11px] border-collapse">
           <thead>
             <tr className="bg-gray-100 border-b border-gray-300 text-gray-700">
@@ -192,6 +193,71 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
             </tr>
           </tbody>
         </table>
+      </div>
+
+      {/* スマホ用カードレイアウト */}
+      <div className="block sm:hidden space-y-2">
+        {/* 1. 誤答肢のカード */}
+        {wrongFig && !isPassed && (
+          <div className="bg-red-50/40 border border-red-200 p-3 rounded-xs space-y-2">
+            <div className="text-[10px] font-bold text-red-700 border-b border-red-200 pb-1">
+              あなたが選択した誤答
+            </div>
+            <div>
+              <strong className="font-bold text-gray-900 text-xs">
+                {highlightWord(wrongFig.name, wrongHighlightTarget)}
+              </strong>
+              {wrongFig.books && wrongFig.books.length > 0 && (
+                <div className="text-[10px] text-gray-600 font-medium mt-0.5">
+                  『{wrongFig.books.join('』、『')}』
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {wrongKws.map((k) => (
+                <span
+                  key={k.id}
+                  className="inline-block bg-white border border-gray-300 text-gray-900 font-bold px-1.5 py-0.2 rounded-xs text-[10px]"
+                >
+                  {highlightWord(k.name, wrongHighlightTarget)}
+                </span>
+              ))}
+            </div>
+            <div className="text-[11px] text-gray-700 leading-relaxed pt-0.5 border-t border-dashed border-red-200">
+              {highlightWord(wrongFig.summary, wrongHighlightTarget)}
+            </div>
+          </div>
+        )}
+
+        {/* 2. 正答肢のカード */}
+        <div className="bg-green-50/50 border border-green-200 p-3 rounded-xs space-y-2">
+          <div className="text-[10px] font-bold text-green-800 border-b border-green-200 pb-1">
+            正しい正答
+          </div>
+          <div>
+            <strong className="font-bold text-gray-900 text-xs">
+              {highlightWord(correctFig.name, correctHighlightTarget)}
+            </strong>
+            {correctFig.books && correctFig.books.length > 0 && (
+              <div className="text-[10px] text-gray-600 font-medium mt-0.5">
+                『{correctFig.books.join('』、『')}』
+              </div>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {correctKws.map((k) => (
+              <span
+                key={k.id}
+                className="inline-block bg-white border border-gray-300 text-gray-900 font-bold px-1.5 py-0.2 rounded-xs text-[10px]"
+              >
+                {highlightWord(k.name, correctHighlightTarget)}
+              </span>
+            ))}
+          </div>
+          <div className="text-[11px] text-gray-700 leading-relaxed pt-0.5 border-t border-dashed border-green-200">
+            {highlightWord(correctFig.summary, correctHighlightTarget)}
+          </div>
+        </div>
       </div>
     </div>
   );

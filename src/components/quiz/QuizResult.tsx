@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { RotateCcw, Home } from 'lucide-react';
 import { AdBanner } from '@/components/ads/AdBanner';
@@ -28,6 +28,17 @@ export const QuizResult: React.FC<QuizResultProps> = ({
   const timeStr = elapsedSeconds ? UserDataStore.formatStudyTime(elapsedSeconds) : '数秒';
 
   const shareText = `【公共倫理パーフェクトマスター.com】で演習をクリア！\n正答率: ${accuracy}% (${correctCount}/${totalQuestions}問)\n学習時間: ${timeStr} (+${xpEarned}XP)\n#共通テスト #倫理 #公共 #大学受験`;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onRetry();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onRetry]);
 
   return (
     <div className="w-full max-w-xl mx-auto bg-white border border-gray-300 rounded-xs p-6 space-y-4 text-center text-gray-900 shadow-xs">
@@ -88,7 +99,7 @@ export const QuizResult: React.FC<QuizResultProps> = ({
           className="flex-1 py-2.5 bg-gray-800 hover:bg-black text-white font-bold text-xs rounded-xs flex items-center justify-center gap-1 shadow-xs"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          <span>もう一度解く</span>
+          <span>もう一度解く (Space / Enter)</span>
         </button>
         <Link
           href="/"
