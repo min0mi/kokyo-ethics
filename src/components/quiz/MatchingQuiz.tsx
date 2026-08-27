@@ -327,9 +327,9 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
             <button
               type="button"
               onClick={() => onComplete({ correct: 0, total: 1, xp: 1 })}
-              className="w-full py-2.5 bg-gray-800 hover:bg-black text-white font-bold rounded-xs text-xs flex items-center justify-center gap-1 shadow-xs"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xs text-xs flex items-center justify-center gap-1 shadow-xs"
             >
-              <span>次の問題へ進む (Space / Enter)</span>
+              <span>次へ (Space / Enter)</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -361,9 +361,9 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
             <button
               type="button"
               onClick={() => onComplete({ correct: 0, total: 1, xp: 2 })}
-              className="w-full py-2.5 bg-gray-800 hover:bg-black text-white font-bold rounded-xs text-xs flex items-center justify-center gap-1 shadow-xs"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xs text-xs flex items-center justify-center gap-1 shadow-xs"
             >
-              <span>次の問題へ進む (Space / Enter)</span>
+              <span>次へ (Space / Enter)</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -378,9 +378,9 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
 
             <button
               onClick={() => onComplete({ correct: 1, total: 1, xp: 25 })}
-              className="w-full py-2.5 bg-gray-800 hover:bg-black text-white font-bold text-xs rounded-xs flex items-center justify-center gap-1 shadow-xs"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xs flex items-center justify-center gap-1 shadow-xs"
             >
-              <span>完了して次の問題へ</span>
+              <span>次へ</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>

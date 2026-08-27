@@ -140,7 +140,7 @@ export const RecallQuiz: React.FC<RecallQuizProps> = ({
                   }
                   className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-sm flex items-center justify-center gap-1"
                 >
-                  <span>次へ進む</span>
+                  <span>次へ (Enter)</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>

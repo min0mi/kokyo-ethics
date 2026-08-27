@@ -147,7 +147,7 @@ export const TypingQuiz: React.FC<TypingQuizProps> = ({
               onClick={() => onComplete({ correct: isCorrect ? 1 : 0, total: 1, xp: isCorrect ? 15 : 2 })}
               className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-sm flex items-center justify-center gap-1"
             >
-              <span>次の問題へ</span>
+              <span>次へ (Enter)</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

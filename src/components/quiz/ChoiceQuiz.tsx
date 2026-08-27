@@ -246,9 +246,9 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
             <button
               type="button"
               onClick={() => handleNext(false)}
-              className="w-full py-2.5 bg-gray-800 hover:bg-black text-white font-bold rounded-xs text-xs flex items-center justify-center gap-1 shadow-xs"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xs text-xs flex items-center justify-center gap-1 shadow-xs"
             >
-              <span>次の問題へ進む (Space / Enter)</span>
+              <span>次へ (Space / Enter)</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
