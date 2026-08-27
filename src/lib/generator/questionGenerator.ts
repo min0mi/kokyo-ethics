@@ -16,6 +16,8 @@ export const AVAILABLE_CATEGORY_IDS: CategoryId[] = [
   'indian_buddhism',
   'chinese_philosophy',
   'japan_buddhism_thought',
+  'western_modern',
+  'western_contemporary',
   'adolescence_public',
 ];
 

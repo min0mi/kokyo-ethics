@@ -9,6 +9,8 @@ export type CategoryId =
   | 'indian_buddhism'
   | 'chinese_philosophy'
   | 'japan_buddhism_thought'
+  | 'western_modern'
+  | 'western_contemporary'
   | 'modern_western_early'
   | 'german_idealism'
   | 'utilitarianism'
