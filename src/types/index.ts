@@ -8,18 +8,11 @@ export type CategoryId =
   | 'islam'
   | 'indian_buddhism'
   | 'chinese_philosophy'
+  | 'japan_ancient_kamakura'
+  | 'japan_muromachi_modern'
   | 'japan_buddhism_thought'
   | 'western_modern'
   | 'western_contemporary'
-  | 'modern_western_early'
-  | 'german_idealism'
-  | 'utilitarianism'
-  | 'modern_criticism'
-  | 'contemporary_existentialism'
-  | 'pragmatism_analytic'
-  | 'frankfurt_structuralism'
-  | 'justice_political_ethics'
-  | 'bioethics_environmental'
   | 'adolescence_public';
 
 export interface Category {

@@ -254,64 +254,63 @@ export default function HomePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {CATEGORIES.map((cat, idx) => {
-                  const st = categoryStats[cat.id] || { total: 0, mastered: 0, learning: 0, rate: 0 };
-                  const isAvailable = cat.isAvailable;
-
+                {(['源流思想', '日本思想', '西洋思想'] as const).map((group) => {
+                  const groupCats = CATEGORIES.filter((c) => c.groupName === group);
                   return (
-                    <tr
-                      key={cat.id}
-                      className={
-                        !isAvailable
-                          ? 'bg-gray-50/60 opacity-50'
-                          : idx % 2 === 0
-                          ? 'bg-white'
-                          : 'bg-gray-50/40 hover:bg-gray-100/60'
-                      }
-                    >
-                      {/* 1. 単元名 */}
-                      <td className="py-2 px-3 font-bold text-gray-900">
-                        {cat.name}
-                        {!isAvailable && (
-                          <span className="ml-1.5 text-[9px] bg-gray-200 text-gray-600 font-normal px-1 py-0.2 rounded-xs">
-                            準備中
-                          </span>
-                        )}
-                      </td>
+                    <React.Fragment key={group}>
+                      <tr className="bg-gray-100/80 border-t border-b border-gray-300">
+                        <td colSpan={3} className="py-1 px-3 font-black text-gray-800 text-[11px]">
+                          ■ {group}
+                        </td>
+                      </tr>
+                      {groupCats.map((cat, idx) => {
+                        const st = categoryStats[cat.id] || { total: 0, mastered: 0, learning: 0, rate: 0 };
+                        const isAvailable = cat.isAvailable;
 
-                      {/* 2. 定着率 */}
-                      <td className="py-2 px-3 text-center">
-                        {isAvailable ? (
-                          <div className="flex items-center justify-center gap-2">
-                            <div className="w-16 bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                              <div
-                                className="bg-gray-800 h-1.5 rounded-full"
-                                style={{ width: `${st.rate}%` }}
-                              />
-                            </div>
-                            <span className="font-bold text-gray-800 text-[11px] w-8 text-right">
-                              {st.rate}%
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-[10px]">-</span>
-                        )}
-                      </td>
-
-                      {/* 3. 演習ボタン */}
-                      <td className="py-2 px-3 text-right">
-                        {isAvailable ? (
-                          <Link
-                            href={`/practice?category=${cat.id}&count=10`}
-                            className="px-2.5 py-1 bg-gray-800 hover:bg-black text-white font-bold text-[11px] rounded-xs"
+                        return (
+                          <tr
+                            key={cat.id}
+                            className={
+                              !isAvailable
+                                ? 'bg-gray-50/60 opacity-50'
+                                : idx % 2 === 0
+                                ? 'bg-white'
+                                : 'bg-gray-50/40 hover:bg-gray-100/60'
+                            }
                           >
-                            演習
-                          </Link>
-                        ) : (
-                          <span className="text-[10px] text-gray-400">準備中</span>
-                        )}
-                      </td>
-                    </tr>
+                            {/* 1. 単元名 */}
+                            <td className="py-2 px-3 font-bold text-gray-900 pl-5">
+                              {cat.name}
+                            </td>
+
+                            {/* 2. 定着率 */}
+                            <td className="py-2 px-3 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <div className="w-16 bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-gray-800 h-1.5 rounded-full"
+                                    style={{ width: `${st.rate}%` }}
+                                  />
+                                </div>
+                                <span className="font-bold text-gray-800 text-[11px] w-8 text-right">
+                                  {st.rate}%
+                                </span>
+                              </div>
+                            </td>
+
+                            {/* 3. 演習ボタン */}
+                            <td className="py-2 px-3 text-right">
+                              <Link
+                                href={`/practice?category=${cat.id}&count=10`}
+                                className="px-2.5 py-1 bg-gray-800 hover:bg-black text-white font-bold text-[11px] rounded-xs shadow-xs"
+                              >
+                                演習
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </React.Fragment>
                   );
                 })}
               </tbody>

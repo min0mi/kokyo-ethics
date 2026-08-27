@@ -5,45 +5,104 @@ import { useSearchParams } from 'next/navigation';
 import { FIGURES } from '@/data/figures';
 import { KEYWORDS } from '@/data/keywords';
 import { CATEGORIES } from '@/data/categories';
-import { CategoryId } from '@/types';
 import Link from 'next/link';
 
-// 検索ワード一致部分のハイライトヘルパー
+// ひらがな ➔ カタカナ
+function hiraToKana(str: string): string {
+  return str.replace(/[\u3041-\u3096]/g, (ch) =>
+    String.fromCharCode(ch.charCodeAt(0) + 0x60)
+  );
+}
+
+// カタカナ ➔ ひらがな
+function kanaToHira(str: string): string {
+  return str.replace(/[\u30a1-\u30f6]/g, (ch) =>
+    String.fromCharCode(ch.charCodeAt(0) - 0x60)
+  );
+}
+
+// ひらがな・カタカナ両対応マッチ判定
+function isMatch(text: string, query: string): boolean {
+  if (!query || !query.trim()) return true;
+  if (!text) return false;
+
+  const qLower = query.toLowerCase().trim();
+  const tLower = text.toLowerCase();
+
+  const qKana = hiraToKana(qLower);
+  const qHira = kanaToHira(qLower);
+  const tKana = hiraToKana(tLower);
+
+  return (
+    tLower.includes(qLower) ||
+    tKana.includes(qKana) ||
+    tLower.includes(qHira) ||
+    tKana.includes(qLower)
+  );
+}
+
+// 検索ワード一致部分のハイライトヘルパー（ひらがな入力時もカタカナ部分を光らせる）
 function highlightMatch(text: string, query: string): React.ReactNode {
   if (!query || !query.trim() || !text) return text;
 
-  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const q = query.trim();
+  const qHira = kanaToHira(q);
+  const qKana = hiraToKana(q);
+
+  const patterns = Array.from(new Set([q, qHira, qKana])).filter(Boolean);
+  const escaped = patterns.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
   const regex = new RegExp(`(${escaped})`, 'gi');
   const parts = text.split(regex);
 
   if (parts.length === 1) return text;
 
-  return parts.map((part, idx) =>
-    part.toLowerCase() === query.toLowerCase() ? (
+  return parts.map((part, idx) => {
+    const isMatched = patterns.some((p) => p.toLowerCase() === part.toLowerCase());
+    return isMatched ? (
       <mark key={idx} className="bg-yellow-200 text-black px-0.5 rounded-xs font-bold">
         {part}
       </mark>
     ) : (
       part
-    )
-  );
+    );
+  });
 }
+
+type MainGroup = 'all' | '源流思想' | '日本思想' | '西洋思想';
 
 function MapContent() {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get('q') || '';
 
-  const [selectedCategory, setSelectedCategory] = useState<CategoryId | 'all'>('all');
+  const [selectedGroup, setSelectedGroup] = useState<MainGroup>('all');
   const [searchQuery, setSearchQuery] = useState<string>(queryParam);
 
   const availableCategories = useMemo(() => CATEGORIES.filter((c) => c.isAvailable), []);
 
+  // 3大区分（源流思想・日本思想・西洋思想）ごとの件数
+  const groupCounts = useMemo(() => {
+    const counts = {
+      all: FIGURES.length,
+      '源流思想': 0,
+      '日本思想': 0,
+      '西洋思想': 0,
+    };
+    FIGURES.forEach((fig) => {
+      const cat = CATEGORIES.find((c) => c.id === fig.categoryId);
+      if (cat && cat.groupName in counts) {
+        counts[cat.groupName as '源流思想' | '日本思想' | '西洋思想'] += 1;
+      }
+    });
+    return counts;
+  }, []);
+
+  // 表示するカテゴリ一覧
   const displayedCategories = useMemo(() => {
-    if (selectedCategory === 'all') {
+    if (selectedGroup === 'all') {
       return availableCategories;
     }
-    return availableCategories.filter((c) => c.id === selectedCategory);
-  }, [selectedCategory, availableCategories]);
+    return availableCategories.filter((c) => c.groupName === selectedGroup);
+  }, [selectedGroup, availableCategories]);
 
   return (
     <div className="max-w-6xl mx-auto px-2 sm:px-4 py-3 space-y-3 text-xs text-gray-900">
@@ -54,50 +113,63 @@ function MapContent() {
             思想・人物対応表
           </h1>
           <p className="text-[11px] text-gray-500 mt-0.5">
-            人物・対応キーワード・説明の一覧（全{FIGURES.length}名・{KEYWORDS.length}語句）
+            人物・著書・対応キーワード・説明の一覧（全{FIGURES.length}名・{KEYWORDS.length}語句）
           </p>
         </div>
 
-        <div className="w-full sm:w-72">
+        <div className="w-full sm:w-80">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="人物・キーワード・説明で検索..."
-            className="w-full px-2.5 py-1 border border-gray-300 rounded-xs text-xs focus:outline-hidden focus:border-gray-500"
+            placeholder="ひらがな・カタカナ・人物・語句で検索..."
+            className="w-full px-2.5 py-1.5 border border-gray-300 rounded-xs text-xs focus:outline-hidden focus:border-gray-500 shadow-inner"
           />
         </div>
       </div>
 
-      {/* 単元切り替えタブ */}
-      <div className="flex flex-wrap gap-1 border-b border-gray-300 pb-1 text-xs">
+      {/* 大分類切り替えタブ（源流思想・日本思想・西洋思想） */}
+      <div className="flex flex-wrap gap-1.5 border-b border-gray-300 pb-1.5 text-xs">
         <button
-          onClick={() => setSelectedCategory('all')}
-          className={`px-2.5 py-1 font-bold rounded-xs border ${
-            selectedCategory === 'all'
-              ? 'bg-gray-800 text-white border-gray-800'
+          onClick={() => setSelectedGroup('all')}
+          className={`px-3 py-1 font-bold rounded-xs border ${
+            selectedGroup === 'all'
+              ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
           }`}
         >
-          全単元 ({FIGURES.length}名)
+          全思想 ({groupCounts.all}名)
         </button>
-        {availableCategories.map((cat) => {
-          const isSel = selectedCategory === cat.id;
-          const count = FIGURES.filter((f) => f.categoryId === cat.id).length;
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`px-2.5 py-1 font-bold rounded-xs border ${
-                isSel
-                  ? 'bg-gray-800 text-white border-gray-800'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-              }`}
-            >
-              {cat.shortName} ({count})
-            </button>
-          );
-        })}
+        <button
+          onClick={() => setSelectedGroup('源流思想')}
+          className={`px-3 py-1 font-bold rounded-xs border ${
+            selectedGroup === '源流思想'
+              ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+          }`}
+        >
+          源流思想 ({groupCounts['源流思想']}名)
+        </button>
+        <button
+          onClick={() => setSelectedGroup('日本思想')}
+          className={`px-3 py-1 font-bold rounded-xs border ${
+            selectedGroup === '日本思想'
+              ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+          }`}
+        >
+          日本思想 ({groupCounts['日本思想']}名)
+        </button>
+        <button
+          onClick={() => setSelectedGroup('西洋思想')}
+          className={`px-3 py-1 font-bold rounded-xs border ${
+            selectedGroup === '西洋思想'
+              ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+          }`}
+        >
+          西洋思想 ({groupCounts['西洋思想']}名)
+        </button>
       </div>
 
       {/* 3列構成テーブル: 人物 | 対応キーワード | 説明 */}
@@ -106,13 +178,13 @@ function MapContent() {
           const catFigures = FIGURES.filter((fig) => {
             if (fig.categoryId !== cat.id) return false;
             if (searchQuery.trim()) {
-              const q = searchQuery.toLowerCase();
               const figKws = KEYWORDS.filter((k) => k.figureId === fig.id);
-              const matchName = fig.name.toLowerCase().includes(q) || (fig.englishName && fig.englishName.toLowerCase().includes(q));
-              const matchConcept = fig.mainConcept.toLowerCase().includes(q);
-              const matchSummary = fig.summary && fig.summary.toLowerCase().includes(q);
-              const matchKw = figKws.some((k) => k.name.toLowerCase().includes(q) || k.definition.toLowerCase().includes(q));
-              return matchName || matchConcept || matchSummary || matchKw;
+              const matchName = isMatch(fig.name, searchQuery) || (fig.englishName && isMatch(fig.englishName, searchQuery));
+              const matchConcept = isMatch(fig.mainConcept, searchQuery);
+              const matchSummary = fig.summary && isMatch(fig.summary, searchQuery);
+              const matchBooks = fig.books && fig.books.some((b) => isMatch(b, searchQuery));
+              const matchKw = figKws.some((k) => isMatch(k.name, searchQuery) || isMatch(k.definition, searchQuery));
+              return matchName || matchConcept || matchSummary || matchBooks || matchKw;
             }
             return true;
           });
@@ -123,14 +195,19 @@ function MapContent() {
             <div key={cat.id} className="bg-white border border-gray-300 rounded-xs overflow-hidden shadow-xs">
               {/* 単元ヘッダー */}
               <div className="bg-gray-100 px-3 py-1.5 border-b border-gray-300 flex items-center justify-between">
-                <span className="font-bold text-gray-900 text-xs">
-                  {cat.name} ── 全 {catFigures.length} 名
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-gray-900 text-xs">
+                    {cat.name}
+                  </span>
+                  <span className="text-[10px] text-gray-500">
+                    （{catFigures.length} 名）
+                  </span>
+                </div>
                 <Link
                   href={`/practice?category=${cat.id}&count=10`}
-                  className="px-2.5 py-0.5 bg-gray-800 hover:bg-black text-white font-bold text-[11px] rounded-xs"
+                  className="px-2.5 py-0.5 bg-gray-800 hover:bg-black text-white font-bold text-[11px] rounded-xs shadow-xs"
                 >
-                  演習
+                  この単元を演習
                 </Link>
               </div>
 

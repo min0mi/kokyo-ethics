@@ -2,11 +2,11 @@ import { Category } from '@/types';
 
 export interface ExtendedCategory extends Category {
   isAvailable: boolean;
-  groupName: string;
+  groupName: '源流思想' | '日本思想' | '西洋思想';
 }
 
 export const CATEGORIES: ExtendedCategory[] = [
-  // 1. 源流思想 (5単元)
+  // 1. 源流思想
   {
     id: 'greek',
     name: '古代ギリシャ哲学',
@@ -62,47 +62,6 @@ export const CATEGORIES: ExtendedCategory[] = [
     isAvailable: true,
     groupName: '源流思想',
   },
-
-  // 2. 日本思想
-  {
-    id: 'japan_buddhism_thought',
-    name: '日本思想（古代〜近代・現代）',
-    shortName: '日本思想',
-    era: '古代〜現代',
-    description: '聖徳太子、平安・鎌倉仏教、江戸儒学・国学・町人農民思想、幕末・近代啓蒙、京都学派、民俗学',
-    iconName: 'Torii',
-    orderIndex: 6,
-    isAvailable: true,
-    groupName: '日本思想',
-  },
-
-  // 3. 西洋近代思想
-  {
-    id: 'western_modern',
-    name: '西洋近代思想（ルネサンス〜功利・社会主義）',
-    shortName: '西洋近代思想',
-    era: '14世紀〜19世紀',
-    description: 'ルネサンス、宗教改革、近代合理論・経験論、社会契約説、啓蒙思想、ドイツ観念論、功利主義、社会主義',
-    iconName: 'Compass',
-    orderIndex: 7,
-    isAvailable: true,
-    groupName: '西洋思想',
-  },
-
-  // 4. 西洋現代思想
-  {
-    id: 'western_contemporary',
-    name: '西洋現代思想（実存〜現代正義・環境倫理）',
-    shortName: '西洋現代思想',
-    era: '19世紀末〜現代',
-    description: '実存主義、プラグマティズム、精神分析、フランクフルト学派、構造主義・ポスト構造主義、正義論、環境倫理・生命倫理',
-    iconName: 'Flame',
-    orderIndex: 8,
-    isAvailable: true,
-    groupName: '西洋思想',
-  },
-
-  // 5. 青年期の課題と人間観
   {
     id: 'adolescence_public',
     name: '青年期の課題と人間観',
@@ -110,8 +69,56 @@ export const CATEGORIES: ExtendedCategory[] = [
     era: '心理・人間論',
     description: 'ホモ・サピエンス/ルーデンス、アイデンティティ（エリクソン）、欲求階層（マズロー）、葛藤・パーソナリティ理論',
     iconName: 'Users',
+    orderIndex: 6,
+    isAvailable: true,
+    groupName: '源流思想',
+  },
+
+  // 2. 日本思想 (〜鎌倉 と 室町〜 に分割)
+  {
+    id: 'japan_ancient_kamakura',
+    name: '日本思想（古代〜鎌倉）',
+    shortName: '日本思想（〜鎌倉）',
+    era: '古代〜鎌倉時代',
+    description: '聖徳太子、奈良・平安仏教（最澄・空海・源信・空也）、鎌倉新仏教（法然・親鸞・一遍・栄西・道元・日蓮・明恵）',
+    iconName: 'Torii',
+    orderIndex: 7,
+    isAvailable: true,
+    groupName: '日本思想',
+  },
+  {
+    id: 'japan_muromachi_modern',
+    name: '日本思想（室町〜近代・現代）',
+    shortName: '日本思想（室町〜）',
+    era: '室町時代〜現代',
+    description: '室町文化、江戸儒学・国学・町人農民思想、幕末・近代啓蒙思想（福沢諭吉・中江兆民）、京都学派（西田幾多郎）、民俗学',
+    iconName: 'BookOpen',
+    orderIndex: 8,
+    isAvailable: true,
+    groupName: '日本思想',
+  },
+
+  // 3. 西洋思想
+  {
+    id: 'western_modern',
+    name: '西洋近代思想（ルネサンス〜功利・社会主義）',
+    shortName: '西洋近代思想',
+    era: '14世紀〜19世紀',
+    description: 'ルネサンス、宗教改革、近代合理論・経験論、社会契約説、啓蒙思想、ドイツ観念論、功利主義、社会主義',
+    iconName: 'Compass',
     orderIndex: 9,
     isAvailable: true,
-    groupName: '青年期の課題と人間観',
+    groupName: '西洋思想',
+  },
+  {
+    id: 'western_contemporary',
+    name: '西洋現代思想（実存〜現代正義・環境倫理）',
+    shortName: '西洋現代思想',
+    era: '19世紀末〜現代',
+    description: '実存主義、プラグマティズム、精神分析、フランクフルト学派、構造主義・ポスト構造主義、正義論、環境倫理・生命倫理',
+    iconName: 'Flame',
+    orderIndex: 10,
+    isAvailable: true,
+    groupName: '西洋思想',
   },
 ];
