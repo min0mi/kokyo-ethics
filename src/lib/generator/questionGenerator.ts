@@ -20,6 +20,7 @@ export const AVAILABLE_CATEGORY_IDS: CategoryId[] = [
   'islam',
   'indian_buddhism',
   'chinese_philosophy',
+  'adolescence_public',
 ];
 
 function shuffle<T>(array: T[]): T[] {

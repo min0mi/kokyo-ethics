@@ -46,7 +46,7 @@ export interface Figure {
   eraDetail: string;
   mainConcept: string;
   summary: string;
-  tags: string[];
+  tags?: string[];
   contrastFigureIds?: string[]; // 共テ頻出の対比人物ID
   relations?: FigureRelation[]; // 思想の有機的相関・系譜
 }
@@ -58,9 +58,10 @@ export interface Keyword {
   figureId: string;
   categoryId: CategoryId;
   definition: string;
-  explanation: string;
-  commonTestPoint: string; // 共通テストでの判断語句・ひっかけポイント
-  distractorTags: string[];
+  importance?: number;
+  explanation?: string;
+  commonTestPoint?: string; // 共通テストでの判断語句・ひっかけポイント
+  distractorTags?: string[];
   contrastKeywordIds?: string[]; // 対比される用語
 }
 
