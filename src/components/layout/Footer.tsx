@@ -5,19 +5,16 @@ export const Footer: React.FC = () => {
   return (
     <footer className="w-full bg-white border-t border-gray-300 text-xs text-gray-600 mt-10 py-5">
       <div className="max-w-7xl mx-auto px-4 text-center space-y-2.5">
-        {/* フッターリンク一覧 */}
         <div className="flex flex-wrap justify-center items-center gap-x-3.5 gap-y-1 text-gray-700 text-xs">
           <Link href="/" className="hover:underline hover:text-blue-700">トップ</Link>
           <span>|</span>
-          <Link href="/practice" className="hover:underline hover:text-blue-700">演習開始（設定・出題）</Link>
-          <span>|</span>
-          <Link href="/dictionary" className="hover:underline hover:text-blue-700">思想・用語図鑑</Link>
+          <Link href="/dictionary" className="hover:underline hover:text-blue-700">思想・人物マップ</Link>
           <span>|</span>
           <Link href="/ranking" className="hover:underline hover:text-blue-700">全国ランキング</Link>
           <span>|</span>
           <Link href="/badges" className="hover:underline hover:text-blue-700">バッジ実績</Link>
           <span>|</span>
-          <Link href="/stats" className="hover:underline hover:text-blue-700">学習進捗・日別グラフ</Link>
+          <Link href="/stats" className="hover:underline hover:text-blue-700">学習進捗・グラフ</Link>
           <span>|</span>
           <Link href="/about" className="hover:underline hover:text-blue-700">サイトについて</Link>
           <span>|</span>

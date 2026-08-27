@@ -188,7 +188,7 @@ export class UserDataStore {
   }
 
   /**
-   * 過去 N 日間の日別学習履歴を取得（折れ線グラフ用）
+   * 過去 N 日間（または全期間）の日別学習履歴を取得（折れ線グラフ用）
    */
   static getDailyHistory(days: number = 7): { date: string; label: string; total: number; correct: number }[] {
     const profile = this.getProfile();
@@ -196,20 +196,48 @@ export class UserDataStore {
     const result: { date: string; label: string; total: number; correct: number }[] = [];
 
     const now = new Date();
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-      const dateStr = d.toISOString().split('T')[0];
-      const month = d.getMonth() + 1;
-      const day = d.getDate();
-      const label = `${month}/${day}`;
 
-      const entry = counts[dateStr] || { total: 0, correct: 0 };
-      result.push({
-        date: dateStr,
-        label,
-        total: entry.total,
-        correct: entry.correct,
-      });
+    if (days >= 999 || days <= 0) {
+      // 全期間: 記録されている最古の日付を探索
+      const storedDates = Object.keys(counts).sort();
+      let targetDays = 7;
+      if (storedDates.length > 0) {
+        const oldest = new Date(storedDates[0]);
+        const diffDays = Math.ceil((now.getTime() - oldest.getTime()) / (24 * 60 * 60 * 1000)) + 1;
+        targetDays = Math.max(diffDays, 7);
+      }
+
+      for (let i = targetDays - 1; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dateStr = d.toISOString().split('T')[0];
+        const month = d.getMonth() + 1;
+        const day = d.getDate();
+        const label = `${month}/${day}`;
+
+        const entry = counts[dateStr] || { total: 0, correct: 0 };
+        result.push({
+          date: dateStr,
+          label,
+          total: entry.total,
+          correct: entry.correct,
+        });
+      }
+    } else {
+      for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dateStr = d.toISOString().split('T')[0];
+        const month = d.getMonth() + 1;
+        const day = d.getDate();
+        const label = `${month}/${day}`;
+
+        const entry = counts[dateStr] || { total: 0, correct: 0 };
+        result.push({
+          date: dateStr,
+          label,
+          total: entry.total,
+          correct: entry.correct,
+        });
+      }
     }
 
     return result;

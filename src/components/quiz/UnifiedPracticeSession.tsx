@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Question, CategoryId, QuizSessionConfig, Badge } from '@/types';
+import { Question, CategoryId, QuizSessionConfig, Badge, ChoiceQuestion, MatchingQuestion, TypingQuestion, RecallQuestion } from '@/types';
 import { QuestionGenerator, AVAILABLE_CATEGORY_IDS } from '@/lib/generator/questionGenerator';
 import { CATEGORIES } from '@/data/categories';
 import { ChoiceQuiz } from './ChoiceQuiz';
@@ -18,7 +18,7 @@ interface UnifiedPracticeProps {
 
 export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
   initialConfig,
-  autoStart = true, // デフォルトで即座にスタート！
+  autoStart = true,
 }) => {
   const [config, setConfig] = useState<QuizSessionConfig>({
     categoryIds: initialConfig?.categoryIds || AVAILABLE_CATEGORY_IDS,
@@ -57,7 +57,6 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
     setIsStarted(true);
   }, []);
 
-  // autoStart が true の場合、初回レンダリングで即座にセッション開始
   useEffect(() => {
     if (autoStart) {
       startSessionWithConfig(config);
@@ -111,21 +110,18 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
     return (
       <div className="bg-white border border-gray-300 rounded-xs p-4 sm:p-6 space-y-4 max-w-3xl mx-auto text-xs">
         <div className="border-b border-gray-200 pb-2">
-          <span className="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-300">
-            演習条件設定
-          </span>
-          <h2 className="text-base sm:text-lg font-bold text-gray-900 mt-1">
-            源流思想 演習カスタマイズ
+          <h2 className="text-base sm:text-lg font-bold text-gray-900">
+            演習設定
           </h2>
           <p className="text-gray-500 text-[11px] mt-0.5">
-            形式と単元をON/OFFして、問題数を選んでスタートしてください。
+            形式と単元を選択し、問題数を指定して開始してください。
           </p>
         </div>
 
-        {/* 1. 問題形式のON/OFF */}
+        {/* 1. 出題形式 */}
         <div className="space-y-1.5">
           <label className="font-bold text-gray-800 block">
-            ① 出題形式（複数選択可能）:
+            出題形式:
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <label className="flex items-center gap-1.5 p-2 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
@@ -135,7 +131,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
                 onChange={() => toggleType('choice')}
                 className="rounded-xs"
               />
-              <span className="font-bold text-gray-800">4択選択問題</span>
+              <span className="font-bold text-gray-800">4択問題</span>
             </label>
 
             <label className="flex items-center gap-1.5 p-2 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
@@ -155,7 +151,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
                 onChange={() => toggleType('typing')}
                 className="rounded-xs"
               />
-              <span className="font-bold text-gray-800">キーワード記述</span>
+              <span className="font-bold text-gray-800">用語記述</span>
             </label>
 
             <label className="flex items-center gap-1.5 p-2 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
@@ -170,11 +166,11 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
           </div>
         </div>
 
-        {/* 2. 単元選択 */}
+        {/* 2. 出題単元 */}
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
             <label className="font-bold text-gray-800">
-              ② 出題単元:
+              出題単元:
             </label>
             <button
               type="button"
@@ -213,12 +209,12 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
         {/* 3. 出題問題数 */}
         <div className="space-y-1.5">
           <label className="font-bold text-gray-800 block">
-            ③ 出題問題数:
+            出題問題数:
           </label>
           <div className="flex flex-wrap gap-2">
             {[5, 10, 20, 30, 999].map((count) => {
               const isSelected = config.questionCount === count;
-              const label = count === 999 ? '全問題' : `${count}問`;
+              const label = count === 999 ? '全問' : `${count}問`;
               return (
                 <button
                   key={count}
@@ -244,7 +240,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
             onClick={() => startSessionWithConfig(config)}
             className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-black text-sm rounded-xs shadow-xs"
           >
-            演習を開始する（{config.questionCount === 999 ? '全問題' : `${config.questionCount}問`}）
+            演習を開始する（{config.questionCount === 999 ? '全問' : `${config.questionCount}問`}）
           </button>
         </div>
       </div>
@@ -253,7 +249,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
 
   // 演習実行中
   return (
-    <div className="max-w-4xl mx-auto space-y-4">
+    <div className="max-w-4xl mx-auto space-y-3">
       <BadgeUnlockedModal badge={activeBadge} onClose={() => setActiveBadge(null)} />
 
       {!isCompleted ? (
@@ -262,40 +258,43 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
             {/* 上部ヘッダー */}
             <div className="flex justify-between items-center text-xs pb-1 border-b border-gray-300">
               <span className="font-bold text-gray-700">
-                源流思想 演習 （第 {currentIndex + 1} 問 / 全 {questions.length} 問）
+                演習 （第 {currentIndex + 1} 問 / 全 {questions.length} 問）
               </span>
               <button
                 onClick={() => setIsStarted(false)}
                 className="text-[11px] text-gray-600 hover:text-blue-700 hover:underline font-semibold"
               >
-                [条件を変更する]
+                [条件変更]
               </button>
             </div>
 
-            {/* 問題タイプごとの表示 */}
+            {/* 問題タイプごとの表示（key={currentQ.id} を指定して完全初期化） */}
             {currentQ.type === 'matching_lines' ? (
               <MatchingQuiz
-                question={currentQ as import('@/types').MatchingQuestion}
+                key={currentQ.id}
+                question={currentQ as MatchingQuestion}
                 onComplete={handleNextQuestion}
                 onBadgeUnlocked={(b) => setActiveBadge(b)}
               />
             ) : currentQ.type === 'fill_in_keyword' ? (
               <TypingQuiz
-                question={currentQ as import('@/types').TypingQuestion}
+                key={currentQ.id}
+                question={currentQ as TypingQuestion}
                 onComplete={handleNextQuestion}
                 onBadgeUnlocked={(b) => setActiveBadge(b)}
               />
             ) : currentQ.type === 'recall_classification' ? (
               <RecallQuiz
-                question={currentQ as import('@/types').RecallQuestion}
+                key={currentQ.id}
+                question={currentQ as RecallQuestion}
                 onComplete={handleNextQuestion}
                 onBadgeUnlocked={(b) => setActiveBadge(b)}
               />
             ) : (
               <ChoiceQuiz
-                questions={[currentQ as import('@/types').ChoiceQuestion]}
-                isSpeedMode={false}
-                onComplete={(stats) => handleNextQuestion(stats)}
+                key={currentQ.id}
+                question={currentQ as ChoiceQuestion}
+                onComplete={handleNextQuestion}
                 onBadgeUnlocked={(b) => setActiveBadge(b)}
               />
             )}

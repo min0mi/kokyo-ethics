@@ -1,19 +1,21 @@
 'use client';
 
-import React from 'react';
-
-interface DailyDataPoint {
-  date: string;
-  label: string;
-  total: number;
-  correct: number;
-}
+import React, { useState, useEffect } from 'react';
+import { UserDataStore } from '@/lib/storage/userDataStore';
 
 interface DailyLineChartProps {
-  data: DailyDataPoint[];
+  initialDays?: number;
 }
 
-export const DailyLineChart: React.FC<DailyLineChartProps> = ({ data }) => {
+export const DailyLineChart: React.FC<DailyLineChartProps> = ({ initialDays = 7 }) => {
+  const [selectedDays, setSelectedDays] = useState<number>(initialDays);
+  const [data, setData] = useState<{ date: string; label: string; total: number; correct: number }[]>([]);
+
+  useEffect(() => {
+    const history = UserDataStore.getDailyHistory(selectedDays);
+    setData(history);
+  }, [selectedDays]);
+
   if (!data || data.length === 0) {
     return <div className="text-xs text-gray-400 p-4 text-center">データがありません</div>;
   }
@@ -27,7 +29,6 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ data }) => {
   const width = chartWidth - paddingX * 2;
   const height = chartHeight - paddingY * 2;
 
-  // 座標計算
   const getX = (index: number) => {
     if (data.length === 1) return paddingX + width / 2;
     return paddingX + (index / (data.length - 1)) * width;
@@ -37,25 +38,51 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ data }) => {
     return paddingY + height - (val / maxVal) * height;
   };
 
-  // ポリライン用の点文字列
   const totalPoints = data.map((d, i) => `${getX(i)},${getY(d.total)}`).join(' ');
   const correctPoints = data.map((d, i) => `${getX(i)},${getY(d.correct)}`).join(' ');
 
+  // ラベル間引き判定（データ点が多い場合）
+  const step = data.length > 20 ? 5 : data.length > 10 ? 2 : 1;
+
   return (
-    <div className="w-full bg-white border border-gray-300 rounded-xs p-3.5 space-y-2 text-xs">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 pb-1.5">
+    <div className="w-full bg-white border border-gray-300 rounded-xs p-3 space-y-2 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-gray-200 pb-1.5">
         <h3 className="font-bold text-gray-900 text-xs">
-          [日別学習問題数の推移] （直近{data.length}日間）
+          [日別学習問題数の推移]
         </h3>
-        <div className="flex items-center gap-3 text-[11px]">
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-0.5 bg-blue-600 inline-block" />
-            <span className="font-semibold text-gray-700">総解答数</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-0.5 bg-green-600 inline-block" />
-            <span className="font-semibold text-gray-700">正解数</span>
-          </div>
+
+        {/* 期間切り替えタブ */}
+        <div className="flex items-center gap-1 text-[10px]">
+          {[
+            { label: '7日', val: 7 },
+            { label: '14日', val: 14 },
+            { label: '30日', val: 30 },
+            { label: '全期間', val: 999 },
+          ].map((item) => (
+            <button
+              key={item.val}
+              type="button"
+              onClick={() => setSelectedDays(item.val)}
+              className={`px-1.5 py-0.5 border rounded-xs font-bold ${
+                selectedDays === item.val
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-gray-50 text-gray-600 border-gray-300 hover:bg-gray-200'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-end gap-3 text-[10px] text-gray-600">
+        <div className="flex items-center gap-1">
+          <span className="w-2.5 h-0.5 bg-blue-600 inline-block" />
+          <span>総解答数</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="w-2.5 h-0.5 bg-green-600 inline-block" />
+          <span>正解数</span>
         </div>
       </div>
 
@@ -63,9 +90,9 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ data }) => {
       <div className="w-full overflow-x-auto">
         <svg
           viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-          className="w-full h-44 select-none"
+          className="w-full h-36 select-none"
         >
-          {/* 横グリッド線 (3本) */}
+          {/* 横グリッド線 */}
           {[0, 0.5, 1].map((ratio, idx) => {
             const y = paddingY + height * (1 - ratio);
             const val = Math.round(maxVal * ratio);
@@ -84,7 +111,7 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ data }) => {
                   x={paddingX - 6}
                   y={y + 3}
                   textAnchor="end"
-                  fontSize="10"
+                  fontSize="9"
                   fill="#9ca3af"
                 >
                   {val}
@@ -114,36 +141,37 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ data }) => {
             const cx = getX(i);
             const cyTotal = getY(d.total);
             const cyCorrect = getY(d.correct);
+            const showLabel = i % step === 0 || i === data.length - 1;
 
             return (
               <g key={i}>
-                {/* 日付ラベル */}
-                <text
-                  x={cx}
-                  y={chartHeight - 6}
-                  textAnchor="middle"
-                  fontSize="10"
-                  fill="#6b7280"
-                  fontWeight="bold"
-                >
-                  {d.label}
-                </text>
+                {showLabel && (
+                  <text
+                    x={cx}
+                    y={chartHeight - 4}
+                    textAnchor="middle"
+                    fontSize="9"
+                    fill="#6b7280"
+                    fontWeight="bold"
+                  >
+                    {d.label}
+                  </text>
+                )}
 
-                {/* 総解答数の点 */}
                 <circle
                   cx={cx}
                   cy={cyTotal}
-                  r="3.5"
+                  r={data.length > 20 ? 2 : 3}
                   fill="#2563eb"
                   stroke="#ffffff"
-                  strokeWidth="1.5"
+                  strokeWidth="1"
                 />
-                {d.total > 0 && (
+                {d.total > 0 && data.length <= 14 && (
                   <text
                     x={cx}
-                    y={cyTotal - 6}
+                    y={cyTotal - 5}
                     textAnchor="middle"
-                    fontSize="9"
+                    fontSize="8"
                     fontWeight="bold"
                     fill="#1d4ed8"
                   >
@@ -151,11 +179,10 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ data }) => {
                   </text>
                 )}
 
-                {/* 正解数の点 */}
                 <circle
                   cx={cx}
                   cy={cyCorrect}
-                  r="3"
+                  r={data.length > 20 ? 1.5 : 2.5}
                   fill="#16a34a"
                   stroke="#ffffff"
                   strokeWidth="1"
@@ -165,11 +192,6 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ data }) => {
           })}
         </svg>
       </div>
-
-      <div className="text-[11px] text-gray-500 text-right pt-0.5">
-        ※ 毎日の演習データは自動集計・保存されます。
-      </div>
     </div>
   );
 };
-
