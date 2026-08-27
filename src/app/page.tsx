@@ -103,13 +103,7 @@ export default function HomePage() {
     router.push(`/practice?${params.toString()}`);
   };
 
-  const topRankers = [
-    { rank: 1, name: 'ソクラテスの弟子', xp: 4850 },
-    { rank: 2, name: 'イデア探求者', xp: 4120 },
-    { rank: 3, name: 'カントの散歩道', xp: 3740 },
-    { rank: 4, name: '超人ニーチェ', xp: 3200 },
-    { rank: 5, name: '実存サルトル', xp: 2850 },
-  ];
+
 
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 py-3 space-y-3">
@@ -461,39 +455,7 @@ export default function HomePage() {
           {/* 2. 学習問題数 折れ線グラフ（全期間・30日・14日・7日切り替え可能） */}
           <DailyLineChart initialDays={7} />
 
-          {/* 3. 全国ランキング TOP5 */}
-          <div className="bg-white border border-gray-300 rounded-xs p-3 space-y-1.5 text-xs">
-            <div className="font-bold text-gray-800 border-b border-gray-200 pb-1 flex items-center justify-between">
-              <span>ランキング TOP 5</span>
-              <Link href="/ranking" className="text-[11px] text-blue-700 hover:underline">
-                全体 »
-              </Link>
-            </div>
 
-            <div className="space-y-1">
-              {topRankers.map((r) => (
-                <div key={r.rank} className="flex items-center justify-between text-[11px] py-0.5">
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className={`w-3.5 h-3.5 text-center font-bold text-[9px] leading-3.5 rounded-xs ${
-                        r.rank === 1
-                          ? 'bg-yellow-400 text-black'
-                          : r.rank === 2
-                          ? 'bg-gray-300 text-black'
-                          : r.rank === 3
-                          ? 'bg-amber-700 text-white'
-                          : 'text-gray-500'
-                      }`}
-                    >
-                      {r.rank}
-                    </span>
-                    <span className="font-semibold text-gray-800 truncate max-w-[120px]">{r.name}</span>
-                  </div>
-                  <span className="font-bold text-blue-700">{r.xp} XP</span>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* 4. スポンサー広告枠 */}
           <AdBanner format="rectangle" label="Sponsor Link" />

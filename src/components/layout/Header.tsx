@@ -40,7 +40,6 @@ export const Header: React.FC = () => {
     { href: '/dictionary', label: '思想・人物対応表' },
     { href: '/guide', label: '使い方' },
     { href: '/stats', label: '学習進捗・グラフ' },
-    { href: '/ranking', label: '全国ランキング' },
     { href: '/badges', label: 'バッジ実績' },
   ];
 
