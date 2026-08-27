@@ -261,10 +261,11 @@ export class UserDataStore {
    * 秒数を「〇時間〇分」または「〇分〇秒」に整形
    */
   static formatStudyTime(seconds: number = 0): string {
-    if (!seconds || seconds <= 0) return '0分';
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
+    const totalSecs = Math.floor(seconds);
+    if (totalSecs <= 0) return '0秒';
+    const hrs = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
 
     if (hrs > 0) {
       return `${hrs}時間${mins}分`;
