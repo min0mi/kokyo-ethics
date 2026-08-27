@@ -75,6 +75,43 @@ export default function StatsPage() {
       ? Math.round((profile.totalCorrect / profile.totalAnswered) * 100)
       : 0;
 
+  const [backupCode, setBackupCode] = useState('');
+  const [isCopied, setIsCopied] = useState(false);
+  const [importCode, setImportCode] = useState('');
+  const [importError, setImportError] = useState('');
+
+  const handleGenerateBackup = () => {
+    try {
+      const code = UserDataStore.exportBackupData();
+      setBackupCode(code);
+      setIsCopied(false);
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : 'エラーが発生しました。';
+      alert(errMsg);
+    }
+  };
+
+  const handleCopyBackup = () => {
+    if (!backupCode) return;
+    navigator.clipboard.writeText(backupCode);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const handleImportBackup = () => {
+    if (!importCode.trim()) return;
+    setImportError('');
+    if (confirm('データを上書きして復元しますか？\n現在保存されている学習データは上書きされ、消去されます。')) {
+      const success = UserDataStore.importBackupData(importCode);
+      if (success) {
+        alert('データを正常に復元しました！自動的にページをリロードします。');
+        window.location.reload();
+      } else {
+        setImportError('コードが正しくありません。貼り付けたコードを確認してください。');
+      }
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-3 py-5 space-y-4 text-xs text-gray-900">
       {/* ページヘッダー */}
@@ -250,6 +287,79 @@ export default function StatsPage() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* ★ 学習データのバックアップ＆復元（引き継ぎ） ★ */}
+      <div className="bg-white border border-gray-300 p-4 rounded-xs space-y-3 text-xs">
+        <div className="border-b border-gray-200 pb-2">
+          <h2 className="font-bold text-gray-900 text-sm">
+            学習データのバックアップ・引き継ぎ
+          </h2>
+          <p className="text-[11px] text-gray-500 mt-0.5">
+            現在の学習進捗やバッジ実績、XPをテキストデータとして保存・移行できます。機種変更時やPCへの引き継ぎにご利用ください。
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* バックアップ発行 */}
+          <div className="space-y-2 border border-gray-200 p-3 rounded-xs bg-gray-50/30">
+            <h3 className="font-bold text-gray-800 text-[11px]">1. データをバックアップする</h3>
+            <p className="text-gray-500 text-[10px] leading-tight">
+              下のボタンを押すとバックアップコードが生成されます。コピーしてメモ帳などに保存してください。
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleGenerateBackup}
+                className="px-3 py-1.5 bg-gray-800 hover:bg-black text-white font-bold rounded-xs text-[11px]"
+              >
+                コード生成
+              </button>
+            </div>
+            {backupCode && (
+              <div className="space-y-1.5 pt-1">
+                <textarea
+                  readOnly
+                  value={backupCode}
+                  className="w-full p-2 border border-gray-300 rounded-xs font-mono text-base sm:text-[10px] bg-white h-20 focus:outline-hidden"
+                  onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+                />
+                <button
+                  type="button"
+                  onClick={handleCopyBackup}
+                  className="w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xs text-[11px]"
+                >
+                  {isCopied ? 'コピー完了！' : 'コードをクリップボードにコピー'}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* 復元・移行 */}
+          <div className="space-y-2 border border-gray-200 p-3 rounded-xs bg-gray-50/30">
+            <h3 className="font-bold text-gray-800 text-[11px]">2. データを復元（引き継ぎ）する</h3>
+            <p className="text-gray-500 text-[10px] leading-tight">
+              コピーしたバックアップコードを下に貼り付け、「復元を実行」を押してください。
+            </p>
+            <textarea
+              value={importCode}
+              onChange={(e) => setImportCode(e.target.value)}
+              placeholder="ここにバックアップコードを貼り付けてください..."
+              className="w-full p-2 border border-gray-300 rounded-xs font-mono text-base sm:text-[10px] bg-white h-20 focus:outline-hidden focus:border-blue-600"
+            />
+            {importError && (
+              <p className="text-red-600 font-bold text-[10px]">{importError}</p>
+            )}
+            <button
+              type="button"
+              onClick={handleImportBackup}
+              disabled={!importCode.trim()}
+              className="w-full py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold rounded-xs text-[11px]"
+            >
+              復元を実行する
+            </button>
+          </div>
         </div>
       </div>
     </div>

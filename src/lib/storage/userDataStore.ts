@@ -323,4 +323,60 @@ export class UserDataStore {
 
     return newlyUnlockedBadges;
   }
+
+  /**
+   * データのバックアップ文字列（Base64）を生成
+   */
+  static exportBackupData(): string {
+    if (typeof window === 'undefined') return '';
+    try {
+      const profile = localStorage.getItem(STORAGE_KEYS.PROFILE) || '';
+      const progress = localStorage.getItem(STORAGE_KEYS.PROGRESS) || '';
+      const muted = localStorage.getItem(STORAGE_KEYS.SOUND_MUTED) || '';
+
+      const packageData = {
+        version: '1.0',
+        timestamp: Date.now(),
+        profile: profile ? JSON.parse(profile) : null,
+        progress: progress ? JSON.parse(progress) : null,
+        muted: muted === 'true',
+      };
+
+      const jsonStr = JSON.stringify(packageData);
+      return btoa(unescape(encodeURIComponent(jsonStr)));
+    } catch (e) {
+      console.error('Backup export failed:', e);
+      throw new Error('バックアップデータの生成に失敗しました。');
+    }
+  }
+
+  /**
+   * バックアップ文字列（Base64）からデータを復元
+   */
+  static importBackupData(backupStr: string): boolean {
+    if (typeof window === 'undefined') return false;
+    try {
+      const decodedJson = decodeURIComponent(escape(atob(backupStr.trim())));
+      const packageData = JSON.parse(decodedJson);
+
+      if (!packageData || typeof packageData !== 'object') {
+        return false;
+      }
+
+      if (packageData.profile) {
+        localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(packageData.profile));
+      }
+      if (packageData.progress) {
+        localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(packageData.progress));
+      }
+      if (packageData.muted !== undefined) {
+        localStorage.setItem(STORAGE_KEYS.SOUND_MUTED, String(packageData.muted));
+      }
+
+      return true;
+    } catch (e) {
+      console.error('Backup import failed:', e);
+      return false;
+    }
+  }
 }
