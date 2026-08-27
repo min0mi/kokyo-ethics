@@ -329,22 +329,28 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+            <div className="grid grid-cols-3 gap-1.5 text-[11px]">
               <div className="bg-gray-50 p-1.5 rounded-xs border border-gray-200">
                 <span className="text-gray-500 block">連続学習</span>
-                <strong className="text-sm text-orange-700">{profile?.streakDays || 1} 日</strong>
+                <strong className="text-xs text-orange-700">{profile?.streakDays || 1} 日</strong>
               </div>
               <div className="bg-gray-50 p-1.5 rounded-xs border border-gray-200">
                 <span className="text-gray-500 block">経験値</span>
-                <strong className="text-sm text-blue-700">{profile?.xp || 0} XP</strong>
+                <strong className="text-xs text-blue-700">{profile?.xp || 0} XP</strong>
               </div>
               <div className="bg-gray-50 p-1.5 rounded-xs border border-gray-200">
                 <span className="text-gray-500 block">総解答数</span>
-                <strong className="text-sm text-gray-800">{profile?.totalAnswered || 0} 問</strong>
+                <strong className="text-xs text-gray-800">{profile?.totalAnswered || 0} 問</strong>
               </div>
               <div className="bg-gray-50 p-1.5 rounded-xs border border-gray-200">
                 <span className="text-gray-500 block">定着数</span>
-                <strong className="text-sm text-green-700">{totalMasteredCount} 問</strong>
+                <strong className="text-xs text-green-700">{totalMasteredCount} 問</strong>
+              </div>
+              <div className="bg-gray-50 p-1.5 rounded-xs border border-gray-200 col-span-2">
+                <span className="text-gray-500 block">総学習時間</span>
+                <strong className="text-xs text-indigo-700">
+                  {UserDataStore.formatStudyTime(profile?.totalStudyTimeSeconds || 0)}
+                </strong>
               </div>
             </div>
           </div>

@@ -38,6 +38,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
   const [correctCount, setCorrectCount] = useState(0);
   const [totalXp, setTotalXp] = useState(0);
   const [activeBadge, setActiveBadge] = useState<Badge | null>(null);
+  const sessionStartTimeRef = React.useRef<number>(Date.now());
 
   const availableCategories = CATEGORIES.filter((c) => c.isAvailable);
 
@@ -49,6 +50,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
       return;
     }
 
+    sessionStartTimeRef.current = Date.now();
     setQuestions(pool);
     setCurrentIndex(0);
     setCorrectCount(0);
@@ -283,6 +285,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
           totalQuestions={questions.length}
           correctCount={correctCount}
           xpEarned={totalXp}
+          elapsedSeconds={(Date.now() - sessionStartTimeRef.current) / 1000}
           onRetry={() => startSessionWithConfig(config)}
           modeTitle="演習"
         />

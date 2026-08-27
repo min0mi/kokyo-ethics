@@ -9,7 +9,7 @@ interface DailyLineChartProps {
 
 export const DailyLineChart: React.FC<DailyLineChartProps> = ({ initialDays = 7 }) => {
   const [selectedDays, setSelectedDays] = useState<number>(initialDays);
-  const [data, setData] = useState<{ date: string; label: string; total: number; correct: number }[]>([]);
+  const [data, setData] = useState<{ date: string; label: string; total: number; correct: number; studyTimeSeconds: number }[]>([]);
 
   useEffect(() => {
     const history = UserDataStore.getDailyHistory(selectedDays);
@@ -21,6 +21,9 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ initialDays = 7 
   }
 
   const maxVal = Math.max(...data.map((d) => d.total), 10);
+  const totalPeriodQuestions = data.reduce((acc, cur) => acc + cur.total, 0);
+  const totalPeriodTimeSeconds = data.reduce((acc, cur) => acc + cur.studyTimeSeconds, 0);
+
   const chartHeight = 160;
   const chartWidth = 500;
   const paddingX = 40;
@@ -41,15 +44,20 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ initialDays = 7 
   const totalPoints = data.map((d, i) => `${getX(i)},${getY(d.total)}`).join(' ');
   const correctPoints = data.map((d, i) => `${getX(i)},${getY(d.correct)}`).join(' ');
 
-  // ラベル間引き判定（データ点が多い場合）
+  // ラベル間引き判定
   const step = data.length > 20 ? 5 : data.length > 10 ? 2 : 1;
 
   return (
     <div className="w-full bg-white border border-gray-300 rounded-xs p-3 space-y-2 text-xs">
       <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-gray-200 pb-1.5">
-        <h3 className="font-bold text-gray-900 text-xs">
-          [日別学習問題数の推移]
-        </h3>
+        <div className="space-y-0.5">
+          <h3 className="font-bold text-gray-900 text-xs">
+            学習記録・推移
+          </h3>
+          <p className="text-[10px] text-gray-500">
+            期間合計: <strong className="text-gray-800">{totalPeriodQuestions}問</strong> / 学習時間: <strong className="text-blue-700">{UserDataStore.formatStudyTime(totalPeriodTimeSeconds)}</strong>
+          </p>
+        </div>
 
         {/* 期間切り替えタブ */}
         <div className="flex items-center gap-1 text-[10px]">
@@ -65,7 +73,7 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ initialDays = 7 
               onClick={() => setSelectedDays(item.val)}
               className={`px-1.5 py-0.5 border rounded-xs font-bold ${
                 selectedDays === item.val
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-gray-800 text-white border-gray-800'
                   : 'bg-gray-50 text-gray-600 border-gray-300 hover:bg-gray-200'
               }`}
             >
@@ -77,7 +85,7 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ initialDays = 7 
 
       <div className="flex items-center justify-end gap-3 text-[10px] text-gray-600">
         <div className="flex items-center gap-1">
-          <span className="w-2.5 h-0.5 bg-blue-600 inline-block" />
+          <span className="w-2.5 h-0.5 bg-gray-800 inline-block" />
           <span>総解答数</span>
         </div>
         <div className="flex items-center gap-1">
@@ -120,10 +128,10 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ initialDays = 7 
             );
           })}
 
-          {/* 総解答数（青ライン） */}
+          {/* 総解答数（黒・濃グレーライン） */}
           <polyline
             fill="none"
-            stroke="#2563eb"
+            stroke="#1f2937"
             strokeWidth="2.5"
             points={totalPoints}
           />
@@ -162,7 +170,7 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ initialDays = 7 
                   cx={cx}
                   cy={cyTotal}
                   r={data.length > 20 ? 2 : 3}
-                  fill="#2563eb"
+                  fill="#1f2937"
                   stroke="#ffffff"
                   strokeWidth="1"
                 />
@@ -173,7 +181,7 @@ export const DailyLineChart: React.FC<DailyLineChartProps> = ({ initialDays = 7 
                     textAnchor="middle"
                     fontSize="8"
                     fontWeight="bold"
-                    fill="#1d4ed8"
+                    fill="#111827"
                   >
                     {d.total}
                   </text>

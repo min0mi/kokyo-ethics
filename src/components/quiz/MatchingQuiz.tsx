@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MatchingQuestion, Badge } from '@/types';
 import { KEYWORDS } from '@/data/keywords';
 import { BOOKS } from '@/data/books';
@@ -24,8 +24,10 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
   const [matchedPairIds, setMatchedPairIds] = useState<string[]>([]);
   const [attempts, setAttempts] = useState<number>(0);
   const [rightOptions, setRightOptions] = useState<{ id: string; text: string; isDummy: boolean }[]>([]);
+  const startTimeRef = useRef<number>(Date.now());
 
   useEffect(() => {
+    startTimeRef.current = Date.now();
     // 正解の右側選択肢
     const correctRights = question.pairs.map((p) => ({
       id: p.id,
@@ -34,14 +36,9 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
     }));
 
     // ダミー選択肢（余る選択肢）をプールから集めて合計6個にする
-    const allKeywordsAndBooks = [
-      ...KEYWORDS.map((k) => k.name),
-      ...BOOKS.map((b) => b.title),
-    ].filter((text) => !question.pairs.some((p) => p.right === text));
-
-    // シャッフルしてダミーを必要数（6 - 正解数）取得
     const dummyNeeded = Math.max(0, 6 - correctRights.length);
-    const shuffledDummies = allKeywordsAndBooks
+    const shuffledDummies = [...KEYWORDS.map((k) => k.name), ...BOOKS.map((b) => b.title)]
+      .filter((text) => !correctRights.some((c) => c.text === text))
       .sort(() => Math.random() - 0.5)
       .slice(0, dummyNeeded)
       .map((text, idx) => ({
@@ -70,8 +67,9 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
       setSelectedRight(null);
 
       if (nextMatched.length === question.pairs.length) {
+        const elapsedSec = (Date.now() - startTimeRef.current) / 1000;
         const isClean = attempts + 1 === question.pairs.length;
-        const res = UserDataStore.recordAnswer(question.id, isClean, isClean ? 5 : 3);
+        const res = UserDataStore.recordAnswer(question.id, isClean, isClean ? 5 : 3, elapsedSec);
         if (res.newlyUnlockedBadges.length > 0 && onBadgeUnlocked) {
           res.newlyUnlockedBadges.forEach((b) => onBadgeUnlocked(b));
         }

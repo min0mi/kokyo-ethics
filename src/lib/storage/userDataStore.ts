@@ -1,101 +1,85 @@
+'use client';
+
 import { UserProfile, UserProgressItem, Badge } from '@/types';
-import { BADGES } from '@/data/badges';
 import { SRSEngine } from '@/lib/srs/srsEngine';
+import { BADGES } from '@/data/badges';
 
 const STORAGE_KEYS = {
   PROFILE: 'kokyo_user_profile',
-  PROGRESS: 'kokyo_user_progress',
-  SETTINGS: 'kokyo_user_settings',
+  PROGRESS: 'kokyo_user_progress_map',
+  SOUND_MUTED: 'kokyo_sound_muted',
+};
+
+const DEFAULT_PROFILE: UserProfile = {
+  id: 'guest_user_1',
+  username: '探求者',
+  xp: 0,
+  level: 1,
+  streakDays: 1,
+  lastActiveDate: new Date().toISOString().split('T')[0],
+  unlockedBadgeIds: [],
+  isGuest: true,
+  totalAnswered: 0,
+  totalCorrect: 0,
+  totalStudyTimeSeconds: 0,
+  dailyCounts: {},
 };
 
 export class UserDataStore {
-  /**
-   * プロファイルの初期化または取得
-   */
   static getProfile(): UserProfile {
-    if (typeof window === 'undefined') {
-      return this.getDefaultProfile();
-    }
-
-    const saved = localStorage.getItem(STORAGE_KEYS.PROFILE);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (!parsed.dailyCounts) {
-          parsed.dailyCounts = {};
-        }
-        this.checkStreak(parsed);
-        return parsed;
-      } catch (e) {
-        console.error('Failed to parse user profile', e);
+    if (typeof window === 'undefined') return DEFAULT_PROFILE;
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.PROFILE);
+      if (!data) {
+        this.saveProfile(DEFAULT_PROFILE);
+        return DEFAULT_PROFILE;
       }
+      const profile: UserProfile = JSON.parse(data);
+
+      // 連続ログイン日数の計算
+      const today = new Date().toISOString().split('T')[0];
+      if (profile.lastActiveDate !== today) {
+        const last = new Date(profile.lastActiveDate);
+        const now = new Date(today);
+        const diffDays = Math.round((now.getTime() - last.getTime()) / (1000 * 3600 * 24));
+
+        if (diffDays === 1) {
+          profile.streakDays += 1;
+        } else if (diffDays > 1) {
+          profile.streakDays = 1;
+        }
+        profile.lastActiveDate = today;
+        this.saveProfile(profile);
+      }
+
+      if (profile.totalStudyTimeSeconds === undefined) {
+        profile.totalStudyTimeSeconds = 0;
+      }
+
+      return profile;
+    } catch (e) {
+      console.error('Failed to load profile from localStorage:', e);
+      return DEFAULT_PROFILE;
     }
-
-    const initial = this.getDefaultProfile();
-    this.saveProfile(initial);
-    return initial;
-  }
-
-  private static getDefaultProfile(): UserProfile {
-    const today = new Date().toISOString().split('T')[0];
-    return {
-      id: `guest_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-      username: '探求者',
-      xp: 0,
-      level: 1,
-      streakDays: 1,
-      lastActiveDate: today,
-      unlockedBadgeIds: [],
-      isGuest: true,
-      totalAnswered: 0,
-      totalCorrect: 0,
-      dailyCounts: {
-        [today]: { total: 0, correct: 0 },
-      },
-    };
   }
 
   static saveProfile(profile: UserProfile): void {
     if (typeof window === 'undefined') return;
-    localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
+    try {
+      localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
+      window.dispatchEvent(new Event('user_profile_updated'));
+    } catch (e) {
+      console.error('Failed to save profile to localStorage:', e);
+    }
   }
 
-  /**
-   * 連続ログイン（ストリーク）の判定・更新
-   */
-  private static checkStreak(profile: UserProfile): void {
-    const today = new Date().toISOString().split('T')[0];
-    const lastDate = profile.lastActiveDate;
-
-    if (lastDate === today) {
-      return;
-    }
-
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-    if (lastDate === yesterdayStr) {
-      profile.streakDays += 1;
-    } else {
-      profile.streakDays = 1;
-    }
-
-    profile.lastActiveDate = today;
-    this.saveProfile(profile);
-  }
-
-  /**
-   * 全問題の学習進捗マップを取得
-   */
   static getProgressMap(): Record<string, UserProgressItem> {
     if (typeof window === 'undefined') return {};
-    const saved = localStorage.getItem(STORAGE_KEYS.PROGRESS);
-    if (!saved) return {};
     try {
-      return JSON.parse(saved);
+      const data = localStorage.getItem(STORAGE_KEYS.PROGRESS);
+      return data ? JSON.parse(data) : {};
     } catch (e) {
-      console.error('Failed to parse progress map', e);
+      console.error('Failed to load progress from localStorage:', e);
       return {};
     }
   }
@@ -106,12 +90,13 @@ export class UserDataStore {
   }
 
   /**
-   * 1問解答時の総合データ更新処理（日別カウント加算付き）
+   * 1問解答時の総合データ更新処理（日別カウント加算 ＆ 学習時間記録付き）
    */
   static recordAnswer(
     questionId: string,
     isCorrect: boolean,
-    rating?: number
+    rating?: number,
+    elapsedSeconds: number = 2
   ): {
     updatedProgress: UserProgressItem;
     profile: UserProfile;
@@ -141,14 +126,19 @@ export class UserDataStore {
       profile.xp += 2;
     }
 
+    // 学習時間の加算（安全のため1問あたり最大60秒にクリップ）
+    const validSec = Math.min(Math.max(Math.round(elapsedSeconds), 1), 60);
+    profile.totalStudyTimeSeconds = (profile.totalStudyTimeSeconds || 0) + validSec;
+
     // 日別カウントの加算
     if (!profile.dailyCounts) {
       profile.dailyCounts = {};
     }
     if (!profile.dailyCounts[today]) {
-      profile.dailyCounts[today] = { total: 0, correct: 0 };
+      profile.dailyCounts[today] = { total: 0, correct: 0, studyTimeSeconds: 0 };
     }
     profile.dailyCounts[today].total += 1;
+    profile.dailyCounts[today].studyTimeSeconds = (profile.dailyCounts[today].studyTimeSeconds || 0) + validSec;
     if (isCorrect) {
       profile.dailyCounts[today].correct += 1;
     }
@@ -190,15 +180,15 @@ export class UserDataStore {
   /**
    * 過去 N 日間（または全期間）の日別学習履歴を取得（折れ線グラフ用）
    */
-  static getDailyHistory(days: number = 7): { date: string; label: string; total: number; correct: number }[] {
+  static getDailyHistory(days: number = 7): { date: string; label: string; total: number; correct: number; studyTimeSeconds: number }[] {
     const profile = this.getProfile();
     const counts = profile.dailyCounts || {};
-    const result: { date: string; label: string; total: number; correct: number }[] = [];
+    const result: { date: string; label: string; total: number; correct: number; studyTimeSeconds: number }[] = [];
 
     const now = new Date();
 
     if (days >= 999 || days <= 0) {
-      // 全期間: 記録されている最古の日付を探索
+      // 全期間
       const storedDates = Object.keys(counts).sort();
       let targetDays = 7;
       if (storedDates.length > 0) {
@@ -214,12 +204,13 @@ export class UserDataStore {
         const day = d.getDate();
         const label = `${month}/${day}`;
 
-        const entry = counts[dateStr] || { total: 0, correct: 0 };
+        const entry = counts[dateStr] || { total: 0, correct: 0, studyTimeSeconds: 0 };
         result.push({
           date: dateStr,
           label,
           total: entry.total,
           correct: entry.correct,
+          studyTimeSeconds: entry.studyTimeSeconds || 0,
         });
       }
     } else {
@@ -230,17 +221,36 @@ export class UserDataStore {
         const day = d.getDate();
         const label = `${month}/${day}`;
 
-        const entry = counts[dateStr] || { total: 0, correct: 0 };
+        const entry = counts[dateStr] || { total: 0, correct: 0, studyTimeSeconds: 0 };
         result.push({
           date: dateStr,
           label,
           total: entry.total,
           correct: entry.correct,
+          studyTimeSeconds: entry.studyTimeSeconds || 0,
         });
       }
     }
 
     return result;
+  }
+
+  /**
+   * 秒数を「〇時間〇分」または「〇分〇秒」に整形
+   */
+  static formatStudyTime(seconds: number = 0): string {
+    if (!seconds || seconds <= 0) return '0分';
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hrs > 0) {
+      return `${hrs}時間${mins}分`;
+    }
+    if (mins > 0) {
+      return `${mins}分${secs}秒`;
+    }
+    return `${secs}秒`;
   }
 
   /**

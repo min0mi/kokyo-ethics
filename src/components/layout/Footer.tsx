@@ -8,7 +8,9 @@ export const Footer: React.FC = () => {
         <div className="flex flex-wrap justify-center items-center gap-x-3.5 gap-y-1 text-gray-700 text-xs">
           <Link href="/" className="hover:underline hover:text-blue-700">トップ</Link>
           <span>|</span>
-          <Link href="/dictionary" className="hover:underline hover:text-blue-700">思想・人物マップ</Link>
+          <Link href="/dictionary" className="hover:underline hover:text-blue-700">思想・人物対応表</Link>
+          <span>|</span>
+          <Link href="/guide" className="hover:underline hover:text-blue-700">使い方</Link>
           <span>|</span>
           <Link href="/ranking" className="hover:underline hover:text-blue-700">全国ランキング</Link>
           <span>|</span>

@@ -37,10 +37,11 @@ export const Header: React.FC = () => {
 
   const navLinks = [
     { href: '/', label: 'トップ' },
-    { href: '/dictionary', label: '思想・人物マップ' },
+    { href: '/dictionary', label: '思想・人物対応表' },
+    { href: '/guide', label: '使い方' },
+    { href: '/stats', label: '学習進捗・グラフ' },
     { href: '/ranking', label: '全国ランキング' },
     { href: '/badges', label: 'バッジ実績' },
-    { href: '/stats', label: '学習進捗・グラフ' },
   ];
 
   return (
@@ -59,11 +60,15 @@ export const Header: React.FC = () => {
         {/* ユーザーステータス */}
         <div className="flex items-center gap-3 text-xs">
           {profile && (
-            <div className="flex items-center gap-2.5 bg-gray-100 px-3 py-1 rounded-xs border border-gray-300">
+            <div className="flex items-center gap-2 bg-gray-100 px-2.5 py-1 rounded-xs border border-gray-300 text-[11px]">
               <span className="font-bold text-gray-700">{profile.username}</span>
               <span className="text-gray-400">|</span>
               <span className="text-orange-700 font-bold">
                 連続 {profile.streakDays}日
+              </span>
+              <span className="text-gray-400">|</span>
+              <span className="text-indigo-700 font-bold">
+                {UserDataStore.formatStudyTime(profile.totalStudyTimeSeconds || 0)}
               </span>
               <span className="text-gray-400">|</span>
               <span className="text-blue-700 font-bold">Lv.{profile.level}</span>

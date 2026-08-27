@@ -23,6 +23,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isTransitioningRef = useRef<boolean>(false);
+  const questionStartTimeRef = useRef<number>(Date.now());
 
   // 問題マウント時・問題ID変更時に完全初期化
   useEffect(() => {
@@ -30,6 +31,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
     setIsAnswered(false);
     setCanInput(false);
     isTransitioningRef.current = false;
+    questionStartTimeRef.current = Date.now();
 
     // 前問のキー連打持ち越しを防ぐため 150ms クールダウン
     const initTimer = setTimeout(() => {
@@ -64,6 +66,8 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
     (option: string) => {
       if (!canInput || isAnswered || isTransitioningRef.current) return;
 
+      const elapsedSec = (Date.now() - questionStartTimeRef.current) / 1000;
+
       setSelectedOption(option);
       setIsAnswered(true);
 
@@ -80,7 +84,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
         sounds.playWrong();
       }
 
-      const res = UserDataStore.recordAnswer(question.id, isCorrect, isCorrect ? 4 : 1);
+      const res = UserDataStore.recordAnswer(question.id, isCorrect, isCorrect ? 4 : 1, elapsedSec);
       if (res.newlyUnlockedBadges.length > 0 && onBadgeUnlocked) {
         res.newlyUnlockedBadges.forEach((b) => onBadgeUnlocked(b));
       }

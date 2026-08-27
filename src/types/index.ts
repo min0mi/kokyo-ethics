@@ -180,6 +180,7 @@ export interface UserProgressItem {
 export interface DailyCount {
   total: number;
   correct: number;
+  studyTimeSeconds?: number; // その日の学習時間（秒）
 }
 
 export interface UserProfile {
@@ -193,6 +194,7 @@ export interface UserProfile {
   isGuest: boolean;
   totalAnswered: number;
   totalCorrect: number;
+  totalStudyTimeSeconds?: number; // 通算学習時間（秒）
   dailyCounts?: Record<string, DailyCount>;
 }
 

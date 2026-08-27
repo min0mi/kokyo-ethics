@@ -91,7 +91,7 @@ export default function StatsPage() {
       </div>
 
       {/* サマリーカード */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
         <div className="bg-white border border-gray-300 p-3 rounded-xs">
           <span className="text-gray-500 block mb-1">総解答数</span>
           <strong className="text-lg text-gray-900">{profile?.totalAnswered || 0} 問</strong>
@@ -105,6 +105,13 @@ export default function StatsPage() {
         <div className="bg-white border border-gray-300 p-3 rounded-xs">
           <span className="text-gray-500 block mb-1">定着完了 (30日+)</span>
           <strong className="text-lg text-green-700">{counts.mastered} 問</strong>
+        </div>
+
+        <div className="bg-white border border-gray-300 p-3 rounded-xs">
+          <span className="text-gray-500 block mb-1">総学習時間</span>
+          <strong className="text-lg text-indigo-700">
+            {UserDataStore.formatStudyTime(profile?.totalStudyTimeSeconds || 0)}
+          </strong>
         </div>
 
         <div className="bg-white border border-gray-300 p-3 rounded-xs">
