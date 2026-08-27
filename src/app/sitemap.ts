@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://公共倫理パーフェクトマスター.com';
+  const baseUrl = 'https://kokyo-ethics.com';
 
   const routes = [
     '',
