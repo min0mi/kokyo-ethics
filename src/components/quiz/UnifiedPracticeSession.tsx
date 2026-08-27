@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Question, CategoryId, QuizSessionConfig, Badge } from '@/types';
 import { QuestionGenerator, AVAILABLE_CATEGORY_IDS } from '@/lib/generator/questionGenerator';
 import { CATEGORIES } from '@/data/categories';
@@ -13,13 +13,13 @@ import { BadgeUnlockedModal } from '@/components/gamification/BadgeUnlockedModal
 
 interface UnifiedPracticeProps {
   initialConfig?: Partial<QuizSessionConfig>;
-  onBackToConfig?: () => void;
+  autoStart?: boolean;
 }
 
 export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
   initialConfig,
+  autoStart = true, // デフォルトで即座にスタート！
 }) => {
-  // 設定ステート
   const [config, setConfig] = useState<QuizSessionConfig>({
     categoryIds: initialConfig?.categoryIds || AVAILABLE_CATEGORY_IDS,
     enabledTypes: {
@@ -41,27 +41,11 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
 
   const availableCategories = CATEGORIES.filter((c) => c.isAvailable);
 
-  const startSession = () => {
-    // 少なくとも1つの形式が有効か
-    const hasType =
-      config.enabledTypes.choice ||
-      config.enabledTypes.matching ||
-      config.enabledTypes.typing ||
-      config.enabledTypes.recall;
-
-    if (!hasType) {
-      alert('出題形式を少なくとも1つ選択してください。');
-      return;
-    }
-
-    if (config.categoryIds.length === 0) {
-      alert('出題単元を少なくとも1つ選択してください。');
-      return;
-    }
-
-    const pool = QuestionGenerator.generateCustomSession(config);
+  const startSessionWithConfig = useCallback((cfg: QuizSessionConfig) => {
+    const pool = QuestionGenerator.generateCustomSession(cfg);
     if (pool.length === 0) {
       alert('条件に一致する問題がありませんでした。');
+      setIsStarted(false);
       return;
     }
 
@@ -71,7 +55,14 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
     setTotalXp(0);
     setIsCompleted(false);
     setIsStarted(true);
-  };
+  }, []);
+
+  // autoStart が true の場合、初回レンダリングで即座にセッション開始
+  useEffect(() => {
+    if (autoStart) {
+      startSessionWithConfig(config);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleNextQuestion = useCallback(
     (stats: { correct: number; total: number; xp: number }) => {
@@ -91,7 +82,6 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
 
   const currentQ = questions[currentIndex];
 
-  // 設定変更ハンドラ
   const toggleCategory = (catId: CategoryId) => {
     setConfig((prev) => {
       const exists = prev.categoryIds.includes(catId);
@@ -116,25 +106,26 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
     }));
   };
 
+  // 設定画面
   if (!isStarted) {
     return (
       <div className="bg-white border border-gray-300 rounded-xs p-4 sm:p-6 space-y-4 max-w-3xl mx-auto text-xs">
         <div className="border-b border-gray-200 pb-2">
           <span className="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-300">
-            演習カスタマイズ
+            演習条件設定
           </span>
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mt-1">
-            源流思想 総合演習設定
+            源流思想 演習カスタマイズ
           </h2>
           <p className="text-gray-500 text-[11px] mt-0.5">
-            出題したい問題形式と単元をON/OFFして、問題数を選んでスタートしてください。
+            形式と単元をON/OFFして、問題数を選んでスタートしてください。
           </p>
         </div>
 
         {/* 1. 問題形式のON/OFF */}
         <div className="space-y-1.5">
           <label className="font-bold text-gray-800 block">
-            ① 出題する問題形式（複数選択可能）:
+            ① 出題形式（複数選択可能）:
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <label className="flex items-center gap-1.5 p-2 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
@@ -174,7 +165,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
                 onChange={() => toggleType('recall')}
                 className="rounded-xs"
               />
-              <span className="font-bold text-gray-800">分類想起（自己評価）</span>
+              <span className="font-bold text-gray-800">分類想起</span>
             </label>
           </div>
         </div>
@@ -183,7 +174,7 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
             <label className="font-bold text-gray-800">
-              ② 出題単元（源流思想）:
+              ② 出題単元:
             </label>
             <button
               type="button"
@@ -250,17 +241,17 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
         <div className="pt-3 border-t border-gray-200">
           <button
             type="button"
-            onClick={startSession}
+            onClick={() => startSessionWithConfig(config)}
             className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-black text-sm rounded-xs shadow-xs"
           >
-            設定した条件で演習を開始する
+            演習を開始する（{config.questionCount === 999 ? '全問題' : `${config.questionCount}問`}）
           </button>
         </div>
       </div>
     );
   }
 
-  // 演習中
+  // 演習実行中
   return (
     <div className="max-w-4xl mx-auto space-y-4">
       <BadgeUnlockedModal badge={activeBadge} onClose={() => setActiveBadge(null)} />
@@ -271,13 +262,13 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
             {/* 上部ヘッダー */}
             <div className="flex justify-between items-center text-xs pb-1 border-b border-gray-300">
               <span className="font-bold text-gray-700">
-                源流思想 総合演習 （第 {currentIndex + 1} 問 / 全 {questions.length} 問）
+                源流思想 演習 （第 {currentIndex + 1} 問 / 全 {questions.length} 問）
               </span>
               <button
                 onClick={() => setIsStarted(false)}
-                className="text-[11px] text-gray-500 hover:underline"
+                className="text-[11px] text-gray-600 hover:text-blue-700 hover:underline font-semibold"
               >
-                [演習を中断して設定に戻る]
+                [条件を変更する]
               </button>
             </div>
 
@@ -319,11 +310,10 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
           totalQuestions={questions.length}
           correctCount={correctCount}
           xpEarned={totalXp}
-          onRetry={startSession}
-          modeTitle="源流思想 総合演習"
+          onRetry={() => startSessionWithConfig(config)}
+          modeTitle="源流思想 演習"
         />
       )}
     </div>
   );
 };
-

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChoiceQuestion, Badge } from '@/types';
 import { CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
 import { sounds } from '@/lib/sound';
@@ -27,14 +27,42 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
   const [maxCombo, setMaxCombo] = useState(0);
   const [earnedXp, setEarnedXp] = useState(0);
 
+  // 連鎖スキップ・誤入力防止用Ref
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const isTransitioningRef = useRef<boolean>(false);
+  const readyForInputRef = useRef<boolean>(false);
+
   const currentQ = questions[currentIndex];
   const progressPercent = Math.round(((currentIndex + 1) / questions.length) * 100);
 
+  // 問題切り替え時の入力クールダウン（250ms）
+  useEffect(() => {
+    readyForInputRef.current = false;
+    isTransitioningRef.current = false;
+    setSelectedOption(null);
+    setIsAnswered(false);
+
+    const readyTimer = setTimeout(() => {
+      readyForInputRef.current = true;
+    }, 250);
+
+    return () => {
+      clearTimeout(readyTimer);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [currentIndex]);
+
   const goToNext = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
-      setSelectedOption(null);
-      setIsAnswered(false);
     } else {
       onComplete({
         correct: correctCount + (selectedOption === currentQ?.correctAnswer ? 1 : 0),
@@ -46,7 +74,10 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
 
   const handleSelectOption = useCallback(
     (option: string) => {
-      if (isAnswered || !currentQ) return;
+      // 入力準備ができていない、または既に解答済み・遷移中の場合は一切無視
+      if (!readyForInputRef.current || isTransitioningRef.current || isAnswered || !currentQ) {
+        return;
+      }
 
       setSelectedOption(option);
       setIsAnswered(true);
@@ -63,13 +94,13 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
         });
         setEarnedXp((prev) => prev + 10 + (combo >= 3 ? 5 : 0));
 
-        // ★正解時はスクロール不要ですぐに自動で次の問題へ進む（スピード演習時は0.35秒、標準演習時は0.5秒）
-        const delay = isSpeedMode ? 350 : 500;
-        setTimeout(() => {
+        // 正解時は 0.45 秒後に自動送り（連鎖防止のため遷移中フラグを立てる）
+        isTransitioningRef.current = true;
+        const delay = isSpeedMode ? 350 : 450;
+        timerRef.current = setTimeout(() => {
           goToNext();
         }, delay);
       } else {
-        // 不正解時は音を鳴らし、画面内で解説を確認できるようにする
         sounds.playWrong();
         setCombo(0);
         setEarnedXp((prev) => prev + 2);
@@ -83,9 +114,13 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
     [isAnswered, currentQ, isSpeedMode, combo, maxCombo, onBadgeUnlocked, goToNext]
   );
 
+  // キーボード操作（長押し防止・連打防止）
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // キーの長押しリピートは無視
+      if (e.repeat) return;
       if (!currentQ) return;
+
       if (!isAnswered) {
         if (['1', '2', '3', '4'].includes(e.key)) {
           const idx = parseInt(e.key, 10) - 1;
@@ -94,9 +129,12 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
           }
         }
       } else {
+        // 不正解時の「次へ」進行
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
           e.preventDefault();
-          goToNext();
+          if (!isTransitioningRef.current) {
+            goToNext();
+          }
         }
       }
     };
@@ -126,7 +164,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
         </div>
       </div>
 
-      {/* 問題エリア（スクロール不要なコンパクトレイアウト） */}
+      {/* 問題エリア（短く本質的な選択肢表示） */}
       <div className="bg-white border border-gray-300 rounded-xs p-3.5 sm:p-5 space-y-3">
         <div className="flex items-center justify-between text-[11px] pb-1.5 border-b border-gray-200">
           <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 font-bold rounded-xs border border-gray-300">
@@ -144,7 +182,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
           {currentQ.prompt}
         </h3>
 
-        {/* 4択選択肢 */}
+        {/* 4択選択肢（短く端的なテキスト） */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {currentQ.options.map((option, idx) => {
             const isSelected = selectedOption === option;
@@ -173,7 +211,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
                   <span className="w-4 h-4 bg-white border border-gray-400 rounded-xs flex items-center justify-center font-bold text-[10px] shrink-0">
                     {idx + 1}
                   </span>
-                  <span className="line-clamp-2 leading-tight">{option}</span>
+                  <span className="line-clamp-2 leading-tight font-semibold">{option}</span>
                 </div>
 
                 {isAnswered && (

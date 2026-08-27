@@ -28,6 +28,14 @@ export interface Category {
   description: string;
   iconName: string;
   orderIndex: number;
+  isAvailable?: boolean;
+}
+
+export interface FigureRelation {
+  targetFigureId: string;
+  relationType: 'oppose' | 'inherit' | 'criticize' | 'teacher' | 'student';
+  label: string;
+  description: string;
 }
 
 export interface Figure {
@@ -39,7 +47,8 @@ export interface Figure {
   mainConcept: string;
   summary: string;
   tags: string[];
-  contrastFigureIds?: string[]; // 共テ頻出の対比・ひっかけ対象人物（例: エピクロス ⇄ ゼノン）
+  contrastFigureIds?: string[]; // 共テ頻出の対比人物ID
+  relations?: FigureRelation[]; // 思想の有機的相関・系譜
 }
 
 export interface Keyword {
@@ -52,7 +61,7 @@ export interface Keyword {
   explanation: string;
   commonTestPoint: string; // 共通テストでの判断語句・ひっかけポイント
   distractorTags: string[];
-  contrastKeywordIds?: string[]; // 対比される用語（例: アタラクシア ⇄ アパテイア）
+  contrastKeywordIds?: string[]; // 対比される用語
 }
 
 export interface Book {
@@ -74,7 +83,7 @@ export interface Episode {
 }
 
 // ==========================================
-// 問題形式の型定義（全6タイプ）
+// 問題形式の型定義
 // ==========================================
 export type QuestionType =
   | 'figure_to_keyword'
@@ -185,7 +194,7 @@ export interface UserProfile {
   isGuest: boolean;
   totalAnswered: number;
   totalCorrect: number;
-  dailyCounts?: Record<string, DailyCount>; // 日付ごとの学習数 (YYYY-MM-DD -> { total, correct })
+  dailyCounts?: Record<string, DailyCount>;
 }
 
 export interface Badge {

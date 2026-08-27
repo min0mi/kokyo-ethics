@@ -78,6 +78,16 @@ export default function HomePage() {
     }));
   };
 
+  const handleStartPracticeDirect = () => {
+    const params = new URLSearchParams();
+    params.set('count', sessionConfig.questionCount.toString());
+    params.set('choice', sessionConfig.enabledTypes.choice ? '1' : '0');
+    params.set('matching', sessionConfig.enabledTypes.matching ? '1' : '0');
+    params.set('typing', sessionConfig.enabledTypes.typing ? '1' : '0');
+    params.set('recall', sessionConfig.enabledTypes.recall ? '1' : '0');
+    router.push(`/practice?${params.toString()}`);
+  };
+
   const topRankers = [
     { rank: 1, name: 'ソクラテスの弟子', xp: 4850 },
     { rank: 2, name: 'イデア探求者', xp: 4120 },
@@ -120,7 +130,7 @@ export default function HomePage() {
         <div className="bg-white border border-gray-300 p-2.5 rounded-xs">
           <form onSubmit={handleSearchSubmit} className="space-y-1">
             <label className="block text-[11px] font-bold text-gray-700">
-              思想家・キーワード・著書の図鑑検索
+              思想・人物有機相関マップ検索
             </label>
             <div className="flex gap-1">
               <input
@@ -153,7 +163,7 @@ export default function HomePage() {
                   一律設定
                 </span>
                 <strong className="text-sm font-bold text-gray-900">
-                  源流思想 総合演習（形式ON/OFF・問題数選択）
+                  源流思想 演習（形式ON/OFF・問題数選択）
                 </strong>
               </div>
               <span className="text-[11px] text-gray-500">源流思想 5単元対象</span>
@@ -234,13 +244,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* スタートボタン */}
-            <Link
-              href={`/practice?count=${sessionConfig.questionCount}`}
-              className="block w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-center text-xs rounded-xs shadow-xs"
+            {/* スタートボタン（ボタン1回クリックで即座に演習開始） */}
+            <button
+              type="button"
+              onClick={handleStartPracticeDirect}
+              className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-center text-xs rounded-xs shadow-xs"
             >
-              上記の設定で演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
-            </Link>
+              演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}・即座に開始）
+            </button>
           </div>
 
           {/* 2. 単元別対照表 */}

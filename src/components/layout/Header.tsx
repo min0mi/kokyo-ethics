@@ -37,8 +37,8 @@ export const Header: React.FC = () => {
 
   const navLinks = [
     { href: '/', label: 'トップ・総合ポータル' },
-    { href: '/practice', label: '演習開始（形式ON/OFF・問題数選択）' },
-    { href: '/dictionary', label: '思想・用語図鑑' },
+    { href: '/practice', label: '演習（形式ON/OFF・即時スタート）' },
+    { href: '/dictionary', label: '思想・人物有機相関マップ' },
     { href: '/ranking', label: '全国ランキング' },
     { href: '/badges', label: 'バッジ実績' },
     { href: '/stats', label: '学習進捗・日別グラフ' },
