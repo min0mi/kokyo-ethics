@@ -10,7 +10,6 @@ import { ChoiceQuiz } from '@/components/quiz/ChoiceQuiz';
 import { QuizResult } from '@/components/quiz/QuizResult';
 import { BadgeUnlockedModal } from '@/components/gamification/BadgeUnlockedModal';
 import { CATEGORIES } from '@/data/categories';
-import { Zap, Filter, Sparkles } from 'lucide-react';
 
 function SpeedQuizContent() {
   const searchParams = useSearchParams();
@@ -26,6 +25,9 @@ function SpeedQuizContent() {
     null
   );
   const [activeBadge, setActiveBadge] = useState<Badge | null>(null);
+
+  // 源流思想のみを抽出
+  const availableCategories = CATEGORIES.filter((c) => c.isAvailable);
 
   const loadQuestions = useCallback(() => {
     let pool: ChoiceQuestion[] = [];
@@ -55,7 +57,6 @@ function SpeedQuizContent() {
       pool = [...f2k, ...k2f, ...km, ...books, ...eps];
     }
 
-    // ランダムに10問抽出
     const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 10);
     setQuestions(shuffled);
     setIsCompleted(false);
@@ -72,32 +73,31 @@ function SpeedQuizContent() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-4xl mx-auto px-3 py-5 space-y-4">
       <BadgeUnlockedModal badge={activeBadge} onClose={() => setActiveBadge(null)} />
 
       {/* ヘッダーエリア */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-gray-300">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold mb-1">
-            <Zap className="w-3.5 h-3.5 fill-amber-600 text-amber-600" />
-            <span>mikan風 スピード暗記特訓 (10問)</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-gray-900">
-            {modeParam === 'due' ? '今日の復習キュー特訓' : 'スピード暗記マスター'}
+          <span className="text-[11px] font-bold text-yellow-900 bg-yellow-100 px-2 py-0.5 rounded-xs">
+            スピード演習（10問即答）
+          </span>
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
+            {modeParam === 'due' ? '本日の復習キュー演習' : '源流思想 スピード暗記'}
           </h1>
         </div>
 
         {/* 単元フィルター */}
         {!isCompleted && modeParam !== 'due' && (
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-gray-600 font-semibold">単元:</span>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value as CategoryId | 'all')}
-              className="text-xs font-semibold bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              className="text-xs bg-white border border-gray-300 rounded-xs px-2 py-1 text-gray-700 focus:outline-hidden focus:border-blue-600"
             >
-              <option value="all">全単元から出題 (10問)</option>
-              {CATEGORIES.map((cat) => (
+              <option value="all">源流思想 全単元 (10問)</option>
+              {availableCategories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.shortName}
                 </option>
@@ -117,18 +117,17 @@ function SpeedQuizContent() {
             onBadgeUnlocked={(b) => setActiveBadge(b)}
           />
         ) : (
-          <div className="bg-white rounded-3xl p-12 text-center border border-gray-200 shadow-sm space-y-4">
-            <Sparkles className="w-12 h-12 text-indigo-400 mx-auto" />
-            <h3 className="text-lg font-bold text-gray-800">出題可能な問題がありません</h3>
-            <p className="text-xs text-gray-500 max-w-sm mx-auto">
-              復習キューが空か、該当単元の問題がすべてマスター済みです。
+          <div className="bg-white border border-gray-300 rounded-xs p-8 text-center space-y-3">
+            <h3 className="text-sm font-bold text-gray-800">出題可能な問題がありません</h3>
+            <p className="text-xs text-gray-500">
+              復習キューが空か、対象単元の問題が未登録です。
             </p>
             <button
               onClick={() => {
                 setSelectedCategory('all');
                 loadQuestions();
               }}
-              className="py-2.5 px-6 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-md hover:bg-indigo-700 transition"
+              className="py-1.5 px-4 bg-blue-600 text-white text-xs font-bold rounded-xs"
             >
               全単元から出題する
             </button>
@@ -140,7 +139,7 @@ function SpeedQuizContent() {
           correctCount={results?.correct || 0}
           xpEarned={results?.xp || 0}
           onRetry={loadQuestions}
-          modeTitle="スピード暗記特訓"
+          modeTitle="スピード演習"
         />
       )}
     </div>
@@ -149,9 +148,8 @@ function SpeedQuizContent() {
 
 export default function SpeedPracticePage() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-gray-500">読み込み中...</div>}>
+    <Suspense fallback={<div className="text-center py-10 text-xs text-gray-500">読み込み中...</div>}>
       <SpeedQuizContent />
     </Suspense>
   );
 }
-

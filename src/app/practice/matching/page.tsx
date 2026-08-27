@@ -8,7 +8,6 @@ import { MatchingQuiz } from '@/components/quiz/MatchingQuiz';
 import { QuizResult } from '@/components/quiz/QuizResult';
 import { BadgeUnlockedModal } from '@/components/gamification/BadgeUnlockedModal';
 import { CATEGORIES } from '@/data/categories';
-import { Network, Filter, Sparkles } from 'lucide-react';
 
 function MatchingQuizContent() {
   const searchParams = useSearchParams();
@@ -22,6 +21,8 @@ function MatchingQuizContent() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [totalXp, setTotalXp] = useState(0);
   const [activeBadge, setActiveBadge] = useState<Badge | null>(null);
+
+  const availableCategories = CATEGORIES.filter((c) => c.isAvailable);
 
   const loadQuestions = useCallback(() => {
     const cat = selectedCategory === 'all' ? undefined : selectedCategory;
@@ -48,32 +49,31 @@ function MatchingQuizContent() {
   const currentQ = questions[currentIndex];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-4xl mx-auto px-3 py-5 space-y-4">
       <BadgeUnlockedModal badge={activeBadge} onClose={() => setActiveBadge(null)} />
 
       {/* ヘッダーエリア */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-gray-300">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-100 text-violet-900 text-xs font-bold mb-1">
-            <Network className="w-3.5 h-3.5 text-violet-600" />
-            <span>相関整理 線つなぎマッチング</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-gray-900">
-            線つなぎ・ペアマッチング
+          <span className="text-[11px] font-bold text-purple-900 bg-purple-100 px-2 py-0.5 rounded-xs">
+            相関整理 線つなぎ演習（6択・余り選択肢あり）
+          </span>
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
+            源流思想 線つなぎマッチング
           </h1>
         </div>
 
         {/* 単元フィルター */}
         {!isCompleted && (
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-gray-600 font-semibold">単元:</span>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value as CategoryId | 'all')}
-              className="text-xs font-semibold bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-hidden focus:ring-2 focus:ring-violet-500"
+              className="text-xs bg-white border border-gray-300 rounded-xs px-2 py-1 text-gray-700 focus:outline-hidden focus:border-blue-600"
             >
-              <option value="all">全単元</option>
-              {CATEGORIES.map((cat) => (
+              <option value="all">源流思想 全単元</option>
+              {availableCategories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.shortName}
                 </option>
@@ -86,8 +86,8 @@ function MatchingQuizContent() {
       {/* マッチングクイズ */}
       {!isCompleted ? (
         currentQ ? (
-          <div className="space-y-4">
-            <div className="text-xs text-gray-400 font-semibold text-right">
+          <div className="space-y-2">
+            <div className="text-[11px] text-gray-500 font-semibold text-right">
               第 {currentIndex + 1} 問 / 全 {questions.length} 問
             </div>
             <MatchingQuiz
@@ -97,12 +97,11 @@ function MatchingQuizContent() {
             />
           </div>
         ) : (
-          <div className="bg-white rounded-3xl p-12 text-center border border-gray-200 shadow-sm space-y-3">
-            <Sparkles className="w-12 h-12 text-violet-400 mx-auto" />
-            <p className="text-sm text-gray-700 font-bold">この単元には十分なマッチングデータがありません。</p>
+          <div className="bg-white border border-gray-300 rounded-xs p-8 text-center space-y-2">
+            <p className="text-xs text-gray-700 font-bold">この単元には十分なマッチングデータがありません。</p>
             <button
               onClick={() => setSelectedCategory('all')}
-              className="py-2 px-4 bg-violet-600 text-white rounded-xl text-xs font-bold"
+              className="py-1 px-3 bg-purple-700 text-white rounded-xs text-xs font-bold"
             >
               全単元に切り替える
             </button>
@@ -114,7 +113,7 @@ function MatchingQuizContent() {
           correctCount={questions.length}
           xpEarned={totalXp}
           onRetry={loadQuestions}
-          modeTitle="線つなぎマッチング"
+          modeTitle="線つなぎ演習"
         />
       )}
     </div>
@@ -123,9 +122,8 @@ function MatchingQuizContent() {
 
 export default function MatchingPracticePage() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-gray-500">読み込み中...</div>}>
+    <Suspense fallback={<div className="text-center py-10 text-xs text-gray-500">読み込み中...</div>}>
       <MatchingQuizContent />
     </Suspense>
   );
 }
-

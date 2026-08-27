@@ -22,7 +22,7 @@ export const BadgeUnlockedModal: React.FC<BadgeModalProps> = ({ badge, onClose }
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
       <div className="w-full max-w-sm bg-white border-2 border-yellow-400 rounded-sm shadow-lg p-5 text-center space-y-3">
         <span className="text-xs font-bold text-yellow-800 bg-yellow-100 px-2 py-0.5 rounded-xs">
-          ★ バッジ獲得 ★
+          [実績解除]
         </span>
 
         <h3 className="text-lg font-bold text-gray-900">{badge.name}</h3>

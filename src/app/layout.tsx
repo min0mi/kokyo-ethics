@@ -9,15 +9,13 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: '公共倫理パーフェクトマスター.com | 共通テスト構造的暗記特訓',
   description:
-    '大学入学共通テスト「公共、倫理」「倫理」対策に特化した、構造的知識定着Webアプリケーション。mikan・過去問道場の良さを融合し、忘却曲線(SM-2)に合わせた問題提示で最速マスター！',
+    '大学入学共通テスト「公共、倫理」「倫理」対策に特化した、構造的知識定着Webサイト。忘却曲線(SM-2)に合わせた問題提示で最速マスター！',
   keywords: [
     '公共倫理',
     '共通テスト倫理',
     '共テ倫理',
     '公共倫理パーフェクトマスター',
     '倫理暗記',
-    '過去問道場',
-    'mikan',
     '忘却曲線',
     '大学受験',
   ],
@@ -58,7 +56,7 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className={`${inter.className} min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased selection:bg-indigo-500 selection:text-white`}>
+      <body className={`${inter.className} min-h-screen bg-[#f0f2f5] text-gray-900 flex flex-col antialiased`}>
         <Header />
         <main className="flex-1 w-full">{children}</main>
         <Footer />

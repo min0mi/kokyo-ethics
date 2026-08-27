@@ -8,7 +8,6 @@ import { ChoiceQuiz } from '@/components/quiz/ChoiceQuiz';
 import { QuizResult } from '@/components/quiz/QuizResult';
 import { BadgeUnlockedModal } from '@/components/gamification/BadgeUnlockedModal';
 import { CATEGORIES } from '@/data/categories';
-import { BookOpen, Filter } from 'lucide-react';
 
 function StandardQuizContent() {
   const searchParams = useSearchParams();
@@ -23,6 +22,8 @@ function StandardQuizContent() {
     null
   );
   const [activeBadge, setActiveBadge] = useState<Badge | null>(null);
+
+  const availableCategories = CATEGORIES.filter((c) => c.isAvailable);
 
   const loadQuestions = useCallback(() => {
     const cat = selectedCategory === 'all' ? undefined : selectedCategory;
@@ -49,32 +50,31 @@ function StandardQuizContent() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-4xl mx-auto px-3 py-5 space-y-4">
       <BadgeUnlockedModal badge={activeBadge} onClose={() => setActiveBadge(null)} />
 
       {/* ヘッダーエリア */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-gray-300">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-100 text-indigo-900 text-xs font-bold mb-1">
-            <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
-            <span>過去問道場風 詳細演習 (10問)</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-gray-900">
-            共テ実践・深堀り道場
+          <span className="text-[11px] font-bold text-blue-900 bg-blue-100 px-2 py-0.5 rounded-xs">
+            標準解説演習（10問）
+          </span>
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
+            源流思想 共通テスト標準演習
           </h1>
         </div>
 
         {/* 単元フィルター */}
         {!isCompleted && (
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-gray-600 font-semibold">単元:</span>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value as CategoryId | 'all')}
-              className="text-xs font-semibold bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              className="text-xs bg-white border border-gray-300 rounded-xs px-2 py-1 text-gray-700 focus:outline-hidden focus:border-blue-600"
             >
-              <option value="all">全単元から出題 (10問)</option>
-              {CATEGORIES.map((cat) => (
+              <option value="all">源流思想 全単元 (10問)</option>
+              {availableCategories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.shortName}
                 </option>
@@ -94,8 +94,8 @@ function StandardQuizContent() {
             onBadgeUnlocked={(b) => setActiveBadge(b)}
           />
         ) : (
-          <div className="bg-white rounded-3xl p-12 text-center border border-gray-200 shadow-sm">
-            <p className="text-sm text-gray-500">問題が見つかりませんでした。</p>
+          <div className="bg-white border border-gray-300 rounded-xs p-8 text-center">
+            <p className="text-xs text-gray-500">問題が見つかりませんでした。</p>
           </div>
         )
       ) : (
@@ -104,7 +104,7 @@ function StandardQuizContent() {
           correctCount={results?.correct || 0}
           xpEarned={results?.xp || 0}
           onRetry={loadQuestions}
-          modeTitle="共テ実践・深堀り道場"
+          modeTitle="標準解説演習"
         />
       )}
     </div>
@@ -113,9 +113,8 @@ function StandardQuizContent() {
 
 export default function StandardPracticePage() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-gray-500">読み込み中...</div>}>
+    <Suspense fallback={<div className="text-center py-10 text-xs text-gray-500">読み込み中...</div>}>
       <StandardQuizContent />
     </Suspense>
   );
 }
-

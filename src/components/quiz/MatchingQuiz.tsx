@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { MatchingQuestion, Badge } from '@/types';
+import { KEYWORDS } from '@/data/keywords';
+import { BOOKS } from '@/data/books';
 import { CheckCircle2, ChevronRight } from 'lucide-react';
 import { sounds } from '@/lib/sound';
 import { UserDataStore } from '@/lib/storage/userDataStore';
@@ -21,22 +23,46 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
   const [selectedRight, setSelectedRight] = useState<string | null>(null);
   const [matchedPairIds, setMatchedPairIds] = useState<string[]>([]);
   const [attempts, setAttempts] = useState<number>(0);
-  const [shuffledRights, setShuffledRights] = useState<{ id: string; text: string }[]>([]);
+  const [rightOptions, setRightOptions] = useState<{ id: string; text: string; isDummy: boolean }[]>([]);
 
   useEffect(() => {
-    const rights = question.pairs.map((p) => ({ id: p.id, text: p.right }));
-    const shuffled = [...rights].sort(() => Math.random() - 0.5);
-    setShuffledRights(shuffled);
+    // 正解の右側選択肢
+    const correctRights = question.pairs.map((p) => ({
+      id: p.id,
+      text: p.right,
+      isDummy: false,
+    }));
+
+    // ダミー選択肢（余る選択肢）をプールから集めて合計6個にする
+    const allKeywordsAndBooks = [
+      ...KEYWORDS.map((k) => k.name),
+      ...BOOKS.map((b) => b.title),
+    ].filter((text) => !question.pairs.some((p) => p.right === text));
+
+    // シャッフルしてダミーを必要数（6 - 正解数）取得
+    const dummyNeeded = Math.max(0, 6 - correctRights.length);
+    const shuffledDummies = allKeywordsAndBooks
+      .sort(() => Math.random() - 0.5)
+      .slice(0, dummyNeeded)
+      .map((text, idx) => ({
+        id: `dummy_${idx}_${Date.now()}`,
+        text,
+        isDummy: true,
+      }));
+
+    const total6 = [...correctRights, ...shuffledDummies].sort(() => Math.random() - 0.5);
+    setRightOptions(total6);
     setMatchedPairIds([]);
     setSelectedLeft(null);
     setSelectedRight(null);
     setAttempts(0);
   }, [question]);
 
-  const checkMatch = (leftId: string, rightId: string) => {
+  const checkMatch = (leftId: string, rightOptId: string) => {
     setAttempts((prev) => prev + 1);
 
-    if (leftId === rightId) {
+    if (leftId === rightOptId) {
+      // 正解ペア
       sounds.playCorrect();
       const nextMatched = [...matchedPairIds, leftId];
       setMatchedPairIds(nextMatched);
@@ -51,6 +77,7 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
         }
       }
     } else {
+      // 不一致・ダミー選択肢
       sounds.playWrong();
       setTimeout(() => {
         setSelectedLeft(null);
@@ -84,10 +111,10 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
       <div className="bg-white border border-gray-300 p-4 sm:p-6 rounded-sm space-y-4">
         <div className="flex items-center justify-between text-xs pb-2 border-b border-gray-200">
           <span className="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-xs">
-            線つなぎ・ペアマッチング
+            線つなぎ（6択・ダミー含有）
           </span>
-          <span className="text-gray-500 font-bold">
-            {matchedPairIds.length} / {question.pairs.length} ペア完成
+          <span className="text-gray-600 font-bold">
+            正解ペア: {matchedPairIds.length} / {question.pairs.length} 組完了
           </span>
         </div>
 
@@ -95,15 +122,15 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
           {question.prompt}
         </h3>
         <p className="text-[11px] text-gray-500">
-          左の人物をクリックしたあと、右の対応する語句/著書をクリックしてください。
+          左の思想家をクリックし、右の正しい語句（全6選択肢中3つが正解）をクリックしてペアを作ってください。
         </p>
 
-        {/* 2カラムリスト */}
-        <div className="grid grid-cols-2 gap-3 text-xs">
-          {/* 左: 人物 */}
+        {/* 2カラム表示 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          {/* 左側: 人物 (3人) */}
           <div className="space-y-1.5">
             <div className="bg-gray-100 p-1.5 font-bold text-gray-700 text-center border border-gray-200">
-              思想家・人物
+              思想家・人物（{question.pairs.length}名）
             </div>
             {question.pairs.map((pair) => {
               const isMatched = matchedPairIds.includes(pair.id);
@@ -120,21 +147,22 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
                   onClick={() => handleLeftClick(pair.id)}
                   className={`w-full p-2.5 text-left rounded-xs transition flex items-center justify-between ${style}`}
                 >
-                  <span>{pair.left}</span>
+                  <span className="font-semibold">{pair.left}</span>
                   {isMatched && <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />}
                 </button>
               );
             })}
           </div>
 
-          {/* 右: キーワード/著書 */}
+          {/* 右側: 選択肢 (6個: 正解3個 + ダミー3個) */}
           <div className="space-y-1.5">
-            <div className="bg-gray-100 p-1.5 font-bold text-gray-700 text-center border border-gray-200">
-              キーワード / 著書
+            <div className="bg-gray-100 p-1.5 font-bold text-gray-700 text-center border border-gray-200 flex items-center justify-between px-2">
+              <span>語句・主著（全6候補）</span>
+              <span className="text-[10px] text-red-600 font-bold">※余りあり</span>
             </div>
-            {shuffledRights.map((item) => {
-              const isMatched = matchedPairIds.includes(item.id);
-              const isSelected = selectedRight === item.id;
+            {rightOptions.map((opt) => {
+              const isMatched = matchedPairIds.includes(opt.id);
+              const isSelected = selectedRight === opt.id;
 
               let style = 'bg-gray-50 border border-gray-300 hover:bg-purple-50 text-gray-800';
               if (isMatched) style = 'bg-green-50 border-green-500 text-green-900 font-bold';
@@ -142,12 +170,12 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
 
               return (
                 <button
-                  key={item.id}
+                  key={opt.id}
                   disabled={isMatched}
-                  onClick={() => handleRightClick(item.id)}
+                  onClick={() => handleRightClick(opt.id)}
                   className={`w-full p-2.5 text-left rounded-xs transition flex items-center justify-between ${style}`}
                 >
-                  <span>{item.text}</span>
+                  <span>{opt.text}</span>
                   {isMatched && <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />}
                 </button>
               );
@@ -155,11 +183,11 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
           </div>
         </div>
 
-        {/* 完了時 */}
+        {/* 全ペア完成時 */}
         {isAllCleared && (
           <div className="pt-4 border-t border-gray-200 space-y-3 text-xs">
             <div className="p-2.5 bg-green-100 text-green-900 font-bold rounded-sm">
-              全ペア完了！相関関係をしっかり定着させましょう。
+              全ペアの対応付けに成功しました！
             </div>
 
             <button

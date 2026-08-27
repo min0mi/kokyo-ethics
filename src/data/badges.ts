@@ -38,7 +38,7 @@ export const BADGES: Badge[] = [
   // ストリーク（連続日数）
   {
     id: 'streak_3',
-    name: '三日坊主脱出！',
+    name: '3日連続達成',
     description: '3日連続で学習を継続した',
     icon: 'Flame',
     category: 'streak',
@@ -46,7 +46,7 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'streak_7',
-    name: '習慣化マスター（1週間）',
+    name: '週間習慣化（7日）',
     description: '7日連続で学習を継続した',
     icon: 'Zap',
     category: 'streak',
@@ -54,41 +54,41 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'streak_30',
-    name: '不屈の魂（1ヶ月継続）',
+    name: '月間継続（30日）',
     description: '30日連続で学習を継続した',
     icon: 'Trophy',
     category: 'streak',
     targetValue: 30,
   },
 
-  // モード別・正答率
+  // モード別・源流思想
   {
     id: 'speed_perfect_10',
-    name: '電光石火（ノーミスクリア）',
-    description: 'スピード暗記モードで10問連続全問正解を達成',
+    name: 'スピード満点クリア',
+    description: 'スピード演習で10問全問正解を達成',
     icon: 'Gauge',
     category: 'speed',
     targetValue: 10,
   },
   {
     id: 'master_greek',
-    name: 'ギリシャ哲学の賢者',
+    name: '古代ギリシャの賢者',
     description: '古代ギリシャ分野の問題を15問以上マスターした',
     icon: 'Landmark',
     category: 'category_clear',
     targetValue: 15,
   },
   {
-    id: 'master_modern',
-    name: '近代理性の解明者',
-    description: '西洋近代・ドイツ観念論の問題を20問以上マスターした',
-    icon: 'Compass',
+    id: 'master_chinese',
+    name: '諸子百家の大家',
+    description: '中国思想分野の問題を15問以上マスターした',
+    icon: 'Scroll',
     category: 'category_clear',
-    targetValue: 20,
+    targetValue: 15,
   },
   {
     id: 'book_scholar',
-    name: '博覧強記の書誌学者',
+    name: '原典・古典の理解者',
     description: '著書・文献問題を累計20問正解した',
     icon: 'BookOpen',
     category: 'total_answers',
@@ -104,11 +104,10 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'typing_master',
-    name: '一言一句の記述王',
+    name: '正確な用字記述者',
     description: 'キーワード記述問題をノーミスで10問正解した',
     icon: 'Edit3',
     category: 'mastery',
     targetValue: 10,
   },
 ];
-

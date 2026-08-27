@@ -1,24 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { BADGES } from '@/data/badges';
 import { UserDataStore } from '@/lib/storage/userDataStore';
+import { BADGES } from '@/data/badges';
 import { UserProfile } from '@/types';
-import {
-  Award,
-  Lock,
-  Sparkles,
-  CheckCircle2,
-  Flame,
-  Zap,
-  BookOpen,
-  Trophy,
-  Gauge,
-  Landmark,
-  Compass,
-  Network,
-  Edit3,
-} from 'lucide-react';
 import { AdBanner } from '@/components/ads/AdBanner';
 
 export default function BadgesPage() {
@@ -28,130 +13,82 @@ export default function BadgesPage() {
     setProfile(UserDataStore.getProfile());
   }, []);
 
-  const unlockedIds = profile?.unlockedBadgeIds || [];
-  const progressPercent = Math.round((unlockedIds.length / BADGES.length) * 100);
-
-  const getBadgeIcon = (iconName: string, isUnlocked: boolean) => {
-    const props = { className: `w-7 h-7 ${isUnlocked ? 'text-amber-600' : 'text-gray-400'}` };
-    switch (iconName) {
-      case 'Sparkles':
-        return <Sparkles {...props} />;
-      case 'Flame':
-        return <Flame {...props} />;
-      case 'Award':
-        return <Award {...props} />;
-      case 'Crown':
-      case 'Trophy':
-        return <Trophy {...props} />;
-      case 'Zap':
-        return <Zap {...props} />;
-      case 'Gauge':
-        return <Gauge {...props} />;
-      case 'Landmark':
-        return <Landmark {...props} />;
-      case 'Compass':
-        return <Compass {...props} />;
-      case 'BookOpen':
-        return <BookOpen {...props} />;
-      case 'Network':
-        return <Network {...props} />;
-      case 'Edit3':
-        return <Edit3 {...props} />;
-      default:
-        return <Award {...props} />;
-    }
-  };
+  const unlockedCount = profile?.unlockedBadgeIds.length || 0;
+  const totalCount = BADGES.length;
+  const progressRate = Math.round((unlockedCount / totalCount) * 100);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-3 py-5 space-y-4">
       {/* ページヘッダー */}
-      <div className="text-center max-w-xl mx-auto space-y-2">
-        <div className="inline-flex p-3 rounded-2xl bg-amber-500/10 text-amber-600 mb-1">
-          <Award className="w-8 h-8" />
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-gray-900">
-          バッジ・実績コレクション
+      <div className="border-b border-gray-300 pb-2">
+        <span className="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-300">
+          実績コレクション
+        </span>
+        <h1 className="text-xl font-bold text-gray-900 mt-1">
+          バッジ獲得一覧
         </h1>
-        <p className="text-xs sm:text-sm text-gray-500">
-          学習を継続し、特定の条件や単元を制覇して限定バッジをコンプリートしよう！
+        <p className="text-xs text-gray-500 mt-0.5">
+          学習の継続日数や正答数に応じて解放される達成バッジです。（全{totalCount}種）
         </p>
       </div>
 
-      {/* 獲得進捗バー */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div>
-          <span className="text-xs text-gray-400 font-bold block mb-1">総バッジ獲得率</span>
-          <div className="text-2xl font-black text-gray-900">
-            {unlockedIds.length} / {BADGES.length} 個 解放済み
-          </div>
+      {/* 進捗サマリー */}
+      <div className="bg-white border border-gray-300 p-3.5 rounded-xs space-y-2 text-xs">
+        <div className="flex justify-between items-center font-bold">
+          <span className="text-gray-700">獲得進捗状況</span>
+          <span className="text-blue-700">{unlockedCount} / {totalCount} 個 達成 ({progressRate}%)</span>
         </div>
-
-        <div className="w-full sm:w-1/2">
-          <div className="flex justify-between text-xs font-bold text-gray-500 mb-1">
-            <span>Progress</span>
-            <span className="text-indigo-600">{progressPercent}%</span>
-          </div>
-          <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-            <div
-              className="bg-gradient-to-r from-indigo-500 to-amber-500 h-3 rounded-full transition-all duration-500"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
+        <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+          <div
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${progressRate}%` }}
+          />
         </div>
       </div>
 
-      {/* 広告枠 */}
-      <AdBanner label="Badges Sponsor" />
-
       {/* バッジ一覧グリッド */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
         {BADGES.map((badge) => {
-          const isUnlocked = unlockedIds.includes(badge.id);
+          const isUnlocked = profile?.unlockedBadgeIds.includes(badge.id);
 
           return (
             <div
               key={badge.id}
-              className={`rounded-3xl p-6 border transition-all duration-300 flex items-start gap-4 ${
+              className={`p-3 rounded-xs border space-y-1.5 ${
                 isUnlocked
-                  ? 'bg-white border-amber-200 shadow-md shadow-amber-50/50 hover:shadow-lg'
-                  : 'bg-gray-50/60 border-gray-200 opacity-60'
+                  ? 'bg-white border-yellow-400 shadow-2xs'
+                  : 'bg-gray-50 border-gray-200 opacity-60'
               }`}
             >
-              <div
-                className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
-                  isUnlocked
-                    ? 'bg-gradient-to-tr from-amber-200 to-yellow-100 border border-amber-300 shadow-inner'
-                    : 'bg-gray-200 text-gray-400'
-                }`}
-              >
-                {isUnlocked ? getBadgeIcon(badge.icon, true) : <Lock className="w-6 h-6 text-gray-400" />}
+              <div className="flex items-center justify-between">
+                <h3 className={`font-bold text-xs ${isUnlocked ? 'text-gray-900' : 'text-gray-500'}`}>
+                  {badge.name}
+                </h3>
+                <span
+                  className={`text-[10px] font-bold px-1.5 py-0.2 rounded-xs ${
+                    isUnlocked
+                      ? 'bg-yellow-100 text-yellow-900 border border-yellow-300'
+                      : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
+                  {isUnlocked ? '[獲得済]' : '[未達成]'}
+                </span>
               </div>
 
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <h3
-                    className={`font-black text-sm ${
-                      isUnlocked ? 'text-gray-900' : 'text-gray-500'
-                    }`}
-                  >
-                    {badge.name}
-                  </h3>
-                  {isUnlocked && (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                  )}
-                </div>
+              <p className="text-[11px] text-gray-600 leading-tight">
+                {badge.description}
+              </p>
 
-                <p className="text-xs text-gray-500 leading-relaxed">{badge.description}</p>
-
-                <div className="pt-2 text-[10px] font-bold text-amber-600">
-                  ボーナス: +50 XP
-                </div>
+              <div className="text-[10px] text-blue-700 font-semibold pt-1 border-t border-gray-100">
+                報酬: +50 XP
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* 広告枠 */}
+      <AdBanner label="Badges Sponsor" />
     </div>
   );
 }
-

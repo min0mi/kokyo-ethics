@@ -13,7 +13,16 @@ import { BOOKS } from '@/data/books';
 import { EPISODES } from '@/data/episodes';
 import { CATEGORIES } from '@/data/categories';
 
-// ユーティリティ: 配列のシャッフル
+// 源流思想のカテゴリID一覧
+export const AVAILABLE_CATEGORY_IDS: CategoryId[] = [
+  'greek',
+  'hebrew_christian',
+  'islam',
+  'indian_buddhism',
+  'chinese_philosophy',
+];
+
+// 配列シャッフル
 function shuffle<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -23,30 +32,26 @@ function shuffle<T>(array: T[]): T[] {
   return arr;
 }
 
-// 交叉生成エンジン
 export class QuestionGenerator {
   /**
-   * 人物 → キーワード選択問題を生成
+   * 人物 → キーワード選択問題
    */
   static generateFigureToKeyword(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
-    const targetKeywords = categoryId
-      ? KEYWORDS.filter((k) => k.categoryId === categoryId)
-      : KEYWORDS;
+    const targetKeywords = KEYWORDS.filter((k) => {
+      if (categoryId) return k.categoryId === categoryId;
+      return AVAILABLE_CATEGORY_IDS.includes(k.categoryId);
+    });
 
     targetKeywords.forEach((kw) => {
       const figure = FIGURES.find((f) => f.id === kw.figureId);
       if (!figure) return;
 
-      // 同一カテゴリ内の他キーワードを優先して誤選択肢にする（交叉ロジック）
-      const sameCategoryOthers = KEYWORDS.filter(
-        (k) => k.id !== kw.id && k.categoryId === kw.categoryId
-      );
-      const differentCategoryOthers = KEYWORDS.filter(
-        (k) => k.categoryId !== kw.categoryId
-      );
+      // 同一カテゴリ内の他キーワードを優先して誤選択肢にする（交叉）
+      const sameCat = KEYWORDS.filter((k) => k.id !== kw.id && k.categoryId === kw.categoryId);
+      const otherCat = KEYWORDS.filter((k) => k.categoryId !== kw.categoryId);
 
-      const pool = [...shuffle(sameCategoryOthers), ...shuffle(differentCategoryOthers)];
+      const pool = [...shuffle(sameCat), ...shuffle(otherCat)];
       const distractors = pool.slice(0, 3).map((k) => k.name);
       const options = shuffle([kw.name, ...distractors]);
 
@@ -56,11 +61,11 @@ export class QuestionGenerator {
         categoryId: kw.categoryId,
         figureId: figure.id,
         keywordId: kw.id,
-        prompt: `【${figure.name}】が説いた思想・キーワードとして最も適切なものはどれか？`,
+        prompt: `【${figure.name}】が説いた思想・キーワードとして最も適切なものはどれか。`,
         context: `${figure.eraDetail} / ${figure.mainConcept}`,
         options,
         correctAnswer: kw.name,
-        explanation: `【正解】${kw.name}\n\n■${figure.name}の解説:\n${figure.summary}\n\n■${kw.name}の意味:\n${kw.explanation}`,
+        explanation: `【正解】${kw.name}\n\n[人物の解説: ${figure.name}]\n${figure.summary}\n\n[語句の意味: ${kw.name}]\n${kw.explanation}`,
         commonTestHint: kw.commonTestPoint,
       });
     });
@@ -69,27 +74,23 @@ export class QuestionGenerator {
   }
 
   /**
-   * キーワード → 人物選択問題を生成
+   * キーワード → 人物選択問題
    */
   static generateKeywordToFigure(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
-    const targetKeywords = categoryId
-      ? KEYWORDS.filter((k) => k.categoryId === categoryId)
-      : KEYWORDS;
+    const targetKeywords = KEYWORDS.filter((k) => {
+      if (categoryId) return k.categoryId === categoryId;
+      return AVAILABLE_CATEGORY_IDS.includes(k.categoryId);
+    });
 
     targetKeywords.forEach((kw) => {
       const figure = FIGURES.find((f) => f.id === kw.figureId);
       if (!figure) return;
 
-      // 同一カテゴリ内の他人物を優先して誤選択肢にする
-      const sameCategoryFigures = FIGURES.filter(
-        (f) => f.id !== figure.id && f.categoryId === kw.categoryId
-      );
-      const diffCategoryFigures = FIGURES.filter(
-        (f) => f.categoryId !== kw.categoryId
-      );
+      const sameCat = FIGURES.filter((f) => f.id !== figure.id && f.categoryId === kw.categoryId);
+      const otherCat = FIGURES.filter((f) => f.categoryId !== kw.categoryId);
 
-      const pool = [...shuffle(sameCategoryFigures), ...shuffle(diffCategoryFigures)];
+      const pool = [...shuffle(sameCat), ...shuffle(otherCat)];
       const distractors = pool.slice(0, 3).map((f) => f.name);
       const options = shuffle([figure.name, ...distractors]);
 
@@ -99,8 +100,8 @@ export class QuestionGenerator {
         categoryId: kw.categoryId,
         figureId: figure.id,
         keywordId: kw.id,
-        prompt: `「${kw.name}」を提唱・展開した人物は誰か？`,
-        context: `定義：${kw.definition}`,
+        prompt: `「${kw.name}」を提唱・展開した人物は誰か。`,
+        context: `定義: ${kw.definition}`,
         options,
         correctAnswer: figure.name,
         explanation: `【正解】${figure.name}\n\n「${kw.name}」は${figure.name}の重要概念です。\n${kw.explanation}`,
@@ -112,27 +113,23 @@ export class QuestionGenerator {
   }
 
   /**
-   * キーワードの意味・判断語句の正誤選択問題を生成
+   * キーワードの意味・判断語句正誤問題
    */
   static generateKeywordMeaning(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
-    const targetKeywords = categoryId
-      ? KEYWORDS.filter((k) => k.categoryId === categoryId)
-      : KEYWORDS;
+    const targetKeywords = KEYWORDS.filter((k) => {
+      if (categoryId) return k.categoryId === categoryId;
+      return AVAILABLE_CATEGORY_IDS.includes(k.categoryId);
+    });
 
     targetKeywords.forEach((kw) => {
       const figure = FIGURES.find((f) => f.id === kw.figureId);
-      const figureName = figure ? figure.name : '';
+      const figureName = figure ? `（${figure.name}）` : '';
 
-      // 他のキーワードの定義を誤選択肢として使用
-      const sameCategoryOthers = KEYWORDS.filter(
-        (k) => k.id !== kw.id && k.categoryId === kw.categoryId
-      );
-      const diffCategoryOthers = KEYWORDS.filter(
-        (k) => k.categoryId !== kw.categoryId
-      );
+      const sameCat = KEYWORDS.filter((k) => k.id !== kw.id && k.categoryId === kw.categoryId);
+      const otherCat = KEYWORDS.filter((k) => k.categoryId !== kw.categoryId);
 
-      const pool = [...shuffle(sameCategoryOthers), ...shuffle(diffCategoryOthers)];
+      const pool = [...shuffle(sameCat), ...shuffle(otherCat)];
       const distractors = pool.slice(0, 3).map((k) => k.definition);
       const options = shuffle([kw.definition, ...distractors]);
 
@@ -142,10 +139,10 @@ export class QuestionGenerator {
         categoryId: kw.categoryId,
         figureId: kw.figureId,
         keywordId: kw.id,
-        prompt: `「${kw.name}」${figureName ? `（${figureName}）` : ''}の意味・内容として最も適切なものはどれか？`,
+        prompt: `「${kw.name}」${figureName}の意味・内容として最も適切なものはどれか。`,
         options,
         correctAnswer: kw.definition,
-        explanation: `【正解】${kw.definition}\n\n■詳細解説:\n${kw.explanation}`,
+        explanation: `【正解】${kw.definition}\n\n[詳細解説]\n${kw.explanation}`,
         commonTestHint: kw.commonTestPoint,
       });
     });
@@ -154,19 +151,19 @@ export class QuestionGenerator {
   }
 
   /**
-   * 人物 ⇄ 著書選択問題を生成
+   * 人物 ⇄ 著書選択問題
    */
   static generateBookQuestions(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
-    const targetBooks = categoryId
-      ? BOOKS.filter((b) => b.categoryId === categoryId)
-      : BOOKS;
+    const targetBooks = BOOKS.filter((b) => {
+      if (categoryId) return b.categoryId === categoryId;
+      return AVAILABLE_CATEGORY_IDS.includes(b.categoryId);
+    });
 
     targetBooks.forEach((book) => {
       const figure = FIGURES.find((f) => f.id === book.figureId);
       if (!figure) return;
 
-      // ① 人物 → 著書
       const otherBooks = BOOKS.filter((b) => b.id !== book.id);
       const bookDistractors = shuffle(otherBooks).slice(0, 3).map((b) => b.title);
       const bookOptions = shuffle([book.title, ...bookDistractors]);
@@ -177,14 +174,12 @@ export class QuestionGenerator {
         categoryId: book.categoryId,
         figureId: figure.id,
         bookId: book.id,
-        prompt: `【${figure.name}】が著した主著・著作として最も適切なものはどれか？`,
+        prompt: `【${figure.name}】が著した著作として最も適切なものはどれか。`,
         options: bookOptions,
         correctAnswer: book.title,
-        explanation: `【正解】${book.title}（著：${figure.name}）\n\n${book.description}`,
-        commonTestHint: `共テでは著者の組み合わせや時代順の並び替えでも問われます。`,
+        explanation: `【正解】${book.title}（著: ${figure.name}）\n\n${book.description}`,
       });
 
-      // ② 著書 → 人物
       const otherFigures = FIGURES.filter((f) => f.id !== figure.id);
       const figDistractors = shuffle(otherFigures).slice(0, 3).map((f) => f.name);
       const figOptions = shuffle([figure.name, ...figDistractors]);
@@ -195,7 +190,7 @@ export class QuestionGenerator {
         categoryId: book.categoryId,
         figureId: figure.id,
         bookId: book.id,
-        prompt: `著作${book.title}の著者として正しいものはどれか？`,
+        prompt: `著作${book.title}の著者として正しいものはどれか。`,
         context: book.description,
         options: figOptions,
         correctAnswer: figure.name,
@@ -207,13 +202,14 @@ export class QuestionGenerator {
   }
 
   /**
-   * エピソード選択問題を生成
+   * エピソード問題
    */
   static generateEpisodeQuestions(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
-    const targetEpisodes = categoryId
-      ? EPISODES.filter((e) => e.categoryId === categoryId)
-      : EPISODES;
+    const targetEpisodes = EPISODES.filter((e) => {
+      if (categoryId) return e.categoryId === categoryId;
+      return AVAILABLE_CATEGORY_IDS.includes(e.categoryId);
+    });
 
     targetEpisodes.forEach((ep) => {
       const figure = FIGURES.find((f) => f.id === ep.figureId);
@@ -229,11 +225,11 @@ export class QuestionGenerator {
         categoryId: ep.categoryId,
         figureId: figure.id,
         episodeId: ep.id,
-        prompt: `次のエピソードにまつわる思想家は誰か？\n\n「${ep.description}」`,
-        context: `エピソード：${ep.title}`,
+        prompt: `次のエピソードにまつわる思想家は誰か。\n\n「${ep.description}」`,
+        context: `エピソード: ${ep.title}`,
         options,
         correctAnswer: figure.name,
-        explanation: `【正解】${figure.name}\n\n【背景・ポイント】${ep.keyTakeaway}`,
+        explanation: `【正解】${figure.name}\n\n[背景と要点]\n${ep.keyTakeaway}`,
       });
     });
 
@@ -241,20 +237,22 @@ export class QuestionGenerator {
   }
 
   /**
-   * 線つなぎマッチング問題を生成（各カテゴリから3〜4組のペアを作成）
+   * 線つなぎマッチング問題
+   * ★要件: 左側3〜4個に対して、右側の選択肢数を「必ず6個」にして余るダミー選択肢を出現させる！
    */
   static generateMatchingQuestions(categoryId?: CategoryId): MatchingQuestion[] {
     const questions: MatchingQuestion[] = [];
-    const categoriesToProcess = categoryId
-      ? CATEGORIES.filter((c) => c.id === categoryId)
-      : CATEGORIES;
+    const targetCatIds = categoryId ? [categoryId] : AVAILABLE_CATEGORY_IDS;
 
-    categoriesToProcess.forEach((cat) => {
-      const catFigures = FIGURES.filter((f) => f.categoryId === cat.id);
+    targetCatIds.forEach((catId) => {
+      const cat = CATEGORIES.find((c) => c.id === catId);
+      if (!cat) return;
+
+      const catFigures = FIGURES.filter((f) => f.categoryId === catId);
       if (catFigures.length < 3) return;
 
-      // 3組または4組の人物とキーワード/著書のペアを作成
-      const selectedFigures = shuffle(catFigures).slice(0, 4);
+      // 3人〜4人の人物を選出
+      const selectedFigures = shuffle(catFigures).slice(0, 3);
       const pairs: MatchingPair[] = [];
 
       selectedFigures.forEach((fig) => {
@@ -281,7 +279,7 @@ export class QuestionGenerator {
           id: `q_match_${cat.id}_${Date.now()}`,
           type: 'matching_lines',
           categoryId: cat.id,
-          prompt: `【${cat.shortName}】思想家と、その人物が説いたキーワード・主著を正しく組み合わせよ。`,
+          prompt: `【${cat.shortName}】思想家と、その人物が説いたキーワード・主著を正しく組み合わせよ。（※右側の選択肢には不要な語句が余分に含まれています）`,
           pairs,
           explanation: `各思想家と主要概念の対応関係を正確に記憶することが、共通テストの得点源となります。`,
         });
@@ -292,23 +290,22 @@ export class QuestionGenerator {
   }
 
   /**
-   * キーワード記述問題を生成
+   * キーワード記述問題
    */
   static generateTypingQuestions(categoryId?: CategoryId): TypingQuestion[] {
     const questions: TypingQuestion[] = [];
-    const targetKeywords = categoryId
-      ? KEYWORDS.filter((k) => k.categoryId === categoryId)
-      : KEYWORDS;
+    const targetKeywords = KEYWORDS.filter((k) => {
+      if (categoryId) return k.categoryId === categoryId;
+      return AVAILABLE_CATEGORY_IDS.includes(k.categoryId);
+    });
 
     targetKeywords.forEach((kw) => {
       const figure = FIGURES.find((f) => f.id === kw.figureId);
       const figureName = figure ? figure.name : '';
 
-      // 許容回答（漢字、ひらがな、英語、省略表記など）
       const cleanName = kw.name.replace(/（.*?）/g, '').trim();
       const reading = kw.reading;
       const full = kw.name.trim();
-
       const correctAnswers = Array.from(new Set([cleanName, reading, full]));
 
       questions.push({
@@ -317,11 +314,11 @@ export class QuestionGenerator {
         categoryId: kw.categoryId,
         figureId: kw.figureId,
         keywordId: kw.id,
-        prompt: `以下の説明文が表す思想用語・キーワードを記述せよ。\n（提唱者：${figureName}）`,
+        prompt: `以下の説明文が表す思想用語・キーワードを記述せよ。\n（提唱者: ${figureName}）`,
         context: kw.definition,
         correctAnswers,
         displayHint: `頭文字: ${reading.charAt(0)} / ${reading.length}文字`,
-        explanation: `【正解】${kw.name}（読み：${kw.reading}）\n\n${kw.explanation}`,
+        explanation: `【正解】${kw.name}（読み: ${kw.reading}）\n\n${kw.explanation}`,
         commonTestHint: kw.commonTestPoint,
       });
     });
@@ -330,7 +327,7 @@ export class QuestionGenerator {
   }
 
   /**
-   * 分類想起問題を生成
+   * 分類想起問題
    */
   static generateRecallQuestions(categoryId?: CategoryId): RecallQuestion[] {
     const questions: RecallQuestion[] = [];
@@ -349,53 +346,37 @@ export class QuestionGenerator {
         ],
       },
       {
-        id: 'recall_empiricism',
-        categoryId: 'modern_western_early' as CategoryId,
-        targetCategoryName: 'イギリス経験論の代表的思想家',
+        id: 'recall_chinese_confucian',
+        categoryId: 'chinese_philosophy' as CategoryId,
+        targetCategoryName: '中国儒家の代表的思想家',
         requiredCount: 3,
-        expectedAnswers: ['ベーコン', 'ロック', 'ヒューム', 'バークリ'],
+        expectedAnswers: ['孔子', '孟子', '荀子'],
         modelAnswerDetails: [
-          { name: 'フランシス・ベーコン', note: '帰納法、知は力なり、四つのイドラ' },
-          { name: 'ジョン・ロック', note: 'タブラ・ラサ（白紙）、自然権と抵抗権' },
-          { name: 'デイヴィッド・ヒューム', note: '懐疑論、自我は知覚の束' },
+          { name: '孔子', note: '仁と礼、徳治主義、論語' },
+          { name: '孟子', note: '性善説、四端の心、王道政治、易姓革命' },
+          { name: '荀子', note: '性悪説、礼治主義、化性起偽' },
         ],
       },
       {
-        id: 'recall_kamakura_buddhism',
-        categoryId: 'japan_buddhism_thought' as CategoryId,
-        targetCategoryName: '鎌倉新仏教の主要な開祖',
-        requiredCount: 4,
-        expectedAnswers: ['法然', '親鸞', '道元', '日蓮', '栄西', '一遍'],
+        id: 'recall_chinese_daoist',
+        categoryId: 'chinese_philosophy' as CategoryId,
+        targetCategoryName: '中国道家の代表的思想家',
+        requiredCount: 2,
+        expectedAnswers: ['老子', '荘子'],
         modelAnswerDetails: [
-          { name: '法然', note: '浄土宗・専修念仏' },
-          { name: '親鸞', note: '浄土真宗・悪人正機説・絶対他力' },
-          { name: '道元', note: '曹洞宗・只管打坐・修証一等' },
-          { name: '日蓮', note: '日蓮宗・題目・立正安国論' },
+          { name: '老子', note: '無為自然、上善如水、小国寡民' },
+          { name: '荘子', note: '万物斉同、胡蝶の夢、逍遥遊' },
         ],
       },
       {
-        id: 'recall_existentialism',
-        categoryId: 'contemporary_existentialism' as CategoryId,
-        targetCategoryName: '現代の実存主義哲学者',
-        requiredCount: 3,
-        expectedAnswers: ['ヤスパース', 'ハイデッガー', 'サルトル', 'ボーヴォワール'],
+        id: 'recall_hellenism',
+        categoryId: 'greek' as CategoryId,
+        targetCategoryName: 'ヘレニズム期の代表学派（エピクロス派・ストア派）の祖',
+        requiredCount: 2,
+        expectedAnswers: ['エピクロス', 'ゼノン'],
         modelAnswerDetails: [
-          { name: 'ヤスパース', note: '限界状況、超越者' },
-          { name: 'ハイデッガー', note: '現存在、世人、死への先駆' },
-          { name: 'サルトル', note: '実存は本質に先立つ、アンガージュマン' },
-        ],
-      },
-      {
-        id: 'recall_justice',
-        categoryId: 'justice_political_ethics' as CategoryId,
-        targetCategoryName: '現代の正義論・社会思想家',
-        requiredCount: 3,
-        expectedAnswers: ['ロールズ', 'ノージック', 'サンデル', 'セン'],
-        modelAnswerDetails: [
-          { name: 'ロールズ', note: '無知のヴェール、格差原理、公正としての正義' },
-          { name: 'ノージック', note: 'リバタリアニズム、自己所有権、最小国家論' },
-          { name: 'サンデル', note: 'コミュニタリアニズム、共通善' },
-          { name: 'セン', note: '潜在能力（ケイパビリティ）アプローチ' },
+          { name: 'エピクロス', note: 'アタラクシア（平静心）、快楽主義、隠れて生きよ' },
+          { name: 'ゼノン（ストア派）', note: 'アパテイア（不動心）、禁欲主義、自然に従え' },
         ],
       },
     ];
@@ -408,7 +389,7 @@ export class QuestionGenerator {
         type: 'recall_classification',
         categoryId: item.categoryId,
         prompt: `【想起トレーニング】「${item.targetCategoryName}」に該当する人物を【${item.requiredCount}人】頭の中で思い浮かべよ。`,
-        context: `思い浮かべたら「解答を確認」を押して自己採点を行ってください。`,
+        context: `思い浮かべたら「模範解答を表示する」を押して自己評価を行ってください。`,
         targetCategoryName: item.targetCategoryName,
         requiredCount: item.requiredCount,
         expectedAnswers: item.expectedAnswers,
@@ -421,7 +402,7 @@ export class QuestionGenerator {
   }
 
   /**
-   * 全問題プールを一括取得
+   * 全問題プールを取得（源流思想を基本対象とする）
    */
   static getAllQuestions(categoryId?: CategoryId): Question[] {
     return [
@@ -436,4 +417,3 @@ export class QuestionGenerator {
     ];
   }
 }
-

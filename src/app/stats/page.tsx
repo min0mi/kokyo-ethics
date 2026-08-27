@@ -6,7 +6,6 @@ import { SRSEngine } from '@/lib/srs/srsEngine';
 import { QuestionGenerator } from '@/lib/generator/questionGenerator';
 import { CATEGORIES } from '@/data/categories';
 import { UserProfile } from '@/types';
-import { BarChart3, Zap } from 'lucide-react';
 import { AdBanner } from '@/components/ads/AdBanner';
 
 export default function StatsPage() {
@@ -19,7 +18,7 @@ export default function StatsPage() {
     new: 0,
   });
   const [categoryData, setCategoryData] = useState<
-    { name: string; era: string; mastered: number; total: number; rate: number }[]
+    { name: string; era: string; mastered: number; total: number; rate: number; isAvailable: boolean }[]
   >([]);
 
   useEffect(() => {
@@ -55,7 +54,6 @@ export default function StatsPage() {
       new: unattempted,
     });
 
-    // カテゴリごとの進捗
     const catList = CATEGORIES.map((cat) => {
       const catQs = allQs.filter((q) => q.categoryId === cat.id);
       const res = SRSEngine.calculateCategoryStats(catQs, progressMap);
@@ -65,6 +63,7 @@ export default function StatsPage() {
         mastered: res.mastered,
         total: res.total,
         rate: res.rate,
+        isAvailable: cat.isAvailable,
       };
     });
     setCategoryData(catList);
@@ -76,100 +75,94 @@ export default function StatsPage() {
       : 0;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-      {/* ページタイトル */}
-      <div className="text-center max-w-xl mx-auto space-y-2">
-        <div className="inline-flex p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 mb-1">
-          <BarChart3 className="w-8 h-8" />
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-gray-900">
+    <div className="max-w-5xl mx-auto px-3 py-5 space-y-4">
+      {/* ページヘッダー */}
+      <div className="border-b border-gray-300 pb-2">
+        <span className="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-300">
+          学習進捗・忘却曲線
+        </span>
+        <h1 className="text-xl font-bold text-gray-900 mt-1">
           学習習熟度・忘却曲線分析
         </h1>
-        <p className="text-xs sm:text-sm text-gray-500">
-          SuperMemo-2 (SM-2) アルゴリズムによる各問題の定着ステータスを可視化
+        <p className="text-xs text-gray-500 mt-0.5">
+          SuperMemo-2 (SM-2) アルゴリズムに基づく記憶定着フェーズの可視化
         </p>
       </div>
 
-      {/* サマリーカード */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-3xl p-5 border border-gray-200/80 shadow-xs">
-          <span className="text-xs text-gray-400 font-bold block mb-1">総解答数</span>
-          <div className="text-2xl font-black text-gray-900">{profile?.totalAnswered || 0} 問</div>
+      {/* サマリーテーブル */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+        <div className="bg-white border border-gray-300 p-3 rounded-xs">
+          <span className="text-gray-500 block mb-1">総解答数</span>
+          <strong className="text-lg text-gray-900">{profile?.totalAnswered || 0} 問</strong>
         </div>
 
-        <div className="bg-white rounded-3xl p-5 border border-gray-200/80 shadow-xs">
-          <span className="text-xs text-gray-400 font-bold block mb-1">通算正答率</span>
-          <div className="text-2xl font-black text-indigo-600">{overallAccuracy}%</div>
+        <div className="bg-white border border-gray-300 p-3 rounded-xs">
+          <span className="text-gray-500 block mb-1">通算正答率</span>
+          <strong className="text-lg text-blue-700">{overallAccuracy}%</strong>
         </div>
 
-        <div className="bg-white rounded-3xl p-5 border border-gray-200/80 shadow-xs">
-          <span className="text-xs text-gray-400 font-bold block mb-1">定着完了 (Mastered)</span>
-          <div className="text-2xl font-black text-emerald-600">{counts.mastered} 問</div>
+        <div className="bg-white border border-gray-300 p-3 rounded-xs">
+          <span className="text-gray-500 block mb-1">定着完了 (30日+)</span>
+          <strong className="text-lg text-green-700">{counts.mastered} 問</strong>
         </div>
 
-        <div className="bg-white rounded-3xl p-5 border border-gray-200/80 shadow-xs">
-          <span className="text-xs text-gray-400 font-bold block mb-1">獲得XP</span>
-          <div className="text-2xl font-black text-amber-600 flex items-center gap-1">
-            <Zap className="w-5 h-5 fill-amber-500 text-amber-500" />
-            {profile?.xp || 0}
-          </div>
+        <div className="bg-white border border-gray-300 p-3 rounded-xs">
+          <span className="text-gray-500 block mb-1">獲得経験値</span>
+          <strong className="text-lg text-yellow-700">{profile?.xp || 0} XP</strong>
         </div>
       </div>
 
-      {/* 忘却曲線 ステータス内訳 */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/80 shadow-sm space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-bold text-gray-900">記憶定着ステータス内訳</h3>
-            <p className="text-xs text-gray-500">全問題プール ({counts.total}問) の習熟フェーズ</p>
-          </div>
-          <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
-            SM-2 SRS
+      {/* 記憶定着ステータス内訳 */}
+      <div className="bg-white border border-gray-300 p-4 rounded-xs space-y-3 text-xs">
+        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
+          <h2 className="font-bold text-gray-900 text-sm">
+            記憶定着フェーズ内訳（源流思想 全{counts.total}問）
+          </h2>
+          <span className="text-[11px] bg-blue-50 text-blue-800 font-bold px-2 py-0.5 border border-blue-200 rounded-xs">
+            SM-2 アルゴリズム
           </span>
         </div>
 
-        {/* スタックバーグラフ */}
-        <div className="space-y-2">
-          <div className="w-full bg-gray-100 rounded-full h-4 flex overflow-hidden">
-            <div
-              className="bg-emerald-500 h-full transition-all duration-500"
-              style={{ width: `${(counts.mastered / (counts.total || 1)) * 100}%` }}
-              title={`Mastered: ${counts.mastered}問`}
-            />
-            <div
-              className="bg-indigo-500 h-full transition-all duration-500"
-              style={{ width: `${(counts.review / (counts.total || 1)) * 100}%` }}
-              title={`Review期: ${counts.review}問`}
-            />
-            <div
-              className="bg-amber-400 h-full transition-all duration-500"
-              style={{ width: `${(counts.learning / (counts.total || 1)) * 100}%` }}
-              title={`Learning中: ${counts.learning}問`}
-            />
-            <div
-              className="bg-gray-200 h-full transition-all duration-500"
-              style={{ width: `${(counts.new / (counts.total || 1)) * 100}%` }}
-              title={`未着手: ${counts.new}問`}
-            />
-          </div>
+        {/* スタックバー */}
+        <div className="w-full bg-gray-200 h-3 rounded-xs flex overflow-hidden">
+          <div
+            className="bg-green-600 h-full"
+            style={{ width: `${(counts.mastered / (counts.total || 1)) * 100}%` }}
+            title={`定着完了: ${counts.mastered}問`}
+          />
+          <div
+            className="bg-blue-600 h-full"
+            style={{ width: `${(counts.review / (counts.total || 1)) * 100}%` }}
+            title={`復習期: ${counts.review}問`}
+          />
+          <div
+            className="bg-yellow-500 h-full"
+            style={{ width: `${(counts.learning / (counts.total || 1)) * 100}%` }}
+            title={`学習中: ${counts.learning}問`}
+          />
+          <div
+            className="bg-gray-300 h-full"
+            style={{ width: `${(counts.new / (counts.total || 1)) * 100}%` }}
+            title={`未着手: ${counts.new}問`}
+          />
+        </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs font-bold">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-gray-700">定着完了 (30日+): {counts.mastered}問</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-indigo-500" />
-              <span className="text-gray-700">復習期 (7〜14日): {counts.review}問</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-amber-400" />
-              <span className="text-gray-700">学習中 (1〜3日): {counts.learning}問</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-gray-300" />
-              <span className="text-gray-400">未学習: {counts.new}問</span>
-            </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 bg-green-600 inline-block" />
+            <span>定着完了: {counts.mastered}問</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 bg-blue-600 inline-block" />
+            <span>復習期 (7〜14日): {counts.review}問</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 bg-yellow-500 inline-block" />
+            <span>学習中 (1〜3日): {counts.learning}問</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 bg-gray-300 inline-block" />
+            <span className="text-gray-500">未学習: {counts.new}問</span>
           </div>
         </div>
       </div>
@@ -177,20 +170,35 @@ export default function StatsPage() {
       {/* 広告枠 */}
       <AdBanner label="Stats Sponsor" />
 
-      {/* 単元別マスター率一覧 */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/80 shadow-sm space-y-4">
-        <h3 className="text-lg font-bold text-gray-900">単元別マスター度</h3>
-        <div className="space-y-4">
+      {/* 単元別マスター度 */}
+      <div className="bg-white border border-gray-300 p-4 rounded-xs space-y-3 text-xs">
+        <h2 className="font-bold text-gray-900 text-sm border-b border-gray-200 pb-2">
+          単元別 習熟度一覧
+        </h2>
+
+        <div className="space-y-2.5">
           {categoryData.map((cat, idx) => (
-            <div key={idx} className="space-y-1.5">
-              <div className="flex justify-between text-xs font-bold text-gray-700">
-                <span>{cat.name} <span className="font-normal text-gray-400">（{cat.era}）</span></span>
-                <span className="text-indigo-600 font-extrabold">{cat.rate}% ({cat.mastered}/{cat.total}問)</span>
+            <div key={idx} className="space-y-1">
+              <div className="flex justify-between text-xs">
+                <div>
+                  <span className="font-bold text-gray-800">{cat.name}</span>
+                  <span className="text-gray-500 text-[11px] ml-1.5">({cat.era})</span>
+                  {!cat.isAvailable && (
+                    <span className="ml-2 text-[10px] text-gray-400 font-mono">[準備中]</span>
+                  )}
+                </div>
+                {cat.isAvailable ? (
+                  <span className="text-blue-700 font-bold">
+                    {cat.rate}% ({cat.mastered}/{cat.total}問)
+                  </span>
+                ) : (
+                  <span className="text-gray-400">-</span>
+                )}
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
                 <div
-                  className="bg-indigo-600 h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${cat.rate}%` }}
+                  className="bg-blue-600 h-1.5 rounded-full"
+                  style={{ width: `${cat.isAvailable ? cat.rate : 0}%` }}
                 />
               </div>
             </div>
@@ -200,4 +208,3 @@ export default function StatsPage() {
     </div>
   );
 }
-

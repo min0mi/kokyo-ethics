@@ -8,7 +8,6 @@ import { RecallQuiz } from '@/components/quiz/RecallQuiz';
 import { QuizResult } from '@/components/quiz/QuizResult';
 import { BadgeUnlockedModal } from '@/components/gamification/BadgeUnlockedModal';
 import { CATEGORIES } from '@/data/categories';
-import { Brain, Filter } from 'lucide-react';
 
 function RecallQuizContent() {
   const searchParams = useSearchParams();
@@ -23,6 +22,8 @@ function RecallQuizContent() {
   const [correctCount, setCorrectCount] = useState(0);
   const [totalXp, setTotalXp] = useState(0);
   const [activeBadge, setActiveBadge] = useState<Badge | null>(null);
+
+  const availableCategories = CATEGORIES.filter((c) => c.isAvailable);
 
   const loadQuestions = useCallback(() => {
     const cat = selectedCategory === 'all' ? undefined : selectedCategory;
@@ -52,32 +53,31 @@ function RecallQuizContent() {
   const currentQ = questions[currentIndex];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-4xl mx-auto px-3 py-5 space-y-4">
       <BadgeUnlockedModal badge={activeBadge} onClose={() => setActiveBadge(null)} />
 
       {/* ヘッダーエリア */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-gray-300">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-100 text-cyan-900 text-xs font-bold mb-1">
-            <Brain className="w-3.5 h-3.5 text-cyan-600" />
-            <span>高次想起 分類セルフチェック</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-gray-900">
-            分類想起トレーニング
+          <span className="text-[11px] font-bold text-cyan-900 bg-cyan-100 px-2 py-0.5 rounded-xs">
+            高次想起 分類セルフチェック
+          </span>
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
+            源流思想 分類想起トレーニング
           </h1>
         </div>
 
         {/* 単元フィルター */}
         {!isCompleted && (
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-gray-600 font-semibold">単元:</span>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value as CategoryId | 'all')}
-              className="text-xs font-semibold bg-white border border-gray-200 rounded-xl px-3 py-2 text-gray-700 focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+              className="text-xs bg-white border border-gray-300 rounded-xs px-2 py-1 text-gray-700 focus:outline-hidden focus:border-blue-600"
             >
-              <option value="all">全単元</option>
-              {CATEGORIES.map((cat) => (
+              <option value="all">源流思想 全単元</option>
+              {availableCategories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.shortName}
                 </option>
@@ -90,8 +90,8 @@ function RecallQuizContent() {
       {/* 想起クイズ */}
       {!isCompleted ? (
         currentQ ? (
-          <div className="space-y-4">
-            <div className="text-xs text-gray-400 font-semibold text-right">
+          <div className="space-y-2">
+            <div className="text-[11px] text-gray-500 font-semibold text-right">
               第 {currentIndex + 1} 問 / 全 {questions.length} 問
             </div>
             <RecallQuiz
@@ -101,8 +101,8 @@ function RecallQuizContent() {
             />
           </div>
         ) : (
-          <div className="bg-white rounded-3xl p-12 text-center border border-gray-200 shadow-sm">
-            <p className="text-sm text-gray-500">問題が見つかりませんでした。</p>
+          <div className="bg-white border border-gray-300 rounded-xs p-8 text-center">
+            <p className="text-xs text-gray-500">問題が見つかりませんでした。</p>
           </div>
         )
       ) : (
@@ -111,7 +111,7 @@ function RecallQuizContent() {
           correctCount={correctCount}
           xpEarned={totalXp}
           onRetry={loadQuestions}
-          modeTitle="分類想起トレーニング"
+          modeTitle="分類想起演習"
         />
       )}
     </div>
@@ -120,9 +120,8 @@ function RecallQuizContent() {
 
 export default function RecallPracticePage() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-gray-500">読み込み中...</div>}>
+    <Suspense fallback={<div className="text-center py-10 text-xs text-gray-500">読み込み中...</div>}>
       <RecallQuizContent />
     </Suspense>
   );
 }
-
