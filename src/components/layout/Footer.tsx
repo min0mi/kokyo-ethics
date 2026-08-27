@@ -27,13 +27,13 @@ export const Footer: React.FC = () => {
           大学入学共通テスト「公共、倫理」「倫理」構造的記憶・忘却曲線演習サイト
         </p>
 
-        {/* レトロなアクセスカウンター */}
+        {/* アクセスカウンター */}
         <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-[11px] text-gray-500 font-bold select-none py-1">
           <span>あなたは</span>
           <img
-            src="https://profile-counter.glitch.me/kokyo-ethics/count.svg"
+            src="https://visitor-badge.laobi.icu/badge?page_id=kokyo-ethics.com&color=34495e"
             alt="Access Counter"
-            className="h-4 sm:h-4.5 opacity-85 select-none"
+            className="h-4.5 opacity-90 select-none"
             style={{ display: 'inline-block', verticalAlign: 'middle' }}
           />
           <span>人目の探求者です</span>
