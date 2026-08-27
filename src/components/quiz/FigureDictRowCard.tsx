@@ -53,25 +53,21 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
 
   // 2. 誤答として選ばれた選択肢のデータを特定（人物 or キーワード）
   let wrongFig: Figure | undefined = undefined;
-  let wrongKw: Keyword | undefined = undefined;
 
   if (selectedWrongOption && !isPassed) {
     // 誤答が人物名の場合
     const foundFig = FIGURES.find((f) => f.name === selectedWrongOption);
     if (foundFig) {
       wrongFig = foundFig;
-      wrongKw = KEYWORDS.find((k) => k.figureId === foundFig.id);
     } else {
       // 誤答がキーワード名の場合
       const foundKw = KEYWORDS.find((k) => k.name === selectedWrongOption);
       if (foundKw) {
-        wrongKw = foundKw;
         wrongFig = FIGURES.find((f) => f.id === foundKw.figureId);
       } else {
         // 部分一致
         const partialKw = KEYWORDS.find((k) => selectedWrongOption.includes(k.name) || k.name.includes(selectedWrongOption));
         if (partialKw) {
-          wrongKw = partialKw;
           wrongFig = FIGURES.find((f) => f.id === partialKw.figureId);
         }
       }
@@ -81,6 +77,7 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
   if (!correctFig) return null;
 
   const correctKws = KEYWORDS.filter((k) => k.figureId === correctFig?.id);
+  const wrongKws = wrongFig ? KEYWORDS.filter((k) => k.figureId === wrongFig?.id) : [];
 
   // ハイライト対象の特定
   const correctHighlightTarget = correctAnswerText || (correctKw ? correctKw.name : correctFig.name);
@@ -104,15 +101,15 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
         <span className="text-[10px] text-gray-500 font-normal">復習キューに追加済</span>
       </div>
 
-      {/* 2行対比テーブル（誤答 ＋ 正答） */}
+      {/* 2行対比テーブル（1人物1行: 誤答 ＋ 正答） */}
       <div className="border border-gray-300 rounded-xs overflow-hidden bg-white shadow-xs">
         <table className="w-full text-left text-[11px] border-collapse">
           <thead>
             <tr className="bg-gray-100 border-b border-gray-300 text-gray-700">
               <th className="py-1 px-2 font-bold w-20 border-r border-gray-200">区分</th>
-              <th className="py-1 px-2.5 font-bold w-36 border-r border-gray-200">人物</th>
-              <th className="py-1 px-2.5 font-bold w-44 border-r border-gray-200">対応キーワード</th>
-              <th className="py-1 px-2.5 font-bold">説明</th>
+              <th className="py-1 px-2.5 font-bold w-40 border-r border-gray-200">人物</th>
+              <th className="py-1 px-2.5 font-bold w-52 border-r border-gray-200">対応キーワード</th>
+              <th className="py-1 px-2.5 font-bold">説明・エピソード</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -135,24 +132,23 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
                   )}
                 </td>
 
-                {/* 対応キーワード */}
-                <td className="py-2 px-2.5 align-top border-r border-gray-200 space-y-0.5">
-                  {wrongKw ? (
-                    <div className="font-bold text-gray-900">
-                      ・{highlightWord(wrongKw.name, wrongHighlightTarget)}
-                    </div>
-                  ) : (
-                    <div className="font-bold text-gray-900">
-                      ・{highlightWord(wrongFig.mainConcept, wrongHighlightTarget)}
-                    </div>
-                  )}
+                {/* 対応キーワード（バッジ一覧） */}
+                <td className="py-2 px-2.5 align-top border-r border-gray-200">
+                  <div className="flex flex-wrap gap-1">
+                    {wrongKws.map((k) => (
+                      <span
+                        key={k.id}
+                        className="inline-block bg-white border border-gray-300 text-gray-900 font-bold px-1.5 py-0.2 rounded-xs text-[10px]"
+                      >
+                        {highlightWord(k.name, wrongHighlightTarget)}
+                      </span>
+                    ))}
+                  </div>
                 </td>
 
-                {/* 説明 */}
+                {/* 説明・エピソード */}
                 <td className="py-2 px-2.5 align-top text-gray-700 leading-relaxed">
-                  {wrongKw
-                    ? highlightWord(wrongKw.definition, wrongHighlightTarget)
-                    : wrongFig.summary}
+                  {highlightWord(wrongFig.summary, wrongHighlightTarget)}
                 </td>
               </tr>
             )}
@@ -175,34 +171,23 @@ export const FigureDictRowCard: React.FC<FigureDictRowCardProps> = ({
                 )}
               </td>
 
-              {/* 対応キーワード */}
-              <td className="py-2 px-2.5 align-top border-r border-gray-200 space-y-0.5">
-                {correctKw ? (
-                  <div className="font-bold text-gray-900">
-                    ・{highlightWord(correctKw.name, correctHighlightTarget)}
-                  </div>
-                ) : (
-                  correctKws.slice(0, 3).map((k) => (
-                    <div key={k.id} className="font-bold text-gray-900">
-                      ・{highlightWord(k.name, correctHighlightTarget)}
-                    </div>
-                  ))
-                )}
+              {/* 対応キーワード（バッジ一覧） */}
+              <td className="py-2 px-2.5 align-top border-r border-gray-200">
+                <div className="flex flex-wrap gap-1">
+                  {correctKws.map((k) => (
+                    <span
+                      key={k.id}
+                      className="inline-block bg-white border border-gray-300 text-gray-900 font-bold px-1.5 py-0.2 rounded-xs text-[10px]"
+                    >
+                      {highlightWord(k.name, correctHighlightTarget)}
+                    </span>
+                  ))}
+                </div>
               </td>
 
-              {/* 説明 */}
-              <td className="py-2 px-2.5 align-top space-y-0.5">
-                {correctKw ? (
-                  <div className="text-gray-700 leading-relaxed">
-                    {highlightWord(correctKw.definition, correctHighlightTarget)}
-                  </div>
-                ) : (
-                  correctKws.slice(0, 3).map((k) => (
-                    <div key={k.id} className="text-gray-700 leading-relaxed">
-                      {highlightWord(k.definition, correctHighlightTarget)}
-                    </div>
-                  ))
-                )}
+              {/* 説明・エピソード */}
+              <td className="py-2 px-2.5 align-top text-gray-700 leading-relaxed">
+                {highlightWord(correctFig.summary, correctHighlightTarget)}
               </td>
             </tr>
           </tbody>
