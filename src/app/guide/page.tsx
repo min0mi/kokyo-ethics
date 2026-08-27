@@ -2,138 +2,142 @@ import React from 'react';
 import Link from 'next/link';
 
 export const metadata = {
-  title: '使い方ガイド | 公共倫理パーフェクトマスター.com',
-  description: '公共倫理パーフェクトマスター.comの効率的な学習方法と機能一覧',
+  title: '使い方 | 公共倫理パーフェクトマスター.com',
+  description: '公共倫理パーフェクトマスター.comの最短利用ガイド',
 };
 
 export default function GuidePage() {
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4 text-xs text-gray-900 leading-relaxed">
-      {/* ページヘッダー */}
+    <div className="max-w-3xl mx-auto px-3 py-4 space-y-3 text-xs text-gray-900 leading-normal">
+      {/* ヘッダー */}
       <div className="border-b border-gray-300 pb-2">
-        <span className="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-300">
-          利用案内
-        </span>
-        <h1 className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
-          使い方ガイド（最短で共通テストの点数を伸ばす学習手順）
+        <h1 className="text-base font-bold text-gray-900">
+          使い方ガイド
         </h1>
         <p className="text-[11px] text-gray-500 mt-0.5">
-          本サイトは、共通テスト倫理・公共で最も失点しやすい「人物とキーワードの混同・ひっかけ」を高速で解消するための特訓ツールです。
+          共通テスト「倫理」「公共」の人物・キーワード対応関係を最短でマスターするための3ステップ
         </p>
       </div>
 
-      {/* ステップ1 */}
-      <section className="bg-white border border-gray-300 rounded-xs p-4 space-y-2 shadow-xs">
-        <div className="flex items-center gap-2 border-b border-gray-200 pb-1.5">
-          <span className="bg-gray-800 text-white font-bold px-2 py-0.5 rounded-xs text-[11px]">
-            STEP 1
-          </span>
-          <h2 className="text-sm font-bold text-gray-900">
-            思想・人物対応表で「人物と語句の結びつき」を確認する
-          </h2>
+      {/* 3つのステップ概要 */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
+        <div className="bg-white border border-gray-300 p-3 rounded-xs space-y-1">
+          <div className="font-mono font-bold text-gray-500 text-[10px]">STEP 01</div>
+          <strong className="block text-xs text-gray-900">対応表で確認</strong>
+          <p className="text-[11px] text-gray-600">人物・キーワード・エピソードを1行で俯瞰</p>
         </div>
-        <p className="text-gray-700">
-          まずは上部バーの「<Link href="/dictionary" className="text-blue-700 font-bold hover:underline">思想・人物対応表</Link>」を開き、全体像を把握します。
-        </p>
-        <ul className="list-disc list-inside space-y-1 text-gray-600 pl-1">
-          <li>
-            <strong>左右2列のシンプル構成:</strong> 左列に人物名と時代、右列に対応キーワードと1行定義を掲載。
-          </li>
-          <li>
-            <strong>即時ハイライト検索:</strong> 検索バーに用語（例:「アタラクシア」「仁」）を入力すると、一致する箇所が自動で黄色く強調表示されます。
-          </li>
-          <li>
-            <strong>単元別タブ切り替え:</strong> 古代ギリシャ、ユダヤ・キリスト、イスラーム、インド仏教、中国思想、日本思想、青年期をワンクリックで絞り込めます。
-          </li>
-        </ul>
-      </section>
+        <div className="bg-white border border-gray-300 p-3 rounded-xs space-y-1">
+          <div className="font-mono font-bold text-gray-500 text-[10px]">STEP 02</div>
+          <strong className="block text-xs text-gray-900">高速反復演習</strong>
+          <p className="text-[11px] text-gray-600">4択・線つなぎで即答（Pキーでパス可）</p>
+        </div>
+        <div className="bg-white border border-gray-300 p-3 rounded-xs space-y-1">
+          <div className="font-mono font-bold text-gray-500 text-[10px]">STEP 03</div>
+          <strong className="block text-xs text-gray-900">忘却曲線で復習</strong>
+          <p className="text-[11px] text-gray-600">間違えた問題を自動で再出題</p>
+        </div>
+      </div>
 
-      {/* ステップ2 */}
-      <section className="bg-white border border-gray-300 rounded-xs p-4 space-y-2 shadow-xs">
-        <div className="flex items-center gap-2 border-b border-gray-200 pb-1.5">
-          <span className="bg-gray-800 text-white font-bold px-2 py-0.5 rounded-xs text-[11px]">
-            STEP 2
-          </span>
-          <h2 className="text-sm font-bold text-gray-900">
-            演習で「1問3秒の瞬間反射」を鍛える（英単語感覚）
-          </h2>
-        </div>
-        <p className="text-gray-700">
-          トップページの「演習を開始する」ボタンから、反射的に正解を選ぶトレーニングを行います。
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
-          <div className="bg-gray-50 border border-gray-300 p-2.5 rounded-xs space-y-1">
-            <strong className="text-gray-900 block">出題される5つの形式:</strong>
-            <ul className="list-disc list-inside text-gray-600 space-y-0.5">
-              <li><strong>人物 ➔ 語句:</strong> 「ソクラテス」に対応する語句はどれか？</li>
-              <li><strong>語句 ➔ 人物:</strong> 「アパテイア」に対応する人物は誰か？</li>
-              <li><strong>仲間はずれ:</strong> 「プラトン」に対応しない語句はどれか？</li>
-              <li><strong>ペア正誤:</strong> 人物と語句の組合せで正しいものはどれか？</li>
-              <li><strong>線つなぎ:</strong> 3名の人物と6択の語句（ダミー含む）を線で結ぶ</li>
-            </ul>
+      {/* 詳細説明テーブル */}
+      <div className="bg-white border border-gray-300 rounded-xs overflow-hidden">
+        <table className="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr className="bg-gray-100 border-b border-gray-300 text-gray-700 text-[11px]">
+              <th className="py-1.5 px-3 font-bold w-28 border-r border-gray-200">機能</th>
+              <th className="py-1.5 px-3 font-bold w-36 border-r border-gray-200">操作 / 画面</th>
+              <th className="py-1.5 px-3 font-bold">ポイント</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 text-[11px]">
+            {/* 1. 対応表 */}
+            <tr>
+              <td className="py-2 px-3 font-bold border-r border-gray-200">
+                思想・人物対応表
+              </td>
+              <td className="py-2 px-3 border-r border-gray-200 text-blue-700 font-semibold">
+                <Link href="/dictionary" className="hover:underline">
+                  /dictionary »
+                </Link>
+              </td>
+              <td className="py-2 px-3 text-gray-700 space-y-0.5">
+                <div>・1人物1行で「人物・著書・対応キーワード・エピソード」を掲載。</div>
+                <div>・ひらがな検索（例:「そくらてす」）でもカタカナ人名に完全ヒット＆黄色ハイライト。</div>
+              </td>
+            </tr>
+
+            {/* 2. 演習 */}
+            <tr>
+              <td className="py-2 px-3 font-bold border-r border-gray-200">
+                反射演習
+              </td>
+              <td className="py-2 px-3 border-r border-gray-200 text-blue-700 font-semibold">
+                <Link href="/" className="hover:underline">
+                  トップページ演習 »
+                </Link>
+              </td>
+              <td className="py-2 px-3 text-gray-700 space-y-0.5">
+                <div>・出題範囲（全範囲 / 源流思想 / 日本思想 / 西洋思想）を選択可能。</div>
+                <div>・<strong>キーボード操作</strong>: <code>1-4</code> で解答、<code>P</code> / <code>0</code> でパス、<code>Enter/Space</code> で次へ。</div>
+                <div>・正解時は0.38秒で自動進行。間違えた時は「選んだ誤答」と「正解」の2行対比テーブルを表示。</div>
+              </td>
+            </tr>
+
+            {/* 3. 学習進捗 */}
+            <tr>
+              <td className="py-2 px-3 font-bold border-r border-gray-200">
+                進捗 ＆ 忘却曲線
+              </td>
+              <td className="py-2 px-3 border-r border-gray-200 text-blue-700 font-semibold">
+                <Link href="/stats" className="hover:underline">
+                  /stats »
+                </Link>
+              </td>
+              <td className="py-2 px-3 text-gray-700 space-y-0.5">
+                <div>・問題を解いた実時間（秒）を自動計測・記録。</div>
+                <div>・SM-2アルゴリズムで、最適な復習タイミングを自動計算。</div>
+              </td>
+            </tr>
+
+            {/* 4. シェア */}
+            <tr>
+              <td className="py-2 px-3 font-bold border-r border-gray-200">
+                結果シェア
+              </td>
+              <td className="py-2 px-3 border-r border-gray-200 text-gray-600">
+                演習リザルト / 成績
+              </td>
+              <td className="py-2 px-3 text-gray-700">
+                <div>・𝕏（Twitter）シェアボタンまたはワンクリックコピーで、解答結果や学習時間を記録・共有可能。</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* キーボードショートカット一覧 */}
+      <div className="bg-gray-50 border border-gray-300 rounded-xs p-3 space-y-1.5">
+        <strong className="text-xs font-bold text-gray-800 block">
+          演習中のキーボード操作
+        </strong>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+          <div className="bg-white border border-gray-200 p-1.5 rounded-xs">
+            <span className="font-mono font-bold bg-gray-100 px-1 py-0.2 border rounded-xs mr-1">1 ~ 4</span>
+            <span>選択肢を選択</span>
           </div>
-          <div className="bg-gray-50 border border-gray-300 p-2.5 rounded-xs space-y-1">
-            <strong className="text-gray-900 block">高速操作とテンポ:</strong>
-            <ul className="list-disc list-inside text-gray-600 space-y-0.5">
-              <li><strong>キーボード対応:</strong> 数字キー <kbd className="bg-white border border-gray-400 px-1 rounded-2xs font-mono">1</kbd>〜<kbd className="bg-white border border-gray-400 px-1 rounded-2xs font-mono">4</kbd> で即答。</li>
-              <li><strong>正解時:</strong> 0.38秒後に自動で次へ進みます。</li>
-              <li><strong>不正解時:</strong> 1行の対比メモが表示されます。<kbd className="bg-white border border-gray-400 px-1 rounded-2xs font-mono">Space</kbd> または <kbd className="bg-white border border-gray-400 px-1 rounded-2xs font-mono">Enter</kbd> で即次へ。</li>
-            </ul>
+          <div className="bg-white border border-gray-200 p-1.5 rounded-xs">
+            <span className="font-mono font-bold bg-gray-100 px-1 py-0.2 border rounded-xs mr-1">P / 0</span>
+            <span>問題をパス</span>
+          </div>
+          <div className="bg-white border border-gray-200 p-1.5 rounded-xs">
+            <span className="font-mono font-bold bg-gray-100 px-1 py-0.2 border rounded-xs mr-1">Space / Enter</span>
+            <span>次の問題へ進む</span>
+          </div>
+          <div className="bg-white border border-gray-200 p-1.5 rounded-xs">
+            <span className="font-mono font-bold bg-gray-100 px-1 py-0.2 border rounded-xs mr-1">Esc</span>
+            <span>パス / 戻る</span>
           </div>
         </div>
-      </section>
-
-      {/* ステップ3 */}
-      <section className="bg-white border border-gray-300 rounded-xs p-4 space-y-2 shadow-xs">
-        <div className="flex items-center gap-2 border-b border-gray-200 pb-1.5">
-          <span className="bg-gray-800 text-white font-bold px-2 py-0.5 rounded-xs text-[11px]">
-            STEP 3
-          </span>
-          <h2 className="text-sm font-bold text-gray-900">
-            忘却曲線（SRS）で自動復習する
-          </h2>
-        </div>
-        <p className="text-gray-700">
-          人間の脳は時間とともに記憶を忘却します。本サイトでは <strong>SuperMemo-2 (SM-2) アルゴリズム</strong> を採用しており、正解した問題は1日後、3日後、7日後、16日後、30日後と間隔を広げながら、忘れかけたベストなタイミングで自動出題されます。
-        </p>
-        <p className="text-gray-600">
-          トップページの黄色い枠に「本日の忘却曲線 復習キュー」が表示されたら、優先して復習を解きましょう。
-        </p>
-      </section>
-
-      {/* ステップ4 */}
-      <section className="bg-white border border-gray-300 rounded-xs p-4 space-y-2 shadow-xs">
-        <div className="flex items-center gap-2 border-b border-gray-200 pb-1.5">
-          <span className="bg-gray-800 text-white font-bold px-2 py-0.5 rounded-xs text-[11px]">
-            STEP 4
-          </span>
-          <h2 className="text-sm font-bold text-gray-900">
-            学習時間と問題数の記録（グラフ確認）
-          </h2>
-        </div>
-        <p className="text-gray-700">
-          演習中に実際に問題を解いていた時間が秒単位で自動集計されます。
-        </p>
-        <ul className="list-disc list-inside space-y-1 text-gray-600 pl-1">
-          <li>
-            <strong>学習進捗・グラフ（<Link href="/stats" className="text-blue-700 font-bold hover:underline">/stats</Link>）:</strong> 日別の解答問題数や学習時間を [7日] [14日] [30日] [全期間] で折れ線グラフ表示。
-          </li>
-          <li>
-            <strong>連続学習日数と経験値（XP）:</strong> 毎日の学習継続でストリーク（連続日数）がカウントされ、全国ランキング（<Link href="/ranking" className="text-blue-700 font-bold hover:underline">/ranking</Link>）にも反映されます。
-          </li>
-        </ul>
-      </section>
-
-      {/* トップへ戻るボタン */}
-      <div className="pt-2 text-center">
-        <Link
-          href="/"
-          className="inline-block px-6 py-2 bg-gray-900 hover:bg-black text-white font-bold rounded-xs text-xs shadow-xs"
-        >
-          トップページへ戻って演習を始める
-        </Link>
       </div>
     </div>
   );
 }
-

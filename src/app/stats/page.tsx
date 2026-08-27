@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { UserDataStore } from '@/lib/storage/userDataStore';
-import { SRSEngine } from '@/lib/srs/srsEngine';
+import { SRSEngine, CategoryDetailedStats } from '@/lib/srs/srsEngine';
 import { QuestionGenerator } from '@/lib/generator/questionGenerator';
 import { CATEGORIES } from '@/data/categories';
 import { UserProfile } from '@/types';
@@ -15,12 +15,12 @@ export default function StatsPage() {
   const [counts, setCounts] = useState({
     total: 0,
     mastered: 0,
-    review: 0,
-    learning: 0,
+    correct: 0,
+    wrong: 0,
     new: 0,
   });
   const [categoryData, setCategoryData] = useState<
-    { name: string; era: string; mastered: number; total: number; rate: number; isAvailable: boolean }[]
+    { name: string; era: string; groupName: string; stats: CategoryDetailedStats; isAvailable: boolean }[]
   >([]);
 
   useEffect(() => {
@@ -31,28 +31,28 @@ export default function StatsPage() {
     setProfile(p);
 
     let mastered = 0;
-    let review = 0;
-    let learning = 0;
+    let correct = 0;
+    let wrong = 0;
     let unattempted = 0;
 
     allQs.forEach((q) => {
       const prog = progressMap[q.id];
-      if (!prog || prog.state === 'new') {
+      if (!prog || prog.totalAttempts === 0 || prog.state === 'new') {
         unattempted += 1;
       } else if (prog.state === 'mastered') {
         mastered += 1;
-      } else if (prog.state === 'review') {
-        review += 1;
+      } else if (prog.correctStreak > 0) {
+        correct += 1;
       } else {
-        learning += 1;
+        wrong += 1;
       }
     });
 
     setCounts({
       total: allQs.length,
       mastered,
-      review,
-      learning,
+      correct,
+      wrong,
       new: unattempted,
     });
 
@@ -60,11 +60,10 @@ export default function StatsPage() {
       const catQs = allQs.filter((q) => q.categoryId === cat.id);
       const res = SRSEngine.calculateCategoryStats(catQs, progressMap);
       return {
-        name: cat.shortName,
+        name: cat.name,
         era: cat.era,
-        mastered: res.mastered,
-        total: res.total,
-        rate: res.rate,
+        groupName: cat.groupName || '源流思想',
+        stats: res,
         isAvailable: !!cat.isAvailable,
       };
     });
@@ -77,7 +76,7 @@ export default function StatsPage() {
       : 0;
 
   return (
-    <div className="max-w-5xl mx-auto px-3 py-5 space-y-4">
+    <div className="max-w-5xl mx-auto px-3 py-5 space-y-4 text-xs text-gray-900">
       {/* ページヘッダー */}
       <div className="border-b border-gray-300 pb-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div>
@@ -88,7 +87,7 @@ export default function StatsPage() {
             学習習熟度・忘却曲線分析
           </h1>
           <p className="text-xs text-gray-500 mt-0.5">
-            日別の学習問題数推移および SuperMemo-2 (SM-2) アルゴリズムに基づく記憶定着フェーズの可視化
+            全{counts.total}問の学習進捗および SuperMemo-2 (SM-2) アルゴリズムに基づく記憶定着フェーズの可視化
           </p>
         </div>
 
@@ -137,7 +136,7 @@ export default function StatsPage() {
       <div className="bg-white border border-gray-300 p-4 rounded-xs space-y-3 text-xs">
         <div className="flex justify-between items-center border-b border-gray-200 pb-2">
           <h2 className="font-bold text-gray-900 text-sm">
-            記憶定着フェーズ内訳（源流思想 全{counts.total}問）
+            全体の記憶定着フェーズ内訳（全{counts.total}問）
           </h2>
           <span className="text-[11px] bg-blue-50 text-blue-800 font-bold px-2 py-0.5 border border-blue-200 rounded-xs">
             SM-2 アルゴリズム
@@ -145,7 +144,7 @@ export default function StatsPage() {
         </div>
 
         {/* スタックバー */}
-        <div className="w-full bg-gray-200 h-3 rounded-xs flex overflow-hidden">
+        <div className="w-full bg-gray-200 h-3.5 rounded-xs flex overflow-hidden border border-gray-300">
           <div
             className="bg-green-600 h-full"
             style={{ width: `${(counts.mastered / (counts.total || 1)) * 100}%` }}
@@ -153,16 +152,16 @@ export default function StatsPage() {
           />
           <div
             className="bg-blue-600 h-full"
-            style={{ width: `${(counts.review / (counts.total || 1)) * 100}%` }}
-            title={`復習期: ${counts.review}問`}
+            style={{ width: `${(counts.correct / (counts.total || 1)) * 100}%` }}
+            title={`正答中: ${counts.correct}問`}
           />
           <div
-            className="bg-yellow-500 h-full"
-            style={{ width: `${(counts.learning / (counts.total || 1)) * 100}%` }}
-            title={`学習中: ${counts.learning}問`}
+            className="bg-red-500 h-full"
+            style={{ width: `${(counts.wrong / (counts.total || 1)) * 100}%` }}
+            title={`誤答/要復習: ${counts.wrong}問`}
           />
           <div
-            className="bg-gray-300 h-full"
+            className="bg-gray-200 h-full"
             style={{ width: `${(counts.new / (counts.total || 1)) * 100}%` }}
             title={`未着手: ${counts.new}問`}
           />
@@ -170,19 +169,19 @@ export default function StatsPage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 bg-green-600 inline-block" />
-            <span>定着完了: {counts.mastered}問</span>
+            <span className="w-2.5 h-2.5 bg-green-600 inline-block rounded-xs" />
+            <span className="font-bold text-green-900">定着完了 (30日+): {counts.mastered}問</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 bg-blue-600 inline-block" />
-            <span>復習期 (7〜14日): {counts.review}問</span>
+            <span className="w-2.5 h-2.5 bg-blue-600 inline-block rounded-xs" />
+            <span className="font-bold text-blue-900">正答中 (1〜14日): {counts.correct}問</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 bg-yellow-500 inline-block" />
-            <span>学習中 (1〜3日): {counts.learning}問</span>
+            <span className="w-2.5 h-2.5 bg-red-500 inline-block rounded-xs" />
+            <span className="font-bold text-red-700">誤答・要復習: {counts.wrong}問</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 bg-gray-300 inline-block" />
+            <span className="w-2.5 h-2.5 bg-gray-300 inline-block rounded-xs" />
             <span className="text-gray-500">未学習: {counts.new}問</span>
           </div>
         </div>
@@ -193,37 +192,64 @@ export default function StatsPage() {
 
       {/* 単元別マスター度 */}
       <div className="bg-white border border-gray-300 p-4 rounded-xs space-y-3 text-xs">
-        <h2 className="font-bold text-gray-900 text-sm border-b border-gray-200 pb-2">
-          単元別 習熟度一覧
-        </h2>
+        <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+          <h2 className="font-bold text-gray-900 text-sm">
+            単元別 学習率 ＆ 記憶定着内訳
+          </h2>
+          <span className="text-[10px] text-gray-500 font-normal">
+            <span className="text-green-700 font-bold">■</span>定着 <span className="text-blue-600 font-bold">■</span>正答 <span className="text-red-500 font-bold">■</span>誤答
+          </span>
+        </div>
 
-        <div className="space-y-2.5">
-          {categoryData.map((cat, idx) => (
-            <div key={idx} className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <div>
-                  <span className="font-bold text-gray-800">{cat.name}</span>
-                  <span className="text-gray-500 text-[11px] ml-1.5">({cat.era})</span>
-                  {!cat.isAvailable && (
-                    <span className="ml-2 text-[10px] text-gray-400 font-mono">[準備中]</span>
+        <div className="space-y-3">
+          {categoryData.map((cat, idx) => {
+            const st = cat.stats;
+            return (
+              <div key={idx} className="space-y-1 bg-gray-50/50 p-2.5 rounded-xs border border-gray-200">
+                <div className="flex justify-between text-xs items-center">
+                  <div>
+                    <span className="font-bold text-gray-900">{cat.name}</span>
+                    <span className="text-gray-500 text-[11px] ml-1.5">({cat.groupName})</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-gray-900 font-bold">学習率: {st.studyRate}%</span>
+                    <span className="text-[10px] text-gray-500 ml-1.5">({st.mastered + st.correct + st.wrong}/{st.total}問)</span>
+                  </div>
+                </div>
+
+                {/* 3色プログレスバー */}
+                <div className="w-full bg-gray-200 h-2.5 rounded-xs flex overflow-hidden border border-gray-300">
+                  {st.masteredRate > 0 && (
+                    <div
+                      style={{ width: `${st.masteredRate}%` }}
+                      className="bg-green-600 h-full"
+                      title={`定着: ${st.mastered}問 (${st.masteredRate}%)`}
+                    />
+                  )}
+                  {st.correctRate > 0 && (
+                    <div
+                      style={{ width: `${st.correctRate}%` }}
+                      className="bg-blue-600 h-full"
+                      title={`正答中: ${st.correct}問 (${st.correctRate}%)`}
+                    />
+                  )}
+                  {st.wrongRate > 0 && (
+                    <div
+                      style={{ width: `${st.wrongRate}%` }}
+                      className="bg-red-500 h-full"
+                      title={`誤答/要復習: ${st.wrong}問 (${st.wrongRate}%)`}
+                    />
                   )}
                 </div>
-                {cat.isAvailable ? (
-                  <span className="text-blue-700 font-bold">
-                    {cat.rate}% ({cat.mastered}/{cat.total}問)
-                  </span>
-                ) : (
-                  <span className="text-gray-400">-</span>
-                )}
+
+                <div className="flex justify-between text-[10px] text-gray-500 pt-0.5">
+                  <span className="text-green-800 font-semibold">定着: {st.mastered}問 ({st.masteredRate}%)</span>
+                  <span className="text-blue-800 font-semibold">正答中: {st.correct}問 ({st.correctRate}%)</span>
+                  <span className="text-red-600 font-semibold">誤答: {st.wrong}問 ({st.wrongRate}%)</span>
+                </div>
               </div>
-              <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                <div
-                  className="bg-blue-600 h-1.5 rounded-full"
-                  style={{ width: `${cat.isAvailable ? cat.rate : 0}%` }}
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CATEGORIES } from '@/data/categories';
 import { QuestionGenerator, AVAILABLE_CATEGORY_IDS } from '@/lib/generator/questionGenerator';
-import { SRSEngine } from '@/lib/srs/srsEngine';
+import { SRSEngine, CategoryDetailedStats } from '@/lib/srs/srsEngine';
 import { UserDataStore } from '@/lib/storage/userDataStore';
 import { UserProfile, Question, QuizSessionConfig } from '@/types';
 import { AdBanner } from '@/components/ads/AdBanner';
@@ -17,9 +17,7 @@ export default function HomePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [dueQuestions, setDueQuestions] = useState<Question[]>([]);
   const [searchWord, setSearchWord] = useState('');
-  const [categoryStats, setCategoryStats] = useState<
-    Record<string, { total: number; mastered: number; learning: number; rate: number }>
-  >({});
+  const [categoryStats, setCategoryStats] = useState<Record<string, CategoryDetailedStats>>({});
   const [totalMasteredCount, setTotalMasteredCount] = useState(0);
   const [totalQuestionsCount, setTotalQuestionsCount] = useState(0);
 
@@ -61,11 +59,11 @@ export default function HomePage() {
     setDueQuestions(due);
 
     let totalMastered = 0;
-    const stats: Record<string, { total: number; mastered: number; learning: number; rate: number }> = {};
+    const stats: Record<string, CategoryDetailedStats> = {};
     CATEGORIES.forEach((cat) => {
       const catQs = allQuestions.filter((q) => q.categoryId === cat.id);
       const res = SRSEngine.calculateCategoryStats(catQs, progressMap);
-      stats[cat.id] = { total: res.total, mastered: res.mastered, learning: res.learning, rate: res.rate };
+      stats[cat.id] = res;
       if (cat.isAvailable) {
         totalMastered += res.mastered;
       }
@@ -291,10 +289,17 @@ export default function HomePage() {
 
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-[11px]">
+                <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-[10px]">
                   <th className="py-1.5 px-3 font-semibold">単元名</th>
-                  <th className="py-1.5 px-3 font-semibold w-32 text-center">定着率</th>
-                  <th className="py-1.5 px-3 font-semibold text-right w-24">演習</th>
+                  <th className="py-1.5 px-3 font-semibold text-center w-64">
+                    <div className="flex items-center justify-between gap-1">
+                      <span>学習率・進捗</span>
+                      <span className="text-[9px] text-gray-500 font-normal">
+                        <span className="text-green-700 font-bold">■</span>定着 <span className="text-blue-600 font-bold">■</span>正答 <span className="text-red-500 font-bold">■</span>誤答
+                      </span>
+                    </div>
+                  </th>
+                  <th className="py-1.5 px-3 font-semibold text-right w-20">演習</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -308,7 +313,19 @@ export default function HomePage() {
                         </td>
                       </tr>
                       {groupCats.map((cat, idx) => {
-                        const st = categoryStats[cat.id] || { total: 0, mastered: 0, learning: 0, rate: 0 };
+                        const st = categoryStats[cat.id] || {
+                          total: 0,
+                          mastered: 0,
+                          correct: 0,
+                          wrong: 0,
+                          unattempted: 0,
+                          studyRate: 0,
+                          masteredRate: 0,
+                          correctRate: 0,
+                          wrongRate: 0,
+                          rate: 0,
+                          learning: 0,
+                        };
                         const isAvailable = cat.isAvailable;
 
                         return (
@@ -327,23 +344,57 @@ export default function HomePage() {
                               {cat.name}
                             </td>
 
-                            {/* 2. 定着率 */}
-                            <td className="py-2 px-3 text-center">
-                              <div className="flex items-center justify-center gap-2">
-                                <div className="w-16 bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                                  <div
-                                    className="bg-gray-800 h-1.5 rounded-full"
-                                    style={{ width: `${st.rate}%` }}
-                                  />
+                            {/* 2. 学習率 ＆ 3色プログレスバー */}
+                            <td className="py-2 px-3">
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="font-bold text-gray-900">
+                                    学習率: {st.studyRate}%
+                                  </span>
+                                  <span className="text-[10px] text-gray-500">
+                                    {st.mastered + st.correct + st.wrong} / {st.total}問
+                                  </span>
                                 </div>
-                                <span className="font-bold text-gray-800 text-[11px] w-8 text-right">
-                                  {st.rate}%
-                                </span>
+
+                                {/* 3色プログレスバー */}
+                                <div className="w-full bg-gray-200 h-2 rounded-xs flex overflow-hidden border border-gray-300">
+                                  {st.masteredRate > 0 && (
+                                    <div
+                                      style={{ width: `${st.masteredRate}%` }}
+                                      className="bg-green-600 h-full"
+                                      title={`定着: ${st.mastered}問 (${st.masteredRate}%)`}
+                                    />
+                                  )}
+                                  {st.correctRate > 0 && (
+                                    <div
+                                      style={{ width: `${st.correctRate}%` }}
+                                      className="bg-blue-600 h-full"
+                                      title={`正答中: ${st.correct}問 (${st.correctRate}%)`}
+                                    />
+                                  )}
+                                  {st.wrongRate > 0 && (
+                                    <div
+                                      style={{ width: `${st.wrongRate}%` }}
+                                      className="bg-red-500 h-full"
+                                      title={`誤答/要復習: ${st.wrong}問 (${st.wrongRate}%)`}
+                                    />
+                                  )}
+                                </div>
+
+                                {/* 内訳テキスト */}
+                                <div className="flex items-center justify-between text-[9px] text-gray-500 pt-0.5">
+                                  <span className="text-green-800 font-bold">
+                                    定着: {st.mastered}問 ({st.masteredRate}%)
+                                  </span>
+                                  <span className="text-red-600 font-bold">
+                                    誤答: {st.wrong}問 ({st.wrongRate}%)
+                                  </span>
+                                </div>
                               </div>
                             </td>
 
                             {/* 3. 演習ボタン */}
-                            <td className="py-2 px-3 text-right">
+                            <td className="py-2 px-3 text-right align-middle">
                               <Link
                                 href={`/practice?category=${cat.id}&count=10`}
                                 className="px-2.5 py-1 bg-gray-800 hover:bg-black text-white font-bold text-[11px] rounded-xs shadow-xs"

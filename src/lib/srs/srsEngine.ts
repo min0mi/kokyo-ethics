@@ -1,5 +1,19 @@
 import { UserProgressItem, Question } from '@/types';
 
+export interface CategoryDetailedStats {
+  total: number;
+  mastered: number;
+  correct: number;
+  wrong: number;
+  unattempted: number;
+  studyRate: number;     // 学習率 (%): 解いたことのある問題の割合
+  masteredRate: number;  // 定着率 (%)
+  correctRate: number;   // 正答中率 (%)
+  wrongRate: number;     // 誤答率 (%)
+  rate: number;          // 互換性のための定着率
+  learning: number;      // 互換性用
+}
+
 export class SRSEngine {
   private static readonly DEFAULT_EASE_FACTOR = 2.5;
   private static readonly MIN_EASE_FACTOR = 1.3;
@@ -104,33 +118,65 @@ export class SRSEngine {
   }
 
   /**
-   * 単元（カテゴリ）ごとのマスター率・正答率を算出
+   * 単元（カテゴリ）ごとの学習率・定着率・正答率・誤答率を精緻に算出
    */
   static calculateCategoryStats(
     categoryQuestions: Question[],
     progressMap: Record<string, UserProgressItem>
-  ) {
+  ): CategoryDetailedStats {
     const total = categoryQuestions.length;
-    if (total === 0) return { total: 0, mastered: 0, learning: 0, unattempted: 0, rate: 0 };
+    if (total === 0) {
+      return {
+        total: 0,
+        mastered: 0,
+        correct: 0,
+        wrong: 0,
+        unattempted: 0,
+        studyRate: 0,
+        masteredRate: 0,
+        correctRate: 0,
+        wrongRate: 0,
+        rate: 0,
+        learning: 0,
+      };
+    }
 
     let mastered = 0;
-    let learning = 0;
+    let correct = 0;
+    let wrong = 0;
     let unattempted = 0;
 
     categoryQuestions.forEach((q) => {
       const p = progressMap[q.id];
-      if (!p || p.state === 'new') {
+      if (!p || p.totalAttempts === 0 || p.state === 'new') {
         unattempted += 1;
       } else if (p.state === 'mastered') {
         mastered += 1;
+      } else if (p.correctStreak > 0) {
+        correct += 1;
       } else {
-        learning += 1;
+        wrong += 1;
       }
     });
 
-    const rate = Math.round((mastered / total) * 100);
+    const attemptedCount = mastered + correct + wrong;
+    const studyRate = Math.round((attemptedCount / total) * 100);
+    const masteredRate = Math.round((mastered / total) * 100);
+    const correctRate = Math.round((correct / total) * 100);
+    const wrongRate = Math.round((wrong / total) * 100);
 
-    return { total, mastered, learning, unattempted, rate };
+    return {
+      total,
+      mastered,
+      correct,
+      wrong,
+      unattempted,
+      studyRate,
+      masteredRate,
+      correctRate,
+      wrongRate,
+      rate: studyRate,
+      learning: correct + wrong,
+    };
   }
 }
-
