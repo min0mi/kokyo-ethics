@@ -37,15 +37,11 @@ export const Header: React.FC = () => {
 
   const navLinks = [
     { href: '/', label: 'トップ・総合ポータル' },
-    { href: '/practice/speed', label: 'スピード演習' },
-    { href: '/practice/standard', label: '標準解説演習' },
-    { href: '/practice/matching', label: '線つなぎ' },
-    { href: '/practice/typing', label: 'キーワード記述' },
-    { href: '/practice/recall', label: '分類想起' },
+    { href: '/practice', label: '演習開始（形式ON/OFF・問題数選択）' },
     { href: '/dictionary', label: '思想・用語図鑑' },
-    { href: '/ranking', label: 'ランキング' },
+    { href: '/ranking', label: '全国ランキング' },
     { href: '/badges', label: 'バッジ実績' },
-    { href: '/stats', label: '学習分析' },
+    { href: '/stats', label: '学習進捗・日別グラフ' },
   ];
 
   return (
@@ -95,7 +91,7 @@ export const Header: React.FC = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-2 border-r border-gray-200 transition ${
+                className={`px-3.5 py-2 border-r border-gray-200 transition ${
                   isActive
                     ? 'bg-white text-red-600 font-bold border-b-2 border-b-red-600 -mb-px'
                     : 'text-gray-700 hover:bg-gray-200 hover:text-blue-700'

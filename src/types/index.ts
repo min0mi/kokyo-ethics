@@ -1,4 +1,6 @@
-// TypeScript 型定義: 公共倫理パーフェクトマスター
+// ==========================================
+// 共通テスト「公共、倫理」データ型定義
+// ==========================================
 
 export type CategoryId =
   | 'greek'
@@ -37,6 +39,7 @@ export interface Figure {
   mainConcept: string;
   summary: string;
   tags: string[];
+  contrastFigureIds?: string[]; // 共テ頻出の対比・ひっかけ対象人物（例: エピクロス ⇄ ゼノン）
 }
 
 export interface Keyword {
@@ -49,6 +52,7 @@ export interface Keyword {
   explanation: string;
   commonTestPoint: string; // 共通テストでの判断語句・ひっかけポイント
   distractorTags: string[];
+  contrastKeywordIds?: string[]; // 対比される用語（例: アタラクシア ⇄ アパテイア）
 }
 
 export interface Book {
@@ -62,105 +66,112 @@ export interface Book {
 
 export interface Episode {
   id: string;
-  title: string;
   figureId: string;
   categoryId: CategoryId;
+  title: string;
   description: string;
   keyTakeaway: string;
 }
 
+// ==========================================
+// 問題形式の型定義（全6タイプ）
+// ==========================================
 export type QuestionType =
-  | 'figure_to_keyword'       // 人物から説いた語句を選ぶ
-  | 'keyword_to_figure'       // 語句から説いた人物を選ぶ
-  | 'keyword_meaning'         // 語句の意味・判断語句の正誤
-  | 'figure_to_book'          // 人物から著書を選ぶ
-  | 'book_to_figure'          // 著書から著者を当てる
-  | 'figure_to_episode'       // エピソードから人物を当てる
-  | 'matching_lines'          // 線つなぎ・ペアマッチング
-  | 'fill_in_keyword'         // 記述式問題（語句入力）
-  | 'recall_classification';  // 分類想起（自己評価）
+  | 'figure_to_keyword'
+  | 'keyword_to_figure'
+  | 'keyword_meaning'
+  | 'figure_to_book'
+  | 'book_to_figure'
+  | 'figure_to_episode'
+  | 'matching_lines'
+  | 'fill_in_keyword'
+  | 'recall_classification';
 
 export interface BaseQuestion {
   id: string;
   type: QuestionType;
   categoryId: CategoryId;
+  figureId?: string;
+  keywordId?: string;
   prompt: string;
   context?: string;
   explanation: string;
-  commonTestHint?: string; // 共テ攻略ワンポイント
-  figureId?: string;
-  keywordId?: string;
+  commonTestHint?: string;
+}
+
+export interface ChoiceQuestion extends BaseQuestion {
+  options: string[];
+  correctAnswer: string;
   bookId?: string;
   episodeId?: string;
 }
 
-// 4択選択問題
-export interface ChoiceQuestion extends BaseQuestion {
-  type:
-    | 'figure_to_keyword'
-    | 'keyword_to_figure'
-    | 'keyword_meaning'
-    | 'figure_to_book'
-    | 'book_to_figure'
-    | 'figure_to_episode';
-  options: string[];
-  correctAnswer: string;
-}
-
-// 線つなぎ・マッチング問題
 export interface MatchingPair {
-  left: string;   // 例: 人物名
-  right: string;  // 例: キーワードや著書名
   id: string;
+  left: string;
+  right: string;
 }
 
 export interface MatchingQuestion extends BaseQuestion {
-  type: 'matching_lines';
   pairs: MatchingPair[];
 }
 
-// 記述式問題
 export interface TypingQuestion extends BaseQuestion {
-  type: 'fill_in_keyword';
-  correctAnswers: string[]; // 漢字、ひらがな、別称などの許容配列
-  displayHint?: string;     // 文字数や頭文字ヒント
+  correctAnswers: string[];
+  displayHint?: string;
 }
 
-// 分類想起問題
+export interface RecallModelAnswer {
+  name: string;
+  note: string;
+}
+
 export interface RecallQuestion extends BaseQuestion {
-  type: 'recall_classification';
   targetCategoryName: string;
   requiredCount: number;
-  expectedAnswers: string[]; // 想定される人物や語句のリスト
-  modelAnswerDetails: { name: string; note: string }[];
+  expectedAnswers: string[];
+  modelAnswerDetails: RecallModelAnswer[];
 }
 
-export type Question = ChoiceQuestion | MatchingQuestion | TypingQuestion | RecallQuestion;
+export type Question =
+  | ChoiceQuestion
+  | MatchingQuestion
+  | TypingQuestion
+  | RecallQuestion;
 
-// 忘却曲線 (SM-2) 状態
+// 統一演習設定の型
+export interface QuizSessionConfig {
+  categoryIds: CategoryId[];
+  enabledTypes: {
+    choice: boolean;
+    matching: boolean;
+    typing: boolean;
+    recall: boolean;
+  };
+  questionCount: number; // 5, 10, 20, 30, または全問(999)
+}
+
+// ==========================================
+// 忘却曲線 (SRS) & ユーザー進捗の型定義
+// ==========================================
 export type MasteryState = 'new' | 'learning' | 'review' | 'mastered';
 
 export interface UserProgressItem {
   questionId: string;
   repetitionCount: number;
-  easeFactor: number;        // デフォルト 2.5
-  intervalDays: number;      // 次回までの間隔（日）
-  nextReviewAt: string;      // ISO 8601
-  lastReviewedAt: string;    // ISO 8601
-  correctStreak: number;     // 連続正解数
+  easeFactor: number;
+  intervalDays: number;
+  nextReviewAt: string;
+  lastReviewedAt: string;
+  correctStreak: number;
   totalAttempts: number;
   totalCorrect: number;
   state: MasteryState;
 }
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: 'streak' | 'total_answers' | 'mastery' | 'speed' | 'category_clear';
-  targetValue: number;
-  unlockedAt?: string;
+export interface DailyCount {
+  total: number;
+  correct: number;
 }
 
 export interface UserProfile {
@@ -174,15 +185,15 @@ export interface UserProfile {
   isGuest: boolean;
   totalAnswered: number;
   totalCorrect: number;
+  dailyCounts?: Record<string, DailyCount>; // 日付ごとの学習数 (YYYY-MM-DD -> { total, correct })
 }
 
-export interface QuizSessionStats {
-  total: number;
-  correct: number;
-  xpEarned: number;
-  newBadges: Badge[];
-  streakUpdated: boolean;
-  accuracy: number;
-  timeSpentSeconds: number;
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: 'streak' | 'total_answers' | 'mastery' | 'speed' | 'category_clear';
+  targetValue: number;
+  unlockedAt?: string;
 }
-

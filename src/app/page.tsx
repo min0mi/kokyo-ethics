@@ -4,37 +4,50 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CATEGORIES } from '@/data/categories';
-import { QuestionGenerator } from '@/lib/generator/questionGenerator';
+import { QuestionGenerator, AVAILABLE_CATEGORY_IDS } from '@/lib/generator/questionGenerator';
 import { SRSEngine } from '@/lib/srs/srsEngine';
 import { UserDataStore } from '@/lib/storage/userDataStore';
-import { UserProfile, Question } from '@/types';
-import { BADGES } from '@/data/badges';
+import { UserProfile, Question, QuizSessionConfig } from '@/types';
 import { AdBanner } from '@/components/ads/AdBanner';
+import { DailyLineChart } from '@/components/stats/DailyLineChart';
 
 export default function HomePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [dueQuestions, setDueQuestions] = useState<Question[]>([]);
   const [searchWord, setSearchWord] = useState('');
+  const [dailyData, setDailyData] = useState<{ date: string; label: string; total: number; correct: number }[]>([]);
   const [categoryStats, setCategoryStats] = useState<
     Record<string, { total: number; mastered: number; learning: number; rate: number }>
   >({});
   const [totalMasteredCount, setTotalMasteredCount] = useState(0);
   const [totalQuestionsCount, setTotalQuestionsCount] = useState(0);
 
+  // 一括演習設定ステート
+  const [sessionConfig, setSessionConfig] = useState<QuizSessionConfig>({
+    categoryIds: AVAILABLE_CATEGORY_IDS,
+    enabledTypes: {
+      choice: true,
+      matching: true,
+      typing: true,
+      recall: true,
+    },
+    questionCount: 10,
+  });
+
   useEffect(() => {
     const p = UserDataStore.getProfile();
     const progressMap = UserDataStore.getProgressMap();
     const allQuestions = QuestionGenerator.getAllQuestions();
+    const history = UserDataStore.getDailyHistory(7);
 
     setProfile(p);
+    setDailyData(history);
     setTotalQuestionsCount(allQuestions.length);
 
-    // 今日復習すべき問題
     const due = SRSEngine.getDueQuestions(allQuestions, progressMap);
     setDueQuestions(due);
 
-    // 単元別統計
     let totalMastered = 0;
     const stats: Record<string, { total: number; mastered: number; learning: number; rate: number }> = {};
     CATEGORIES.forEach((cat) => {
@@ -55,13 +68,22 @@ export default function HomePage() {
     router.push(`/dictionary?q=${encodeURIComponent(searchWord.trim())}`);
   };
 
-  // ランキング簡易データ
+  const toggleType = (key: keyof QuizSessionConfig['enabledTypes']) => {
+    setSessionConfig((prev) => ({
+      ...prev,
+      enabledTypes: {
+        ...prev.enabledTypes,
+        [key]: !prev.enabledTypes[key],
+      },
+    }));
+  };
+
   const topRankers = [
-    { rank: 1, name: 'ソクラテスの弟子', xp: 4850, streak: 24 },
-    { rank: 2, name: 'イデア探求者', xp: 4120, streak: 18 },
-    { rank: 3, name: 'カントの散歩道', xp: 3740, streak: 15 },
-    { rank: 4, name: '超人ニーチェ', xp: 3200, streak: 12 },
-    { rank: 5, name: '実存サルトル', xp: 2850, streak: 9 },
+    { rank: 1, name: 'ソクラテスの弟子', xp: 4850 },
+    { rank: 2, name: 'イデア探求者', xp: 4120 },
+    { rank: 3, name: 'カントの散歩道', xp: 3740 },
+    { rank: 4, name: '超人ニーチェ', xp: 3200 },
+    { rank: 5, name: '実存サルトル', xp: 2850 },
   ];
 
   return (
@@ -81,16 +103,16 @@ export default function HomePage() {
               <p className="text-gray-600 text-[11px] mt-0.5">
                 {dueQuestions.length > 0
                   ? 'SM-2アルゴリズムにより本日復習期日に達した問題です。'
-                  : '今日の復習は完了しています。源流思想の単元学習を進めましょう。'}
+                  : '今日の復習は完了しています。源流思想の総合演習を進めましょう。'}
               </p>
             </div>
           </div>
 
           <Link
-            href={dueQuestions.length > 0 ? '/practice/speed?mode=due' : '/practice/speed'}
+            href="/practice?count=10"
             className="w-full sm:w-auto px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xs text-center shadow-xs shrink-0"
           >
-            {dueQuestions.length > 0 ? '復習を開始する' : '全問ランダム演習'}
+            {dueQuestions.length > 0 ? '復習を開始する' : '総合演習を解く'}
           </Link>
         </div>
 
@@ -105,7 +127,7 @@ export default function HomePage() {
                 type="text"
                 value={searchWord}
                 onChange={(e) => setSearchWord(e.target.value)}
-                placeholder="例: イデア、ソクラテス、無知の知"
+                placeholder="例: エピクロス、アタラクシア、仁"
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-xs text-xs focus:outline-hidden focus:border-blue-600"
               />
               <button
@@ -123,101 +145,109 @@ export default function HomePage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
         {/* ===================== 左側 メインコンテンツ (8/12) ===================== */}
         <div className="lg:col-span-8 space-y-3">
-          {/* 1. 演習モード一覧（6分割パネル） */}
-          <div className="bg-white border border-gray-300 rounded-xs overflow-hidden">
-            <div className="bg-gray-100 px-3 py-1.5 border-b border-gray-300 flex items-center justify-between">
-              <h2 className="text-xs font-bold text-gray-800">
-                [演習モード一覧] 問題形式から選ぶ
-              </h2>
-              <span className="text-[11px] text-gray-500">源流思想対応</span>
+          {/* ★ 1. 一括演習設定パネル（問題形式ON/OFF ＆ 問題数選択） ★ */}
+          <div className="bg-white border-2 border-blue-600 rounded-xs p-3.5 sm:p-4 space-y-3 text-xs">
+            <div className="flex items-center justify-between border-b border-gray-200 pb-1.5">
+              <div>
+                <span className="text-[11px] font-bold bg-blue-100 text-blue-900 px-1.5 py-0.2 rounded-xs mr-1.5">
+                  一律設定
+                </span>
+                <strong className="text-sm font-bold text-gray-900">
+                  源流思想 総合演習（形式ON/OFF・問題数選択）
+                </strong>
+              </div>
+              <span className="text-[11px] text-gray-500">源流思想 5単元対象</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 divide-x divide-y divide-gray-200 text-xs">
-              <Link
-                href="/practice/speed"
-                className="p-2.5 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
-              >
-                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
-                  <span>スピード演習</span>
-                  <span className="text-[10px] bg-yellow-100 text-yellow-900 px-1 rounded-xs">即答10問</span>
-                </div>
-                <p className="text-[11px] text-gray-500 leading-tight">
-                  1問3秒で4択即答。キーボード[1-4]対応・正解時自動送り。
-                </p>
-              </Link>
+            {/* 問題形式のON/OFF */}
+            <div className="space-y-1">
+              <span className="font-bold text-gray-700 block text-[11px]">
+                出題形式（チェックでON/OFF）:
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                <label className="flex items-center gap-1.5 p-1.5 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
+                  <input
+                    type="checkbox"
+                    checked={sessionConfig.enabledTypes.choice}
+                    onChange={() => toggleType('choice')}
+                    className="rounded-xs"
+                  />
+                  <span className="font-bold text-gray-800 text-[11px]">4択選択問題</span>
+                </label>
 
-              <Link
-                href="/practice/standard"
-                className="p-2.5 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
-              >
-                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
-                  <span>標準解説演習</span>
-                  <span className="text-[10px] bg-blue-100 text-blue-900 px-1 rounded-xs">判断ポイント</span>
-                </div>
-                <p className="text-[11px] text-gray-500 leading-tight">
-                  判断語句のひっかけ解説付き。共通テスト本番対策。
-                </p>
-              </Link>
+                <label className="flex items-center gap-1.5 p-1.5 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
+                  <input
+                    type="checkbox"
+                    checked={sessionConfig.enabledTypes.matching}
+                    onChange={() => toggleType('matching')}
+                    className="rounded-xs"
+                  />
+                  <span className="font-bold text-gray-800 text-[11px]">線つなぎ（6択）</span>
+                </label>
 
-              <Link
-                href="/practice/matching"
-                className="p-2.5 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
-              >
-                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
-                  <span>線つなぎ演習</span>
-                  <span className="text-[10px] bg-purple-100 text-purple-900 px-1 rounded-xs">6択余りあり</span>
-                </div>
-                <p className="text-[11px] text-gray-500 leading-tight">
-                  人物と語句・主著を対応づけ。余分な選択肢が含まれます。
-                </p>
-              </Link>
+                <label className="flex items-center gap-1.5 p-1.5 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
+                  <input
+                    type="checkbox"
+                    checked={sessionConfig.enabledTypes.typing}
+                    onChange={() => toggleType('typing')}
+                    className="rounded-xs"
+                  />
+                  <span className="font-bold text-gray-800 text-[11px]">キーワード記述</span>
+                </label>
 
-              <Link
-                href="/practice/typing"
-                className="p-2.5 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
-              >
-                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
-                  <span>キーワード記述</span>
-                  <span className="text-[10px] bg-green-100 text-green-900 px-1 rounded-xs">用語入力</span>
-                </div>
-                <p className="text-[11px] text-gray-500 leading-tight">
-                  定義から用語をキーボード入力。正確な用字を定着。
-                </p>
-              </Link>
-
-              <Link
-                href="/practice/recall"
-                className="p-2.5 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
-              >
-                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
-                  <span>分類想起演習</span>
-                  <span className="text-[10px] bg-cyan-100 text-cyan-900 px-1 rounded-xs">自己採点</span>
-                </div>
-                <p className="text-[11px] text-gray-500 leading-tight">
-                  「〇〇派の人物を3人答えよ」などのアクティブリコール。
-                </p>
-              </Link>
-
-              <Link
-                href="/dictionary"
-                className="p-2.5 hover:bg-blue-50 transition flex flex-col justify-between space-y-1 group"
-              >
-                <div className="flex items-center gap-1 font-bold text-blue-700 group-hover:underline">
-                  <span>思想・用語図鑑</span>
-                  <span className="text-[10px] bg-gray-200 text-gray-800 px-1 rounded-xs">全項目検索</span>
-                </div>
-                <p className="text-[11px] text-gray-500 leading-tight">
-                  思想家・用語・著書・エピソードの検索＆一覧。
-                </p>
-              </Link>
+                <label className="flex items-center gap-1.5 p-1.5 bg-gray-50 border border-gray-300 rounded-xs cursor-pointer hover:bg-blue-50">
+                  <input
+                    type="checkbox"
+                    checked={sessionConfig.enabledTypes.recall}
+                    onChange={() => toggleType('recall')}
+                    className="rounded-xs"
+                  />
+                  <span className="font-bold text-gray-800 text-[11px]">分類想起</span>
+                </label>
+              </div>
             </div>
+
+            {/* 問題数の選択 */}
+            <div className="space-y-1">
+              <span className="font-bold text-gray-700 block text-[11px]">
+                出題問題数:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {[5, 10, 20, 30, 999].map((count) => {
+                  const isSelected = sessionConfig.questionCount === count;
+                  const label = count === 999 ? '全問演習' : `${count}問`;
+                  return (
+                    <button
+                      key={count}
+                      type="button"
+                      onClick={() => setSessionConfig((prev) => ({ ...prev, questionCount: count }))}
+                      className={`px-3 py-1 border rounded-xs font-bold text-xs ${
+                        isSelected
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* スタートボタン */}
+            <Link
+              href={`/practice?count=${sessionConfig.questionCount}`}
+              className="block w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-center text-xs rounded-xs shadow-xs"
+            >
+              上記の設定で演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
+            </Link>
           </div>
 
-          {/* 2. 単元別一覧表（源流思想を本稼働、その他は準備中） */}
+          {/* 2. 単元別対照表 */}
           <div className="bg-white border border-gray-300 rounded-xs overflow-hidden">
             <div className="bg-gray-100 px-3 py-1.5 border-b border-gray-300 flex items-center justify-between">
               <h2 className="text-xs font-bold text-gray-800">
-                [単元別 演習対照表] 源流思想・分野から直接選ぶ
+                [単元別対照表] 源流思想・分野一覧
               </h2>
               <span className="text-[11px] text-gray-600 font-bold">
                 源流思想 定着数: {totalMasteredCount} / {totalQuestionsCount} 問
@@ -231,7 +261,7 @@ export default function HomePage() {
                     <th className="py-1.5 px-2.5 font-semibold">単元・分野名</th>
                     <th className="py-1.5 px-2 font-semibold w-24">時代区分</th>
                     <th className="py-1.5 px-2 font-semibold w-16 text-center">定着率</th>
-                    <th className="py-1.5 px-2.5 font-semibold text-right">演習リンク</th>
+                    <th className="py-1.5 px-2.5 font-semibold text-right">単元別演習</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -254,7 +284,7 @@ export default function HomePage() {
                           <div className="flex items-center gap-1.5">
                             {isAvailable ? (
                               <Link
-                                href={`/practice/standard?category=${cat.id}`}
+                                href={`/practice?category=${cat.id}`}
                                 className="font-bold text-blue-700 hover:underline"
                               >
                                 {cat.name}
@@ -301,36 +331,12 @@ export default function HomePage() {
 
                         <td className="py-2 px-2.5 text-right">
                           {isAvailable ? (
-                            <div className="inline-flex items-center gap-1">
-                              <Link
-                                href={`/practice/speed?category=${cat.id}`}
-                                className="px-1.5 py-0.5 bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-[10px] rounded-xs"
-                                title="スピード4択"
-                              >
-                                4択
-                              </Link>
-                              <Link
-                                href={`/practice/matching?category=${cat.id}`}
-                                className="px-1.5 py-0.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-[10px] rounded-xs"
-                                title="線つなぎ（6択）"
-                              >
-                                線つなぎ
-                              </Link>
-                              <Link
-                                href={`/practice/typing?category=${cat.id}`}
-                                className="px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] rounded-xs"
-                                title="キーワード記述"
-                              >
-                                記述
-                              </Link>
-                              <Link
-                                href={`/practice/recall?category=${cat.id}`}
-                                className="px-1.5 py-0.5 bg-cyan-700 hover:bg-cyan-800 text-white font-bold text-[10px] rounded-xs"
-                                title="分類想起"
-                              >
-                                想起
-                              </Link>
-                            </div>
+                            <Link
+                              href={`/practice?category=${cat.id}`}
+                              className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded-xs"
+                            >
+                              この単元を演習
+                            </Link>
                           ) : (
                             <span className="text-[10px] text-gray-400 font-mono">Coming Soon</span>
                           )}
@@ -375,7 +381,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 2. 全国ランキング TOP5 */}
+          {/* 2. 直近7日間の日別学習問題数グラフ */}
+          <DailyLineChart data={dailyData} />
+
+          {/* 3. 全国ランキング TOP5 */}
           <div className="bg-white border border-gray-300 rounded-xs p-3 space-y-1.5 text-xs">
             <div className="font-bold text-gray-800 border-b border-gray-200 pb-1 flex items-center justify-between">
               <span>[全国ランキング TOP 5]</span>
@@ -409,49 +418,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 3. バッジ獲得状況ミニ */}
-          <div className="bg-white border border-gray-300 rounded-xs p-3 space-y-1.5 text-xs">
-            <div className="font-bold text-gray-800 border-b border-gray-200 pb-1 flex items-center justify-between">
-              <span>[バッジ実績]</span>
-              <Link href="/badges" className="text-[11px] text-blue-700 hover:underline">
-                全13種 »
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-4 gap-1 pt-0.5 text-center">
-              {BADGES.slice(0, 8).map((b) => {
-                const isUnlocked = profile?.unlockedBadgeIds.includes(b.id);
-                return (
-                  <div
-                    key={b.id}
-                    className={`p-1 rounded-xs border text-[9px] truncate ${
-                      isUnlocked
-                        ? 'bg-yellow-50 border-yellow-300 text-yellow-900 font-bold'
-                        : 'bg-gray-50 border-gray-200 text-gray-400'
-                    }`}
-                    title={`${b.name}: ${b.description}`}
-                  >
-                    {isUnlocked ? '[済]' : '[未]'} {b.name}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
           {/* 4. スポンサー広告枠 */}
           <AdBanner format="rectangle" label="Sponsor Link" />
-
-          {/* 5. ご案内 */}
-          <div className="bg-white border border-gray-300 rounded-xs p-2.5 space-y-1 text-xs text-gray-600">
-            <div className="font-bold text-gray-800 border-b border-gray-200 pb-1">
-              [共通テスト源流思想の攻略法]
-            </div>
-            <ul className="list-disc pl-3.5 space-y-0.5 text-[11px] text-gray-700">
-              <li>ギリシャ思想: ソクラテス/プラトン/アリストテレスの内在・超越の対比。</li>
-              <li>宗教思想: キリスト教の「アガペー」とイスラームの「六信五行」。</li>
-              <li>中国思想: 儒家（孔子・孟子・荀子）の徳治と法家・道家の相違。</li>
-            </ul>
-          </div>
         </div>
       </div>
     </div>

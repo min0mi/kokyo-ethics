@@ -7,9 +7,12 @@ import { QuestionGenerator } from '@/lib/generator/questionGenerator';
 import { CATEGORIES } from '@/data/categories';
 import { UserProfile } from '@/types';
 import { AdBanner } from '@/components/ads/AdBanner';
+import { DailyLineChart } from '@/components/stats/DailyLineChart';
 
 export default function StatsPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [chartDays, setChartDays] = useState<number>(7);
+  const [dailyData, setDailyData] = useState<{ date: string; label: string; total: number; correct: number }[]>([]);
   const [counts, setCounts] = useState({
     total: 0,
     mastered: 0,
@@ -25,8 +28,10 @@ export default function StatsPage() {
     const p = UserDataStore.getProfile();
     const progressMap = UserDataStore.getProgressMap();
     const allQs = QuestionGenerator.getAllQuestions();
+    const history = UserDataStore.getDailyHistory(chartDays);
 
     setProfile(p);
+    setDailyData(history);
 
     let mastered = 0;
     let review = 0;
@@ -67,7 +72,7 @@ export default function StatsPage() {
       };
     });
     setCategoryData(catList);
-  }, []);
+  }, [chartDays]);
 
   const overallAccuracy =
     profile && profile.totalAnswered > 0
@@ -85,11 +90,11 @@ export default function StatsPage() {
           学習習熟度・忘却曲線分析
         </h1>
         <p className="text-xs text-gray-500 mt-0.5">
-          SuperMemo-2 (SM-2) アルゴリズムに基づく記憶定着フェーズの可視化
+          日別の学習問題数推移および SuperMemo-2 (SM-2) アルゴリズムに基づく記憶定着フェーズの可視化
         </p>
       </div>
 
-      {/* サマリーテーブル */}
+      {/* サマリーカード */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
         <div className="bg-white border border-gray-300 p-3 rounded-xs">
           <span className="text-gray-500 block mb-1">総解答数</span>
@@ -110,6 +115,29 @@ export default function StatsPage() {
           <span className="text-gray-500 block mb-1">獲得経験値</span>
           <strong className="text-lg text-yellow-700">{profile?.xp || 0} XP</strong>
         </div>
+      </div>
+
+      {/* ★ 日別学習問題数の折れ線グラフ ★ */}
+      <div className="space-y-1">
+        <div className="flex justify-end gap-1 text-[11px]">
+          <button
+            onClick={() => setChartDays(7)}
+            className={`px-2 py-0.5 border rounded-xs font-bold ${
+              chartDays === 7 ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300'
+            }`}
+          >
+            直近7日間
+          </button>
+          <button
+            onClick={() => setChartDays(14)}
+            className={`px-2 py-0.5 border rounded-xs font-bold ${
+              chartDays === 14 ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300'
+            }`}
+          >
+            直近14日間
+          </button>
+        </div>
+        <DailyLineChart data={dailyData} />
       </div>
 
       {/* 記憶定着ステータス内訳 */}

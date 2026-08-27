@@ -21,6 +21,9 @@ export class UserDataStore {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        if (!parsed.dailyCounts) {
+          parsed.dailyCounts = {};
+        }
         this.checkStreak(parsed);
         return parsed;
       } catch (e) {
@@ -34,17 +37,21 @@ export class UserDataStore {
   }
 
   private static getDefaultProfile(): UserProfile {
+    const today = new Date().toISOString().split('T')[0];
     return {
       id: `guest_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-      username: '探求者（ゲスト）',
+      username: '探求者',
       xp: 0,
       level: 1,
       streakDays: 1,
-      lastActiveDate: new Date().toISOString().split('T')[0],
+      lastActiveDate: today,
       unlockedBadgeIds: [],
       isGuest: true,
       totalAnswered: 0,
       totalCorrect: 0,
+      dailyCounts: {
+        [today]: { total: 0, correct: 0 },
+      },
     };
   }
 
@@ -99,7 +106,7 @@ export class UserDataStore {
   }
 
   /**
-   * 1問解答時の総合データ更新処理
+   * 1問解答時の総合データ更新処理（日別カウント加算付き）
    */
   static recordAnswer(
     questionId: string,
@@ -112,6 +119,7 @@ export class UserDataStore {
   } {
     const progressMap = this.getProgressMap();
     const profile = this.getProfile();
+    const today = new Date().toISOString().split('T')[0];
 
     // SRS 計算
     const currentItem = progressMap[questionId];
@@ -131,6 +139,18 @@ export class UserDataStore {
       profile.xp += 10;
     } else {
       profile.xp += 2;
+    }
+
+    // 日別カウントの加算
+    if (!profile.dailyCounts) {
+      profile.dailyCounts = {};
+    }
+    if (!profile.dailyCounts[today]) {
+      profile.dailyCounts[today] = { total: 0, correct: 0 };
+    }
+    profile.dailyCounts[today].total += 1;
+    if (isCorrect) {
+      profile.dailyCounts[today].correct += 1;
     }
 
     // レベル計算: XPから計算 (Lv = floor(sqrt(XP / 50)) + 1)
@@ -168,6 +188,34 @@ export class UserDataStore {
   }
 
   /**
+   * 過去 N 日間の日別学習履歴を取得（折れ線グラフ用）
+   */
+  static getDailyHistory(days: number = 7): { date: string; label: string; total: number; correct: number }[] {
+    const profile = this.getProfile();
+    const counts = profile.dailyCounts || {};
+    const result: { date: string; label: string; total: number; correct: number }[] = [];
+
+    const now = new Date();
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const dateStr = d.toISOString().split('T')[0];
+      const month = d.getMonth() + 1;
+      const day = d.getDate();
+      const label = `${month}/${day}`;
+
+      const entry = counts[dateStr] || { total: 0, correct: 0 };
+      result.push({
+        date: dateStr,
+        label,
+        total: entry.total,
+        correct: entry.correct,
+      });
+    }
+
+    return result;
+  }
+
+  /**
    * ユーザーネームの変更
    */
   static updateUsername(name: string): UserProfile {
@@ -177,4 +225,3 @@ export class UserDataStore {
     return profile;
   }
 }
-
