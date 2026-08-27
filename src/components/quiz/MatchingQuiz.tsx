@@ -192,7 +192,7 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
           </span>
 
           <div className="flex items-center gap-2">
-            {!isFinished && (
+            {!isFinished ? (
               <button
                 type="button"
                 onClick={handlePass}
@@ -201,6 +201,23 @@ export const MatchingQuiz: React.FC<MatchingQuizProps> = ({
               >
                 <SkipForward className="w-3 h-3 text-gray-500" />
                 <span>パス [P]</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (isFailed) {
+                    onComplete({ correct: 0, total: 1, xp: 1 });
+                  } else if (isPassed) {
+                    onComplete({ correct: 0, total: 1, xp: 2 });
+                  } else if (isAllCleared) {
+                    onComplete({ correct: 1, total: 1, xp: 25 });
+                  }
+                }}
+                className="px-2.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xs text-[10px] flex items-center gap-0.5 shadow-xs"
+              >
+                <span>次へ</span>
+                <ChevronRight className="w-3 h-3 text-white" />
               </button>
             )}
             <span className="text-gray-600 font-bold">

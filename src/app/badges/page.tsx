@@ -61,22 +61,22 @@ export default function BadgesPage() {
               }`}
             >
               <div className="flex items-center justify-between">
-                <h3 className={`font-bold text-xs ${isUnlocked ? 'text-gray-900' : 'text-gray-500'}`}>
-                  {badge.name}
+                <h3 className={`font-bold text-xs ${isUnlocked ? 'text-gray-900' : 'text-gray-400 font-normal italic'}`}>
+                  {isUnlocked ? badge.name : 'Secret Badge'}
                 </h3>
                 <span
                   className={`text-[10px] font-bold px-1.5 py-0.2 rounded-xs ${
                     isUnlocked
                       ? 'bg-yellow-100 text-yellow-900 border border-yellow-300'
-                      : 'bg-gray-200 text-gray-600'
+                      : 'bg-gray-200 text-gray-500'
                   }`}
                 >
-                  {isUnlocked ? '[獲得済]' : '[未達成]'}
+                  {isUnlocked ? '[獲得済]' : '[ロック中]'}
                 </span>
               </div>
 
               <p className="text-[11px] text-gray-600 leading-tight">
-                {badge.description}
+                {isUnlocked ? badge.description : '問題をたくさん解くか、連続学習することで獲得できます。'}
               </p>
 
               <div className="text-[10px] text-blue-700 font-semibold pt-1 border-t border-gray-100">

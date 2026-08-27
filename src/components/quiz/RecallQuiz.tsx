@@ -46,7 +46,26 @@ export const RecallQuiz: React.FC<RecallQuizProps> = ({
           <span className="bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded-xs">
             分類想起トレーニング（自己評価）
           </span>
-          <span className="text-gray-500 font-bold">目標: {question.requiredCount}人</span>
+          <div className="flex items-center gap-2">
+            {selfGrade !== null ? (
+              <button
+                type="button"
+                onClick={() =>
+                  onComplete({
+                    correct: selfGrade === 'pass' ? 1 : 0,
+                    total: 1,
+                    xp: selfGrade === 'pass' ? 15 : 2,
+                  })
+                }
+                className="px-2.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xs text-[10px] flex items-center gap-0.5 shadow-xs"
+              >
+                <span>次へ</span>
+                <ChevronRight className="w-3 h-3 text-white" />
+              </button>
+            ) : (
+              <span className="text-gray-500 font-bold">目標: {question.requiredCount}人</span>
+            )}
+          </div>
         </div>
 
         <h3 className="text-sm sm:text-base font-bold text-gray-900 leading-relaxed">

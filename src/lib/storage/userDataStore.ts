@@ -101,6 +101,7 @@ export class UserDataStore {
     updatedProgress: UserProgressItem;
     profile: UserProfile;
     newlyUnlockedBadges: Badge[];
+    speedRating: 'excellent' | 'great' | 'good' | 'none';
   } {
     const progressMap = this.getProgressMap();
     const profile = this.getProfile();
@@ -119,9 +120,23 @@ export class UserDataStore {
 
     // プロファイル更新
     profile.totalAnswered += 1;
+    let speedRating: 'excellent' | 'great' | 'good' | 'none' = 'none';
+
     if (isCorrect) {
       profile.totalCorrect += 1;
       profile.xp += 10;
+
+      // 速度評価（秒単位）
+      if (elapsedSeconds <= 1.5) {
+        speedRating = 'excellent';
+        profile.excellentCount = (profile.excellentCount || 0) + 1;
+      } else if (elapsedSeconds <= 3.0) {
+        speedRating = 'great';
+        profile.greatCount = (profile.greatCount || 0) + 1;
+      } else if (elapsedSeconds <= 5.0) {
+        speedRating = 'good';
+        profile.goodCount = (profile.goodCount || 0) + 1;
+      }
     } else {
       profile.xp += 2;
     }
@@ -158,6 +173,12 @@ export class UserDataStore {
         isUnlocked = true;
       } else if (badge.id === 'first_step' && profile.totalAnswered >= 1) {
         isUnlocked = true;
+      } else if (badge.id === 'lightning_reflection' && (profile.excellentCount || 0) >= badge.targetValue) {
+        isUnlocked = true;
+      } else if (badge.id === 'sharp_mind' && (profile.greatCount || 0) >= badge.targetValue) {
+        isUnlocked = true;
+      } else if (badge.id === 'steady_tempo' && (profile.goodCount || 0) >= badge.targetValue) {
+        isUnlocked = true;
       }
 
       if (isUnlocked) {
@@ -174,6 +195,7 @@ export class UserDataStore {
       updatedProgress,
       profile,
       newlyUnlockedBadges,
+      speedRating,
     };
   }
 

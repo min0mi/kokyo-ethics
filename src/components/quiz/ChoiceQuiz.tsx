@@ -22,6 +22,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
   const [isAnswered, setIsAnswered] = useState(false);
   const [isPassed, setIsPassed] = useState(false);
   const [canInput, setCanInput] = useState(false);
+  const [speedFeedback, setSpeedFeedback] = useState<'Excellent!' | 'Great!' | 'Good!' | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isTransitioningRef = useRef<boolean>(false);
@@ -33,6 +34,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
     setIsAnswered(false);
     setIsPassed(false);
     setCanInput(false);
+    setSpeedFeedback(null);
     isTransitioningRef.current = false;
     questionStartTimeRef.current = Date.now();
 
@@ -91,19 +93,24 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
       setIsAnswered(true);
 
       const isCorrect = option === question.correctAnswer;
+      const res = UserDataStore.recordAnswer(question.id, isCorrect, isCorrect ? 4 : 1, elapsedSec);
 
       if (isCorrect) {
         sounds.playCorrect();
         isTransitioningRef.current = true;
-        // 正解時は 0.38 秒後に自動送り（サクサク快適テンポ）
+
+        if (res.speedRating === 'excellent') setSpeedFeedback('Excellent!');
+        else if (res.speedRating === 'great') setSpeedFeedback('Great!');
+        else if (res.speedRating === 'good') setSpeedFeedback('Good!');
+
+        // 自動送りのディレイを少し長め（750ms）にして、フィードバックを視認可能にする
         timerRef.current = setTimeout(() => {
           handleNext(true);
-        }, 380);
+        }, 750);
       } else {
         sounds.playWrong();
       }
 
-      const res = UserDataStore.recordAnswer(question.id, isCorrect, isCorrect ? 4 : 1, elapsedSec);
       if (res.newlyUnlockedBadges.length > 0 && onBadgeUnlocked) {
         res.newlyUnlockedBadges.forEach((b) => onBadgeUnlocked(b));
       }
@@ -141,7 +148,14 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
   }, [canInput, isAnswered, question, selectedOption, isPassed, handleSelectOption, handlePass, handleNext]);
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-2 text-xs">
+    <div className="w-full max-w-2xl mx-auto space-y-2 text-xs relative">
+      {speedFeedback && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
+          <div className="bg-yellow-400 text-yellow-950 font-black text-2xl px-6 py-3 rounded-xs border-2 border-yellow-600 shadow-xl animate-bounce">
+            {speedFeedback}
+          </div>
+        </div>
+      )}
       {/* 問題カード */}
       <div className="bg-white border border-gray-300 rounded-xs p-4 space-y-3 shadow-xs">
         {/* 問題種別ラベル ＆ パスボタン */}
@@ -170,9 +184,14 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
                 <span>パス [P]</span>
               </button>
             ) : (
-              <span className="text-gray-500">
-                Enterキーで次へ
-              </span>
+              <button
+                type="button"
+                onClick={() => handleNext(selectedOption === question.correctAnswer && !isPassed)}
+                className="px-2.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xs text-[10px] flex items-center gap-0.5 shadow-xs"
+              >
+                <span>次へ</span>
+                <ChevronRight className="w-3 h-3 text-white" />
+              </button>
             )}
           </div>
         </div>

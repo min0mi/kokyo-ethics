@@ -1,10 +1,10 @@
 import { Badge } from '@/types';
 
 export const BADGES: Badge[] = [
-  // 回答数バッジ
+  // 回答数バッジ (1, 50, 100, 300, 500, 1000, 10000)
   {
     id: 'first_step',
-    name: '知への第一歩',
+    name: 'First Step',
     description: '初めて問題を1問解いた',
     icon: 'Sparkles',
     category: 'total_answers',
@@ -12,7 +12,7 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'answered_50',
-    name: '思索の深まり',
+    name: 'Initiate',
     description: '通算50問の問題に解答した',
     icon: 'Flame',
     category: 'total_answers',
@@ -20,7 +20,7 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'answered_100',
-    name: '百問踏破の哲人',
+    name: 'Scholar',
     description: '通算100問の問題に解答した',
     icon: 'Award',
     category: 'total_answers',
@@ -28,43 +28,101 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'answered_300',
-    name: '知の求道者',
+    name: 'Thinker',
     description: '通算300問の問題に解答した',
     icon: 'Crown',
     category: 'total_answers',
     targetValue: 300,
   },
+  {
+    id: 'answered_500',
+    name: 'Sage',
+    description: '通算500問の問題に解答した',
+    icon: 'Compass',
+    category: 'total_answers',
+    targetValue: 500,
+  },
+  {
+    id: 'answered_1000',
+    name: 'Philosopher',
+    description: '通算1000問の問題に解答した',
+    icon: 'BookOpen',
+    category: 'total_answers',
+    targetValue: 1000,
+  },
+  {
+    id: 'answered_10000',
+    name: 'Transcendent',
+    description: '通算10000問の問題に解答した',
+    icon: 'Zap',
+    category: 'total_answers',
+    targetValue: 10000,
+  },
 
-  // ストリーク（連続日数）
+  // ストリーク（連続日数 - 3, 10, 50, 100）
   {
     id: 'streak_3',
-    name: '3日連続達成',
+    name: 'Novice Streak',
     description: '3日連続で学習を継続した',
     icon: 'Flame',
     category: 'streak',
     targetValue: 3,
   },
   {
-    id: 'streak_7',
-    name: '週間習慣化（7日）',
-    description: '7日連続で学習を継続した',
+    id: 'streak_10',
+    name: 'Dedicated',
+    description: '10日連続で学習を継続した',
     icon: 'Zap',
     category: 'streak',
-    targetValue: 7,
+    targetValue: 10,
   },
   {
-    id: 'streak_30',
-    name: '月間継続（30日）',
-    description: '30日連続で学習を継続した',
+    id: 'streak_50',
+    name: 'Unyielding',
+    description: '50日連続で学習を継続した',
     icon: 'Trophy',
     category: 'streak',
-    targetValue: 30,
+    targetValue: 50,
+  },
+  {
+    id: 'streak_100',
+    name: 'Eternal Study',
+    description: '100日連続で学習を継続した',
+    icon: 'Crown',
+    category: 'streak',
+    targetValue: 100,
   },
 
-  // モード別・源流思想
+  // スピード（解答速度）バッジ
+  {
+    id: 'lightning_reflection',
+    name: 'Lightning Reflection',
+    description: 'Excellent評価（1.5秒以内の正解）を10回獲得した',
+    icon: 'Sparkles',
+    category: 'speed',
+    targetValue: 10,
+  },
+  {
+    id: 'sharp_mind',
+    name: 'Sharp Mind',
+    description: 'Great評価（3.0秒以内の正解）を30回獲得した',
+    icon: 'Zap',
+    category: 'speed',
+    targetValue: 30,
+  },
+  {
+    id: 'steady_tempo',
+    name: 'Steady Tempo',
+    description: 'Good評価（5.0秒以内の正解）を50回獲得した',
+    icon: 'Gauge',
+    category: 'speed',
+    targetValue: 50,
+  },
+
+  // その他の実績バッジ
   {
     id: 'speed_perfect_10',
-    name: 'スピード満点クリア',
+    name: 'Flash Solver',
     description: 'スピード演習で10問全問正解を達成',
     icon: 'Gauge',
     category: 'speed',
@@ -72,7 +130,7 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'master_greek',
-    name: '古代ギリシャの賢者',
+    name: 'Greek Sage',
     description: '古代ギリシャ分野の問題を15問以上マスターした',
     icon: 'Landmark',
     category: 'category_clear',
@@ -80,7 +138,7 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'master_chinese',
-    name: '諸子百家の大家',
+    name: 'Eastern Master',
     description: '中国思想分野の問題を15問以上マスターした',
     icon: 'Scroll',
     category: 'category_clear',
@@ -88,7 +146,7 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'book_scholar',
-    name: '原典・古典の理解者',
+    name: 'Classic Scholar',
     description: '著書・文献問題を累計20問正解した',
     icon: 'BookOpen',
     category: 'total_answers',
@@ -96,7 +154,7 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'matching_expert',
-    name: '相関関係の達人',
+    name: 'Link Master',
     description: '線つなぎマッチング問題を5回パーフェクトクリアした',
     icon: 'Network',
     category: 'mastery',
@@ -104,10 +162,11 @@ export const BADGES: Badge[] = [
   },
   {
     id: 'typing_master',
-    name: '正確な用字記述者',
+    name: 'Perfect Scribe',
     description: 'キーワード記述問題をノーミスで10問正解した',
     icon: 'Edit3',
     category: 'mastery',
     targetValue: 10,
   },
 ];
+

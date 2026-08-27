@@ -192,6 +192,9 @@ export interface UserProfile {
   totalCorrect: number;
   totalStudyTimeSeconds?: number; // 通算学習時間（秒）
   dailyCounts?: Record<string, DailyCount>;
+  excellentCount?: number;
+  greatCount?: number;
+  goodCount?: number;
 }
 
 export interface Badge {

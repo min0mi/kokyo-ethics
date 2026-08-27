@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TypingQuestion, Badge } from '@/types';
 import { CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
 import { sounds } from '@/lib/sound';
@@ -21,10 +21,24 @@ export const TypingQuiz: React.FC<TypingQuizProps> = ({
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [speedFeedback, setSpeedFeedback] = useState<'Excellent!' | 'Great!' | 'Good!' | null>(null);
+
+  const startTimeRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    setInputVal('');
+    setIsAnswered(false);
+    setIsCorrect(false);
+    setShowHint(false);
+    setSpeedFeedback(null);
+    startTimeRef.current = Date.now();
+  }, [question.id]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isAnswered || !inputVal.trim()) return;
+
+    const elapsedSec = (Date.now() - startTimeRef.current) / 1000;
 
     const cleanInput = inputVal.trim().toLowerCase().replace(/\s+/g, '');
     const matched = question.correctAnswers.some((ans) => {
@@ -41,27 +55,54 @@ export const TypingQuiz: React.FC<TypingQuizProps> = ({
       sounds.playWrong();
     }
 
-    const res = UserDataStore.recordAnswer(question.id, matched, matched ? 5 : 1);
+    const res = UserDataStore.recordAnswer(question.id, matched, matched ? 5 : 1, elapsedSec);
+
+    if (matched) {
+      if (res.speedRating === 'excellent') setSpeedFeedback('Excellent!');
+      else if (res.speedRating === 'great') setSpeedFeedback('Great!');
+      else if (res.speedRating === 'good') setSpeedFeedback('Good!');
+    }
+
     if (res.newlyUnlockedBadges.length > 0 && onBadgeUnlocked) {
       res.newlyUnlockedBadges.forEach((b) => onBadgeUnlocked(b));
     }
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-3">
+    <div className="w-full max-w-3xl mx-auto space-y-3 relative">
+      {speedFeedback && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
+          <div className="bg-yellow-400 text-yellow-950 font-black text-2xl px-6 py-3 rounded-xs border-2 border-yellow-600 shadow-xl animate-bounce">
+            {speedFeedback}
+          </div>
+        </div>
+      )}
       <div className="bg-white border border-gray-300 p-4 sm:p-6 rounded-sm space-y-4">
         <div className="flex items-center justify-between text-xs pb-2 border-b border-gray-200">
           <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-xs">
             キーワード記述マスター
           </span>
-          {question.displayHint && (
-            <button
-              onClick={() => setShowHint(!showHint)}
-              className="text-[11px] text-blue-700 hover:underline font-bold"
-            >
-              {showHint ? `[${question.displayHint}]` : 'ヒントを表示'}
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {question.displayHint && !isAnswered && (
+              <button
+                type="button"
+                onClick={() => setShowHint(!showHint)}
+                className="text-[11px] text-blue-700 hover:underline font-bold"
+              >
+                {showHint ? `[${question.displayHint}]` : 'ヒントを表示'}
+              </button>
+            )}
+            {isAnswered && (
+              <button
+                type="button"
+                onClick={() => onComplete({ correct: isCorrect ? 1 : 0, total: 1, xp: isCorrect ? 15 : 2 })}
+                className="px-2.5 py-0.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xs text-[10px] flex items-center gap-0.5 shadow-xs"
+              >
+                <span>次へ</span>
+                <ChevronRight className="w-3 h-3 text-white" />
+              </button>
+            )}
+          </div>
         </div>
 
         <h3 className="text-sm sm:text-base font-bold text-gray-900 leading-relaxed whitespace-pre-line">
