@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChoiceQuestion, Badge } from '@/types';
-import { CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
+import { CheckCircle2, XCircle, ChevronRight, SkipForward } from 'lucide-react';
 import { sounds } from '@/lib/sound';
 import { UserDataStore } from '@/lib/storage/userDataStore';
+import { FigureDictRowCard } from './FigureDictRowCard';
 
 interface ChoiceQuizProps {
   question: ChoiceQuestion;
@@ -19,6 +20,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
 }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [isPassed, setIsPassed] = useState(false);
   const [canInput, setCanInput] = useState(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -29,6 +31,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
   useEffect(() => {
     setSelectedOption(null);
     setIsAnswered(false);
+    setIsPassed(false);
     setCanInput(false);
     isTransitioningRef.current = false;
     questionStartTimeRef.current = Date.now();
@@ -62,6 +65,22 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
     [onComplete]
   );
 
+  // パス（スキップ）処理
+  const handlePass = useCallback(() => {
+    if (!canInput || isAnswered || isTransitioningRef.current) return;
+
+    const elapsedSec = (Date.now() - questionStartTimeRef.current) / 1000;
+    setIsAnswered(true);
+    setIsPassed(true);
+    setSelectedOption(null);
+    sounds.playWrong();
+
+    const res = UserDataStore.recordAnswer(question.id, false, 1, elapsedSec);
+    if (res.newlyUnlockedBadges.length > 0 && onBadgeUnlocked) {
+      res.newlyUnlockedBadges.forEach((b) => onBadgeUnlocked(b));
+    }
+  }, [canInput, isAnswered, question, onBadgeUnlocked]);
+
   const handleSelectOption = useCallback(
     (option: string) => {
       if (!canInput || isAnswered || isTransitioningRef.current) return;
@@ -92,7 +111,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
     [canInput, isAnswered, question, onBadgeUnlocked, handleNext]
   );
 
-  // キーボード操作 [1-4] or [Space/Enter]
+  // キーボード操作 [1-4] or [P/0: パス] or [Space/Enter: 次へ]
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
@@ -103,12 +122,15 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
           if (idx < question.options.length) {
             handleSelectOption(question.options[idx]);
           }
+        } else if (e.key === 'p' || e.key === 'P' || e.key === '0' || e.key === 'Escape') {
+          e.preventDefault();
+          handlePass();
         }
       } else if (isAnswered) {
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
           e.preventDefault();
           if (!isTransitioningRef.current) {
-            handleNext(selectedOption === question.correctAnswer);
+            handleNext(selectedOption === question.correctAnswer && !isPassed);
           }
         }
       }
@@ -116,13 +138,13 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canInput, isAnswered, question, selectedOption, handleSelectOption, handleNext]);
+  }, [canInput, isAnswered, question, selectedOption, isPassed, handleSelectOption, handlePass, handleNext]);
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-2 text-xs">
       {/* 問題カード */}
       <div className="bg-white border border-gray-300 rounded-xs p-4 space-y-3 shadow-xs">
-        {/* 問題種別ラベル */}
+        {/* 問題種別ラベル ＆ パスボタン */}
         <div className="flex items-center justify-between text-[11px] pb-1 border-b border-gray-200">
           <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 font-bold rounded-xs border border-gray-300">
             {question.type === 'figure_to_keyword'
@@ -135,11 +157,24 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
               ? 'ペア正誤判定'
               : '対応問題'}
           </span>
-          <span className="text-gray-500">
-            {isAnswered && selectedOption !== question.correctAnswer
-              ? 'Enterキーで次へ'
-              : 'キー [1-4] で選択'}
-          </span>
+
+          <div className="flex items-center gap-2">
+            {!isAnswered ? (
+              <button
+                type="button"
+                onClick={handlePass}
+                className="px-2 py-0.5 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 font-bold rounded-xs text-[10px] flex items-center gap-1"
+                title="パスして正解データを確認 (P / 0キー)"
+              >
+                <SkipForward className="w-3 h-3 text-gray-500" />
+                <span>パス [P]</span>
+              </button>
+            ) : (
+              <span className="text-gray-500">
+                Enterキーで次へ
+              </span>
+            )}
+          </div>
         </div>
 
         {/* 問題文（短く本質的） */}
@@ -147,7 +182,7 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
           {question.prompt}
         </h3>
 
-        {/* 4択選択肢（大きくタップしやすいボタン） */}
+        {/* 4択選択肢 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {question.options.map((option, idx) => {
             const isSelected = selectedOption === option;
@@ -191,19 +226,22 @@ export const ChoiceQuiz: React.FC<ChoiceQuizProps> = ({
           })}
         </div>
 
-        {/* 不正解時：1行の淡白な対比メモ（スクロール不要） */}
-        {isAnswered && selectedOption !== question.correctAnswer && (
-          <div className="pt-2 border-t border-gray-200 space-y-2 text-xs">
-            <div className="bg-gray-100 border border-gray-300 p-2.5 rounded-xs text-gray-900 whitespace-pre-line leading-relaxed font-medium">
-              {question.explanation}
-            </div>
+        {/* 不正解時 / パス時：思想・人物対応表の該当行をダイレクト抽出表示 */}
+        {isAnswered && (selectedOption !== question.correctAnswer || isPassed) && (
+          <div className="pt-2 border-t border-gray-200 space-y-2.5">
+            <FigureDictRowCard
+              figureId={question.figureId}
+              keywordId={question.keywordId}
+              selectedWrongOption={selectedOption}
+              isPassed={isPassed}
+            />
 
             <button
               type="button"
               onClick={() => handleNext(false)}
               className="w-full py-2.5 bg-gray-800 hover:bg-black text-white font-bold rounded-xs text-xs flex items-center justify-center gap-1 shadow-xs"
             >
-              <span>次の問題へ (Space / Enter)</span>
+              <span>次の問題へ進む (Space / Enter)</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
