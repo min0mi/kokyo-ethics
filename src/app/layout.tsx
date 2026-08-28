@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
@@ -51,8 +51,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
-
   return (
     <html lang="ja">
       <head>
@@ -71,14 +69,12 @@ export default function RootLayout({
             `,
           }}
         />
-        {/* Google AdSense スクリプトタグ（環境変数設定時に自動有効化） */}
-        {adsenseClientId && (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
-            crossOrigin="anonymous"
-          />
-        )}
+        {/* Google AdSense */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7686734004910208"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className={`${inter.className} min-h-screen bg-[#f0f2f5] text-gray-900 flex flex-col antialiased`}>
         <Header />
