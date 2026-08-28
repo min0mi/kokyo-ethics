@@ -13,7 +13,10 @@ export type CategoryId =
   | 'japan_buddhism_thought'
   | 'western_modern'
   | 'western_contemporary'
-  | 'adolescence_public';
+  | 'adolescence_public'
+  | 'public_politics'
+  | 'public_economy'
+  | 'public_international';
 
 export interface Category {
   id: CategoryId;
@@ -153,6 +156,7 @@ export interface QuizSessionConfig {
     matching: boolean;
   };
   questionCount: number; // 5, 10, 20, 30, または全問(999)
+  onlyWeak?: boolean;    // 間違えた問題のみ
 }
 
 // ==========================================

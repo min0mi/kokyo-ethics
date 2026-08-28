@@ -21,8 +21,9 @@ export default function HomePage() {
   const [totalMasteredCount, setTotalMasteredCount] = useState(0);
   const [totalQuestionsCount, setTotalQuestionsCount] = useState(0);
 
-  // 演習範囲ステート（全範囲 / 源流思想 / 日本思想 / 西洋思想）
-  const [selectedScope, setSelectedScope] = useState<'all' | '源流思想' | '日本思想' | '西洋思想'>('all');
+  // 演習範囲ステート（全範囲 / 源流思想 / 日本思想 / 西洋思想 / 公共分野）
+  const [selectedScope, setSelectedScope] = useState<'all' | '源流思想' | '日本思想' | '西洋思想' | '公共分野'>('all');
+  const [onlyWeak, setOnlyWeak] = useState<boolean>(false);
 
   // 演習設定ステート
   const [sessionConfig, setSessionConfig] = useState<QuizSessionConfig>({
@@ -37,7 +38,7 @@ export default function HomePage() {
     questionCount: 10,
   });
 
-  const handleScopeChange = (scope: 'all' | '源流思想' | '日本思想' | '西洋思想') => {
+  const handleScopeChange = (scope: 'all' | '源流思想' | '日本思想' | '西洋思想' | '公共分野') => {
     setSelectedScope(scope);
     if (scope === 'all') {
       setSessionConfig((prev) => ({ ...prev, categoryIds: AVAILABLE_CATEGORY_IDS }));
@@ -100,6 +101,12 @@ export default function HomePage() {
     params.set('odd', sessionConfig.enabledTypes.oddOneOut ? '1' : '0');
     params.set('pair', sessionConfig.enabledTypes.pairValidation ? '1' : '0');
     params.set('matching', sessionConfig.enabledTypes.matching ? '1' : '0');
+    if (onlyWeak) {
+      params.set('weak', '1');
+    }
+    if (selectedScope !== 'all') {
+      params.set('group', selectedScope);
+    }
     router.push(`/practice?${params.toString()}`);
   };
 
@@ -173,24 +180,25 @@ export default function HomePage() {
               <span className="text-[11px] text-gray-500">人物 ⇄ 語句の対応関係特化</span>
             </div>
 
-            {/* 出題範囲の選択（全範囲 / 源流思想 / 日本思想 / 西洋思想） */}
+            {/* 出題範囲の選択（全範囲 / 源流思想 / 日本思想 / 西洋思想 / 公共分野） */}
             <div className="space-y-1">
               <span className="font-bold text-gray-700 block text-[11px]">
                 出題範囲:
               </span>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
                 {[
                   { key: 'all', label: '全範囲' },
                   { key: '源流思想', label: '源流思想' },
                   { key: '日本思想', label: '日本思想' },
                   { key: '西洋思想', label: '西洋思想' },
+                  { key: '公共分野', label: '公共分野' },
                 ].map(({ key, label }) => {
                   const isSel = selectedScope === key;
                   return (
                     <button
                       key={key}
                       type="button"
-                      onClick={() => handleScopeChange(key as 'all' | '源流思想' | '日本思想' | '西洋思想')}
+                      onClick={() => handleScopeChange(key as 'all' | '源流思想' | '日本思想' | '西洋思想' | '公共分野')}
                       className={`py-1.5 px-2 rounded-xs border font-bold text-xs text-center transition ${
                         isSel
                           ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
@@ -201,6 +209,35 @@ export default function HomePage() {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* 出題対象 */}
+            <div className="space-y-1">
+              <span className="font-bold text-gray-700 block text-[11px]">
+                出題対象:
+              </span>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-gray-850 text-[11px]">
+                  <input
+                    type="radio"
+                    name="onlyWeak"
+                    checked={!onlyWeak}
+                    onChange={() => setOnlyWeak(false)}
+                    className="rounded-xs text-gray-800 focus:ring-gray-800"
+                  />
+                  <span>全問題</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-red-650 text-[11px]">
+                  <input
+                    type="radio"
+                    name="onlyWeak"
+                    checked={onlyWeak}
+                    onChange={() => setOnlyWeak(true)}
+                    className="rounded-xs text-red-600 focus:ring-red-500"
+                  />
+                  <span>間違えた問題（弱点のみ）</span>
+                </label>
               </div>
             </div>
 
@@ -297,7 +334,7 @@ export default function HomePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {(['源流思想', '日本思想', '西洋思想'] as const).map((group) => {
+                {(['源流思想', '日本思想', '西洋思想', '公共分野'] as const).map((group) => {
                   const groupCats = CATEGORIES.filter((c) => c.groupName === group);
                   return (
                     <React.Fragment key={group}>
@@ -380,21 +417,37 @@ export default function HomePage() {
                                   <span className="text-green-800 font-bold">
                                     定着: {st.mastered}問 ({st.masteredRate}%)
                                   </span>
-                                  <span className="text-red-600 font-bold">
-                                    誤答: {st.wrong}問 ({st.wrongRate}%)
-                                  </span>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-red-600 font-bold">
+                                      誤答: {st.wrong}問 ({st.wrongRate}%)
+                                    </span>
+                                    {st.wrong > 0 && isAvailable && (
+                                      <Link
+                                        href={`/practice?category=${cat.id}&count=10&weak=1`}
+                                        className="px-1 py-0.5 bg-red-100 hover:bg-red-200 text-red-700 font-bold text-[9px] rounded-xs transition"
+                                      >
+                                        弱点演習
+                                      </Link>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </td>
 
                             {/* 3. 演習ボタン */}
                             <td className="py-2 px-3 text-right align-middle">
-                              <Link
-                                href={`/practice?category=${cat.id}&count=10`}
-                                className="px-2.5 py-1 bg-gray-800 hover:bg-black text-white font-bold text-[11px] rounded-xs shadow-xs"
-                              >
-                                演習
-                              </Link>
+                              {isAvailable ? (
+                                <Link
+                                  href={`/practice?category=${cat.id}&count=10`}
+                                  className="px-2.5 py-1 bg-gray-800 hover:bg-black text-white font-bold text-[11px] rounded-xs shadow-xs"
+                                >
+                                  演習
+                                </Link>
+                              ) : (
+                                <span className="text-[10px] text-gray-500 font-bold bg-gray-200 px-2 py-1 rounded-xs select-none">
+                                  準備中
+                                </span>
+                              )}
                             </td>
                           </tr>
                         );

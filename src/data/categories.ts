@@ -2,7 +2,7 @@ import { Category } from '@/types';
 
 export interface ExtendedCategory extends Category {
   isAvailable: boolean;
-  groupName: '源流思想' | '日本思想' | '西洋思想';
+  groupName: '源流思想' | '日本思想' | '西洋思想' | '公共分野';
 }
 
 export const CATEGORIES: ExtendedCategory[] = [
@@ -91,7 +91,7 @@ export const CATEGORIES: ExtendedCategory[] = [
     name: '日本思想（室町〜近代・現代）',
     shortName: '日本思想（室町〜）',
     era: '室町時代〜現代',
-    description: '室町文化、江戸儒学・国学・町人農民思想、幕末・近代啓蒙思想（福沢諭吉・中江兆民）、京都学派（西田幾多郎）、民俗学',
+    description: '室町文化、江戸儒学・国学・町人農民思想、幕末・近代啓盟思想（福沢諭吉・中江兆民）、京都学派（西田幾多郎）、民俗学',
     iconName: 'BookOpen',
     orderIndex: 8,
     isAvailable: true,
@@ -120,5 +120,40 @@ export const CATEGORIES: ExtendedCategory[] = [
     orderIndex: 10,
     isAvailable: true,
     groupName: '西洋思想',
+  },
+
+  // 4. 公共分野
+  {
+    id: 'public_politics',
+    name: '民主政治と現代社会',
+    shortName: '民主政治',
+    era: '政治制度・社会',
+    description: '民主政治の基本原理、日本国憲法と基本的人権、平和主義、国会・内閣・裁判所、地方自治',
+    iconName: 'Scale',
+    orderIndex: 11,
+    isAvailable: false,
+    groupName: '公共分野',
+  },
+  {
+    id: 'public_economy',
+    name: '現代経済と国民福祉',
+    shortName: '現代経済',
+    era: '経済システム',
+    description: '市場機構と価格、国民所得と景気変動、政府の役割と租税、金融、労働問題、社会保障',
+    iconName: 'TrendingUp',
+    orderIndex: 12,
+    isAvailable: false,
+    groupName: '公共分野',
+  },
+  {
+    id: 'public_international',
+    name: '国際社会の動向と課題',
+    shortName: '国際社会',
+    era: '国際関係',
+    description: '主権国家体制、国際連盟と国際連合、冷戦と多極化、地域統合、人類の福祉と地球環境問題',
+    iconName: 'Globe',
+    orderIndex: 13,
+    isAvailable: false,
+    groupName: '公共分野',
   },
 ];

@@ -11,6 +11,7 @@ function PracticeContent() {
   const catParam = searchParams.get('category') as CategoryId | null;
   const groupParam = searchParams.get('group'); // 'all' | '源流思想' | '日本思想' | '西洋思想'
   const countParam = searchParams.get('count');
+  const weakParam = searchParams.get('weak');
 
   const f2kParam = searchParams.get('f2k');
   const k2fParam = searchParams.get('k2f');
@@ -38,6 +39,7 @@ function PracticeContent() {
   const initialConfig = {
     categoryIds: targetCategoryIds,
     questionCount: isNaN(questionCount) ? 10 : questionCount,
+    onlyWeak: weakParam === '1',
     enabledTypes: hasSpecificTypes
       ? {
           figureToKeyword: f2kParam === '1',

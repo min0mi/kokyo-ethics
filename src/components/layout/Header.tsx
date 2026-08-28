@@ -11,11 +11,22 @@ export const Header: React.FC = () => {
   const pathname = usePathname();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [daysUntilTest, setDaysUntilTest] = useState<number | null>(null);
 
   useEffect(() => {
     const p = UserDataStore.getProfile();
     setProfile(p);
     setIsMuted(sounds.getMuted());
+
+    const calculateDays = () => {
+      const targetDate = new Date('2027-01-16T00:00:00+09:00');
+      const now = new Date();
+      const targetUtc = Date.UTC(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+      const nowUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+      const diffMs = targetUtc - nowUtc;
+      return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    };
+    setDaysUntilTest(calculateDays());
 
     const handleStorage = () => {
       setProfile(UserDataStore.getProfile());
@@ -58,6 +69,11 @@ export const Header: React.FC = () => {
 
         {/* ユーザーステータス */}
         <div className="flex items-center gap-3 text-xs">
+          {daysUntilTest !== null && (
+            <div className="bg-red-50 text-red-700 px-2.5 py-1 border border-red-300 rounded-xs font-black text-[11px] select-none">
+              共テまであと {daysUntilTest}日
+            </div>
+          )}
           {profile && (
             <div className="flex items-center gap-2 bg-gray-100 px-2.5 py-1 rounded-xs border border-gray-300 text-[11px]">
               <span className="font-bold text-gray-700">{profile.username}</span>

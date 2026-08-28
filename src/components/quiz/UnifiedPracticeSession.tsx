@@ -44,9 +44,18 @@ export const UnifiedPracticeSession: React.FC<UnifiedPracticeProps> = ({
   const availableCategories = CATEGORIES.filter((c) => c.isAvailable);
 
   const startSessionWithConfig = useCallback((cfg: QuizSessionConfig) => {
-    const pool = QuestionGenerator.generateCustomSession(cfg);
+    let pool = QuestionGenerator.generateCustomSession(cfg);
+
+    if (cfg.onlyWeak) {
+      const progressMap = UserDataStore.getProgressMap();
+      pool = pool.filter((q) => {
+        const progress = progressMap[q.id];
+        return progress && progress.totalAttempts > progress.totalCorrect;
+      });
+    }
+
     if (pool.length === 0) {
-      alert('条件に一致する問題がありませんでした。');
+      alert(cfg.onlyWeak ? '該当する「間違えた問題」が登録されていません。' : '条件に一致する問題がありませんでした。');
       setIsStarted(false);
       return;
     }
