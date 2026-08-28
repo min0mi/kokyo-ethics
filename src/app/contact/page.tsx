@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Mail, ExternalLink } from 'lucide-react';
 
 export const metadata = {
@@ -27,9 +27,6 @@ export default function ContactPage() {
       <div className="bg-white rounded-xl p-8 border border-gray-200 space-y-6">
         <div className="space-y-2 text-sm text-gray-700 leading-relaxed">
           <p>以下のGoogleフォームよりお問い合わせください。</p>
-          <p className="text-xs text-gray-500">
-            内容によっては返信が遅れる場合や、返信できない場合があります。あらかじめご了承ください。
-          </p>
         </div>
 
         <a
