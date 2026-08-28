@@ -14,7 +14,7 @@ export const Footer: React.FC = () => {
           <span>|</span>
           <Link href="/stats" className="hover:underline hover:text-blue-700">学習進捗・グラフ</Link>
           <span>|</span>
-          <Link href="/about" className="hover:underline hover:text-blue-700">サイトについて</Link>
+          <Link href="/about" className="hover:underline hover:text-blue-700">当サイトについて・運営者情報</Link>
           <span>|</span>
           <Link href="/privacy" className="hover:underline hover:text-blue-700">プライバシーポリシー</Link>
           <span>|</span>

@@ -71,6 +71,44 @@ export default function AboutPage() {
           </p>
         </div>
       </div>
+
+      {/* 運営者情報 */}
+      <div className="pt-6 border-t border-gray-200 space-y-4">
+        <h2 className="text-lg font-bold text-gray-900">運営者情報</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs sm:text-sm border-collapse border border-gray-300">
+            <tbody>
+              <tr className="border-b border-gray-300">
+                <th className="p-3 bg-gray-50 font-bold border-r border-gray-300 w-1/4">運営者</th>
+                <td className="p-3">公共倫理パーフェクトマスター.com 運営事務局 (代表: minomi)</td>
+              </tr>
+              <tr className="border-b border-gray-300">
+                <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">サイトURL</th>
+                <td className="p-3">
+                  <a href="https://kokyo-ethics.com" className="text-indigo-600 hover:underline">
+                    https://kokyo-ethics.com
+                  </a>
+                </td>
+              </tr>
+              <tr className="border-b border-gray-300">
+                <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">お問い合わせ先</th>
+                <td className="p-3">
+                  <a href="/contact" className="text-indigo-600 hover:underline">
+                    お問い合わせフォーム
+                  </a>
+                  よりご連絡ください。
+                </td>
+              </tr>
+              <tr>
+                <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">主な活動目的</th>
+                <td className="p-3">
+                  大学入学共通テストにおける「公共、倫理」および「倫理」科目の暗記・演習支援
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
