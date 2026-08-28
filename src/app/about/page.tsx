@@ -80,7 +80,11 @@ export default function AboutPage() {
             <tbody>
               <tr className="border-b border-gray-300">
                 <th className="p-3 bg-gray-50 font-bold border-r border-gray-300 w-1/4">運営者</th>
-                <td className="p-3">公共倫理パーフェクトマスター.com 運営事務局 (代表: minomi)</td>
+                <td className="p-3">minor</td>
+              </tr>
+              <tr className="border-b border-gray-300">
+                <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">メールアドレス</th>
+                <td className="p-3">minomi@ymail.ne.jp</td>
               </tr>
               <tr className="border-b border-gray-300">
                 <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">サイトURL</th>
@@ -96,7 +100,7 @@ export default function AboutPage() {
                   <a href="/contact" className="text-indigo-600 hover:underline">
                     お問い合わせフォーム
                   </a>
-                  よりご連絡ください。
+                  または上記メールアドレスよりご連絡ください。
                 </td>
               </tr>
               <tr>
