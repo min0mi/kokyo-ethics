@@ -180,18 +180,17 @@ export default function HomePage() {
               <span className="text-[11px] text-gray-500">人物 ⇄ 語句の対応関係特化</span>
             </div>
 
-            {/* 出題範囲の選択（全範囲 / 源流思想 / 日本思想 / 西洋思想 / 公共分野） */}
+            {/* 出題範囲の選択（全範囲 / 源流思想 / 日本思想 / 西洋思想） */}
             <div className="space-y-1">
               <span className="font-bold text-gray-700 block text-[11px]">
                 出題範囲:
               </span>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                 {[
                   { key: 'all', label: '全範囲' },
                   { key: '源流思想', label: '源流思想' },
                   { key: '日本思想', label: '日本思想' },
                   { key: '西洋思想', label: '西洋思想' },
-                  { key: '公共分野', label: '公共分野' },
                 ].map(({ key, label }) => {
                   const isSel = selectedScope === key;
                   return (
