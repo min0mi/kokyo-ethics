@@ -151,6 +151,7 @@ export default function HomePage() {
           >
             {dueQuestions.length > 0 ? '復習を開始する' : '演習を解く'}
           </Link>
+          <Link href="/chemistry/manufacturing" className="w-full sm:w-auto px-3.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-xs text-center shadow-xs shrink-0">気体の製法を暗記</Link>
         </div>
 
         {/* 物質・色検索バー（未入力Enter対応） */}
