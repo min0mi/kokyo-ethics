@@ -37,6 +37,7 @@ export default function HomePage() {
   // 演習範囲ステート（全範囲 / 非金属元素 / 主要金属元素 / 遷移金属元素 / 沈殿反応）
   const [selectedScope, setSelectedScope] = useState<string>('all');
   const [onlyWeak, setOnlyWeak] = useState<boolean>(false);
+  const [gasMode, setGasMode] = useState<'all' | 'raw_to_gas' | 'gas_to_raw' | 'heat'>('all');
 
   // 演習設定ステート
   const [sessionConfig, setSessionConfig] = useState<QuizSessionConfig>({
@@ -112,7 +113,7 @@ export default function HomePage() {
 
   const handleStartPracticeDirect = () => {
     if (selectedScope === 'gas') {
-      router.push(`/chemistry/manufacturing?count=${sessionConfig.questionCount}`);
+      router.push(`/chemistry/manufacturing?count=${sessionConfig.questionCount}&mode=${gasMode}`);
       return;
     }
     const params = new URLSearchParams();
@@ -264,7 +265,7 @@ export default function HomePage() {
             </div>
 
             {/* 色暗記シリーズの問題形式 */}
-            <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50/70 p-2">
+            {selectedScope !== 'gas' && <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50/70 p-2">
               <span className="font-bold text-gray-700 block text-[11px]">
                 出題形式:
               </span>
@@ -287,7 +288,8 @@ export default function HomePage() {
                   </label>
                 ))}
               </div>
-            </div>
+            </div>}
+            {selectedScope === 'gas' && <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50/70 p-2"><span className="font-bold text-gray-700 block text-[11px]">気体の製法シリーズ・出題形式</span><div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">{[['all','全範囲'],['gas_to_raw','物質→原料'],['raw_to_gas','原料→物質'],['heat','加熱の有無']].map(([value,label])=><label key={value} className="flex items-center gap-1.5 rounded-xs border border-gray-300 bg-white p-1.5 text-[11px] font-bold"><input type="radio" name="gasMode" checked={gasMode===value} onChange={()=>setGasMode(value as typeof gasMode)} />{label}</label>)}</div></div>}
 
             {/* 問題数の選択 */}
             <div className="space-y-1">

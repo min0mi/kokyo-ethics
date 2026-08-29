@@ -2,12 +2,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { GAS_PROCESSES, GAS_RAW } from '@/data/chemistry/gasProcesses';
+import { sounds } from '@/lib/sound';
 
 export default function ManufacturingPage() {
   const params = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search);
   const requested = Number(params.get('count') || 10);
   const count = [5, 10, 14].includes(requested) ? requested : 10;
-  const [mode, setMode] = useState<'raw' | 'heat'>('raw');
+  const modeParam = params.get('mode') || 'all';
+  const mode: 'raw' | 'heat' = modeParam === 'heat' ? 'heat' : 'raw';
+  const setMode = () => {};
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<string[]>([]);
   const [heat, setHeat] = useState<boolean | null>(null);
@@ -17,7 +20,7 @@ export default function ManufacturingPage() {
     const opposite = gas.raw.find((x) => x.startsWith('希'))?.replace('希', '濃') || gas.raw.find((x) => x.startsWith('濃'))?.replace('濃', '希');
     return [...gas.raw, ...(opposite && !gas.raw.includes(opposite) ? [opposite] : []), ...GAS_RAW.filter((x) => !gas.raw.includes(x) && x !== opposite).slice(index % 5, index % 5 + (opposite ? 5 : 6))];
   }, [gas, index]);
-  const judgeRaw = (selection: string[]) => setResult(selection.length === gas.raw.length && selection.every((x) => gas.raw.includes(x)));
+  const judgeRaw = (selection: string[]) => { const correct = selection.length === gas.raw.length && selection.every((x) => gas.raw.includes(x)); setResult(correct); if (correct) { sounds.playCorrect(); window.setTimeout(() => { setIndex((i) => (i + 1) % count); setPicked([]); setHeat(null); setResult(null); }, 380); } else sounds.playWrong(); };
   const toggleRaw = (x: string) => { setPicked((current) => { const next = current.includes(x) ? current.filter((y) => y !== x) : [...current, x]; if (next.length === gas.raw.length) judgeRaw(next); return next; }); };
   useEffect(() => { const onKey = (e: KeyboardEvent) => { if (e.repeat || result !== null) return; const n = Number(e.key); if (mode === 'raw' && n >= 1 && n <= options.length) toggleRaw(options[n - 1]); if (mode === 'heat' && (n === 1 || n === 2)) { setHeat(n === 1); setResult((n === 1) === gas.heat); } }; window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey); }, [mode, result, options, gas]);
   const next = () => { setIndex((index + 1) % count); setPicked([]); setHeat(null); setResult(null); };
