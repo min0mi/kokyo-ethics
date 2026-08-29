@@ -1,0 +1,1787 @@
+{
+  "schemaVersion": 1,
+  "approvalDate": "2026-08-29",
+  "colorAliases": {
+    "紫色": "赤紫色",
+    "青白色": "淡青色"
+  },
+  "records": [
+    {
+      "id": "kw_chem_0",
+      "name": "フッ素（気体）",
+      "formula": "F2",
+      "color": "淡黄色",
+      "phase": "気体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_halogen",
+      "tags": [
+        "ハロゲン"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 9,
+      "originalName": "フッ素 (F2)",
+      "originalColor": "淡黄色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_1",
+      "name": "塩素（気体）",
+      "formula": "Cl2",
+      "color": "黄緑色",
+      "phase": "気体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_halogen",
+      "tags": [
+        "ハロゲン"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 10,
+      "originalName": "塩素 (Cl2)",
+      "originalColor": "黄緑色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_2",
+      "name": "臭素（液体）",
+      "formula": "Br2",
+      "color": "赤褐色",
+      "phase": "液体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_halogen",
+      "tags": [
+        "ハロゲン"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 11,
+      "originalName": "臭素 (Br2)",
+      "originalColor": "赤褐色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_3",
+      "name": "ヨウ素（固体）",
+      "formula": "I2",
+      "color": "黒紫色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_halogen",
+      "tags": [
+        "ハロゲン"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 12,
+      "originalName": "ヨウ素 (I2)",
+      "originalColor": "黒紫色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_4",
+      "name": "フッ化銀（水溶性・沈殿しない）",
+      "formula": "AgF",
+      "color": "無色",
+      "phase": "参考",
+      "status": "reference",
+      "condition": "",
+      "categoryId": "cat_silver_halide",
+      "tags": [
+        "ハロゲン化銀"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 13,
+      "originalName": "フッ化銀 (AgF)",
+      "originalColor": "無色",
+      "sources": [],
+      "note": "水溶性で沈殿しない。固体と溶液の色を一律に扱わず、色問題から除外。"
+    },
+    {
+      "id": "kw_chem_5",
+      "name": "塩化銀（沈殿）",
+      "formula": "AgCl",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "Ag⁺とCl⁻を含む水溶液を混合 希アンモニア水で溶け、無色の銀アンミン錯イオンになる。",
+      "categoryId": "cat_silver_halide",
+      "tags": [
+        "ハロゲン化銀"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 14,
+      "originalName": "塩化銀 (AgCl)",
+      "originalColor": "白色",
+      "sources": [],
+      "note": "",
+      "precipitateId": "agcl"
+    },
+    {
+      "id": "kw_chem_6",
+      "name": "臭化銀（沈殿）",
+      "formula": "AgBr",
+      "color": "淡黄色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "Ag⁺とBr⁻を含む水溶液を混合 希アンモニア水には溶けにくく、濃アンモニア水には溶ける。",
+      "categoryId": "cat_silver_halide",
+      "tags": [
+        "ハロゲン化銀"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 15,
+      "originalName": "臭化銀 (AgBr)",
+      "originalColor": "淡黄色",
+      "sources": [],
+      "note": "",
+      "precipitateId": "agbr"
+    },
+    {
+      "id": "kw_chem_7",
+      "name": "ヨウ化銀（沈殿）",
+      "formula": "AgI",
+      "color": "黄色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "Ag⁺とI⁻を含む水溶液を混合 通常のアンモニア水に溶けない。AgFは水溶性で、この沈殿群に含めない。",
+      "categoryId": "cat_silver_halide",
+      "tags": [
+        "ハロゲン化銀"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 16,
+      "originalName": "ヨウ化銀 (AgI)",
+      "originalColor": "黄色",
+      "sources": [],
+      "note": "",
+      "precipitateId": "agi"
+    },
+    {
+      "id": "kw_chem_8",
+      "name": "リチウムの炎色反応",
+      "formula": "Li",
+      "color": "赤色",
+      "phase": "炎色反応",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_flame",
+      "tags": [
+        "炎色反応"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 17,
+      "originalName": "リチウムの炎色反応 (Li)",
+      "originalColor": "赤色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_9",
+      "name": "ナトリウムの炎色反応",
+      "formula": "Na",
+      "color": "黄色",
+      "phase": "炎色反応",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_flame",
+      "tags": [
+        "炎色反応"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 18,
+      "originalName": "ナトリウムの炎色反応 (Na)",
+      "originalColor": "黄色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_10_v2",
+      "name": "カリウムの炎色反応",
+      "formula": "K",
+      "color": "赤紫色",
+      "phase": "炎色反応",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_flame",
+      "tags": [
+        "炎色反応"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 19,
+      "originalName": "カリウムの炎色反応 (K)",
+      "originalColor": "紫色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_11",
+      "name": "銅の炎色反応",
+      "formula": "Cu",
+      "color": "青緑色",
+      "phase": "炎色反応",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_flame",
+      "tags": [
+        "炎色反応"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 20,
+      "originalName": "銅の炎色反応 (Cu)",
+      "originalColor": "青緑色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_12_v2",
+      "name": "カルシウムの炎色反応",
+      "formula": "Ca",
+      "color": "橙赤色",
+      "phase": "炎色反応",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_flame",
+      "tags": [
+        "炎色反応"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 21,
+      "originalName": "カルシウムの炎色反応 (Ca)",
+      "originalColor": "橙色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_13",
+      "name": "ストロンチウムの炎色反応",
+      "formula": "Sr",
+      "color": "紅色",
+      "phase": "炎色反応",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_flame",
+      "tags": [
+        "炎色反応"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 22,
+      "originalName": "ストロンチウムの炎色反応 (Sr)",
+      "originalColor": "紅色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_14",
+      "name": "バリウムの炎色反応",
+      "formula": "Ba",
+      "color": "黄緑色",
+      "phase": "炎色反応",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_flame",
+      "tags": [
+        "炎色反応"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 23,
+      "originalName": "バリウムの炎色反応 (Ba)",
+      "originalColor": "黄緑色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_42007c792e78_v2",
+      "name": "二クロム酸イオン（水溶液）",
+      "formula": "Cr2O7^2-",
+      "color": "橙色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_chromate",
+      "tags": [
+        "クロム酸"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 26,
+      "originalName": "二クロム酸イオン",
+      "originalColor": "赤褐色",
+      "sources": [
+        "chromate"
+      ],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_d5d82723ff22",
+      "name": "クロム酸イオン（水溶液）",
+      "formula": "CrO4^2-",
+      "color": "黄色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_chromate",
+      "tags": [
+        "クロム酸"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 27,
+      "originalName": "クロム酸イオン",
+      "originalColor": "黄色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_b9dad6c79eb5_v2",
+      "name": "クロム(III)イオン（緑色系の水溶液）",
+      "formula": "Cr^3+",
+      "color": "緑色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "配位子や液性で呈色が変わる。ヘキサアクアクロム(III)イオンは紫色。",
+      "categoryId": "cat_chromate",
+      "tags": [
+        "クロム酸"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 28,
+      "originalName": "クロムⅢイオン",
+      "originalColor": "暗緑色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_15",
+      "name": "クロム酸カリウム",
+      "formula": "K2CrO4",
+      "color": "黄色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_chromate",
+      "tags": [
+        "クロム酸"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 29,
+      "originalName": "クロム酸カリウム (K2CrO4)",
+      "originalColor": "黄色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_16",
+      "name": "クロム酸鉛（沈殿）",
+      "formula": "PbCrO4",
+      "color": "黄色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_chromate",
+      "tags": [
+        "クロム酸"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 30,
+      "originalName": "クロム酸鉛 (PbCrO4)",
+      "originalColor": "黄色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_17",
+      "name": "クロム酸銀（沈殿）",
+      "formula": "Ag2CrO4",
+      "color": "赤褐色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_chromate",
+      "tags": [
+        "クロム酸"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 31,
+      "originalName": "クロム酸銀 (Ag2CrO4)",
+      "originalColor": "赤褐色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_18",
+      "name": "硫化亜鉛（沈殿）",
+      "formula": "ZnS",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_sulfide",
+      "tags": [
+        "特殊な硫化物"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 32,
+      "originalName": "硫化亜鉛 (ZnS)",
+      "originalColor": "白色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_19",
+      "name": "硫化スズ(II)（沈殿）",
+      "formula": "SnS",
+      "color": "褐色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_sulfide",
+      "tags": [
+        "特殊な硫化物"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 33,
+      "originalName": "硫化スズ (SnS)",
+      "originalColor": "褐色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_20",
+      "name": "硫化カドミウム（沈殿）",
+      "formula": "CdS",
+      "color": "黄色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_sulfide",
+      "tags": [
+        "特殊な硫化物"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 34,
+      "originalName": "硫化カドニウム (CdS)",
+      "originalColor": "黄色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_21",
+      "name": "硫化マンガン（沈殿）",
+      "formula": "MnS",
+      "color": "淡赤色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_sulfide",
+      "tags": [
+        "特殊な硫化物"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 35,
+      "originalName": "硫化マンガン (MnS)",
+      "originalColor": "淡赤色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_23",
+      "name": "銅（単体）",
+      "formula": "Cu",
+      "color": "赤色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_copper",
+      "tags": [
+        "銅"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 37,
+      "originalName": "銅 (Cu)",
+      "originalColor": "赤色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_24",
+      "name": "酸化銅(I)（固体）",
+      "formula": "Cu2O",
+      "color": "赤色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_copper",
+      "tags": [
+        "銅"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 38,
+      "originalName": "酸化銅Ⅰ (Cu2O)",
+      "originalColor": "赤色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_25",
+      "name": "酸化銅(II)（固体）",
+      "formula": "CuO",
+      "color": "黒色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_copper",
+      "tags": [
+        "銅"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 39,
+      "originalName": "酸化銅Ⅱ (CuO)",
+      "originalColor": "黒色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_26",
+      "name": "銅(II)イオン（水溶液）",
+      "formula": "Cu^2+",
+      "color": "青色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_copper",
+      "tags": [
+        "銅"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 40,
+      "originalName": "銅イオン (Cu2+)",
+      "originalColor": "青色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_27_v2",
+      "name": "水酸化銅(II)（沈殿）",
+      "formula": "Cu(OH)2",
+      "color": "淡青色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "青白色とも表す。過剰NaOHには溶けず、過剰NH₃には溶けて深青色になる。 Cu²⁺に少量のNaOH水溶液、またはアンモニア水 過剰NaOH：溶けない。過剰NH₃：溶けて深青色の錯イオンになる。",
+      "categoryId": "cat_copper",
+      "tags": [
+        "銅"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 41,
+      "originalName": "水酸化銅 (Cu(OH)2)",
+      "originalColor": "青白色",
+      "sources": [],
+      "note": "",
+      "precipitateId": "cuoh2"
+    },
+    {
+      "id": "kw_chem_28",
+      "name": "テトラアンミン銅(II)イオン（水溶液）",
+      "formula": "[Cu(NH3)4]^2+",
+      "color": "深青色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_copper",
+      "tags": [
+        "銅"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 42,
+      "originalName": "テトラアンミン銅Ⅱイオン ([Cu(NH3)4]2+)",
+      "originalColor": "深青色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_264a694d725e",
+      "name": "鉄(II)イオン（水溶液）",
+      "formula": "Fe^2+",
+      "color": "淡緑色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_iron",
+      "tags": [
+        "鉄"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 43,
+      "originalName": "鉄Ⅱイオン",
+      "originalColor": "淡緑色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_030822a837fd",
+      "name": "鉄(III)イオン（水溶液）",
+      "formula": "Fe^3+",
+      "color": "黄褐色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "通常の水溶液の代表色。液性・濃度で見え方が変わる。",
+      "categoryId": "cat_iron",
+      "tags": [
+        "鉄"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 44,
+      "originalName": "鉄Ⅲイオン",
+      "originalColor": "黄褐色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_4c203f3ba313",
+      "name": "水酸化鉄(II)（生成直後の沈殿）",
+      "formula": "Fe(OH)2",
+      "color": "緑白色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "空気中で酸化されると褐色系に変わる。生成直後の色を答える。 Fe²⁺にNaOH水溶液を加える（生成直後） 過剰NaOH・NH₃では溶けない。空気酸化で褐色系に変化する。",
+      "categoryId": "cat_iron",
+      "tags": [
+        "鉄"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 45,
+      "originalName": "水酸化鉄Ⅱ",
+      "originalColor": "緑白色",
+      "sources": [],
+      "note": "",
+      "precipitateId": "feoh2"
+    },
+    {
+      "id": "kw_chem_e68fba4b9eea",
+      "name": "水酸化鉄(III)（沈殿）",
+      "formula": "Fe(OH)3",
+      "color": "赤褐色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "Fe³⁺にNaOH水溶液、またはアンモニア水 過剰NaOH・NH₃でも溶けない。水和酸化物を高校範囲ではこの式で表す。",
+      "categoryId": "cat_iron",
+      "tags": [
+        "鉄"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 46,
+      "originalName": "水酸化鉄Ⅲ",
+      "originalColor": "赤褐色",
+      "sources": [],
+      "note": "",
+      "precipitateId": "feoh3"
+    },
+    {
+      "id": "kw_chem_c37acc51f5e6",
+      "name": "酸化鉄",
+      "formula": "",
+      "color": "黒色",
+      "phase": "固体",
+      "status": "pending",
+      "condition": "",
+      "categoryId": "cat_iron",
+      "tags": [
+        "鉄"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 47,
+      "originalName": "酸化鉄",
+      "originalColor": "黒色",
+      "sources": [],
+      "note": "組成・酸化数が未特定のため出題対象外。元の表記は保存。"
+    },
+    {
+      "id": "kw_chem_e28d359e4116",
+      "name": "四酸化三鉄（固体）",
+      "formula": "Fe3O4",
+      "color": "黒色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_iron",
+      "tags": [
+        "鉄"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 48,
+      "originalName": "四酸化三鉄",
+      "originalColor": "黒色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_96a17d6e6431_v2",
+      "name": "酸化鉄(III)（固体）",
+      "formula": "Fe2O3",
+      "color": "赤褐色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_iron",
+      "tags": [
+        "鉄"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 49,
+      "originalName": "三酸化二鉄",
+      "originalColor": "赤色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_eee7c6b99170",
+      "name": "酸化亜鉛（常温）",
+      "formula": "ZnO",
+      "color": "白色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "加熱時は黄色、冷却すると白色に戻る。",
+      "categoryId": "cat_other",
+      "tags": [],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 51,
+      "originalName": "酸化亜鉛",
+      "originalColor": "白色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_e39bc94792bb_v2",
+      "name": "ヨウ化物イオン（水溶液）",
+      "formula": "I^-",
+      "color": "無色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "I⁻自体は無色。ヨウ素を含む褐色の水溶液とは区別する。",
+      "categoryId": "cat_other",
+      "tags": [],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 52,
+      "originalName": "ヨウ素イオン",
+      "originalColor": "褐色",
+      "sources": [
+        "iodine"
+      ],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_23222c1321e6",
+      "name": "二酸化窒素（気体）",
+      "formula": "NO2",
+      "color": "赤褐色",
+      "phase": "気体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_other",
+      "tags": [],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 53,
+      "originalName": "二酸化窒素",
+      "originalColor": "赤褐色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_851221101990",
+      "name": "オゾン（気体）",
+      "formula": "O3",
+      "color": "淡青色",
+      "phase": "気体",
+      "status": "active",
+      "condition": "",
+      "categoryId": "cat_other",
+      "tags": [],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 55,
+      "originalName": "オゾン",
+      "originalColor": "淡青色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_f68d31537372",
+      "name": "マンガン(II)イオン（水溶液）",
+      "formula": "Mn^2+",
+      "color": "淡桃色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "淡桃色。希薄な溶液では色が非常に薄い。",
+      "categoryId": "cat_manganese",
+      "tags": [
+        "マンガン"
+      ],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 56,
+      "originalName": "マンガンイオン",
+      "originalColor": "淡桃色",
+      "sources": [],
+      "note": ""
+    },
+    {
+      "id": "kw_chem_d57161901dce",
+      "name": "酸化マンガン",
+      "formula": "",
+      "color": "黒色",
+      "phase": "固体",
+      "status": "pending",
+      "condition": "",
+      "categoryId": "cat_other",
+      "tags": [],
+      "sourceSheet": "Sheet1",
+      "sourceRow": 57,
+      "originalName": "酸化マンガン",
+      "originalColor": "黒色",
+      "sources": [],
+      "note": "組成・酸化数が未特定のため出題対象外。元の表記は保存。"
+    },
+    {
+      "id": "kw_add_1",
+      "name": "過マンガン酸イオン（水溶液）",
+      "formula": "MnO4^-",
+      "color": "赤紫色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "Mn(II)の淡桃色との対比。酸化還元で重要。",
+      "categoryId": "cat_manganese",
+      "tags": [
+        "マンガン"
+      ],
+      "sources": [
+        "permanganate"
+      ]
+    },
+    {
+      "id": "kw_add_2",
+      "name": "硫酸銅(II)五水和物",
+      "formula": "CuSO4·5H2O",
+      "color": "青色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "結晶水と色の対応。無水物とセットで追加。",
+      "categoryId": "cat_copper",
+      "tags": [
+        "結晶水"
+      ],
+      "sources": [
+        "hydrate"
+      ]
+    },
+    {
+      "id": "kw_add_3",
+      "name": "無水硫酸銅(II)",
+      "formula": "CuSO4",
+      "color": "白色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "水の検出と水和による青色への変化。",
+      "categoryId": "cat_copper",
+      "tags": [
+        "結晶水"
+      ],
+      "sources": [
+        "hydrate"
+      ]
+    },
+    {
+      "id": "kw_add_4",
+      "name": "ヨウ化鉛(II)（沈殿）",
+      "formula": "PbI2",
+      "color": "黄色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "ヨウ化銀との比較と沈殿の代表例。 Pb²⁺とI⁻を含む水溶液を混合 AgIと同じ黄色でも、陽イオンと化学式が異なる。",
+      "categoryId": "cat_precipitate",
+      "tags": [
+        "ハロゲン化物"
+      ],
+      "sources": [
+        "lead"
+      ],
+      "precipitateId": "pbi2"
+    },
+    {
+      "id": "kw_add_5",
+      "name": "塩化鉛(II)（沈殿）",
+      "formula": "PbCl2",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "熱水への溶解でAgClと区別。 Pb²⁺とCl⁻を十分な濃度で混合 熱水に溶けやすくなる。冷却すると再び析出しうる。",
+      "categoryId": "cat_precipitate",
+      "tags": [
+        "ハロゲン化物"
+      ],
+      "sources": [
+        "separation"
+      ],
+      "precipitateId": "pbcl2"
+    },
+    {
+      "id": "kw_add_6",
+      "name": "硫酸バリウム（沈殿）",
+      "formula": "BaSO4",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "硫酸イオンの確認。 Ba²⁺とSO₄²⁻を含む水溶液を混合 希酸にも溶けにくい。硫酸イオンの検出に用いる。",
+      "categoryId": "cat_precipitate",
+      "tags": [
+        "硫酸塩・炭酸塩"
+      ],
+      "sources": [
+        "separation"
+      ],
+      "precipitateId": "baso4"
+    },
+    {
+      "id": "kw_add_7",
+      "name": "水酸化アルミニウム（沈殿）",
+      "formula": "Al(OH)3",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "過剰NaOHには溶け、過剰NH₃には溶けない。 Al³⁺に少量のNaOH水溶液 過剰NaOH：溶けて無色。過剰NH₃：溶けない。",
+      "categoryId": "cat_precipitate",
+      "tags": [
+        "水酸化物"
+      ],
+      "sources": [
+        "qa"
+      ],
+      "precipitateId": "aloh3"
+    },
+    {
+      "id": "kw_add_8",
+      "name": "水酸化亜鉛（沈殿）",
+      "formula": "Zn(OH)2",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "過剰NaOHにも過剰NH₃にも溶ける。 Zn²⁺に少量のNaOH水溶液、またはアンモニア水 過剰NaOH・過剰NH₃のどちらでも溶けて無色になる。",
+      "categoryId": "cat_precipitate",
+      "tags": [
+        "水酸化物"
+      ],
+      "sources": [
+        "qa"
+      ],
+      "precipitateId": "znoh2"
+    },
+    {
+      "id": "kw_add_9",
+      "name": "水酸化マグネシウム（沈殿）",
+      "formula": "Mg(OH)2",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "condition": "Al・Znとの再溶解性の比較。 Mg²⁺にNaOH水溶液 過剰NaOHでも溶けない。白色だけではAl・Znと区別できない。",
+      "categoryId": "cat_precipitate",
+      "tags": [
+        "水酸化物"
+      ],
+      "sources": [
+        "qa"
+      ],
+      "precipitateId": "mgoh2"
+    },
+    {
+      "id": "kw_add_10",
+      "name": "ヨウ素をヨウ化カリウム水溶液に溶かしたもの",
+      "formula": "I3^-",
+      "color": "褐色",
+      "phase": "水溶液",
+      "status": "active",
+      "condition": "無色のI⁻とは別項目。I₂ + I⁻ ⇄ I₃⁻の平衡を含む溶液。",
+      "categoryId": "cat_other",
+      "tags": [],
+      "sources": [
+        "iodine"
+      ]
+    },
+    {
+      "id": "kw_add_zno_hot",
+      "name": "酸化亜鉛（加熱時）",
+      "formula": "ZnO",
+      "color": "黄色",
+      "phase": "固体",
+      "status": "active",
+      "condition": "加熱時の色。冷却すると白色に戻る。",
+      "categoryId": "cat_other",
+      "tags": [],
+      "sources": [
+        "zinc"
+      ]
+    },
+    {
+      "id": "kw_precip_hg2cl2",
+      "name": "塩化水銀(I)（沈殿）",
+      "formula": "Hg2Cl2",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "categoryId": "cat_precipitate",
+      "tags": [
+        "ハロゲン化物"
+      ],
+      "sources": [
+        "separation"
+      ],
+      "precipitateId": "hg2cl2",
+      "condition": "Hg₂²⁺とCl⁻を含む水溶液を混合 アンモニア水で黒〜灰色に変化。「水銀(II)」と区別する。"
+    },
+    {
+      "id": "kw_precip_pbso4",
+      "name": "硫酸鉛(II)（沈殿）",
+      "formula": "PbSO4",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "categoryId": "cat_precipitate",
+      "tags": [
+        "硫酸塩・炭酸塩"
+      ],
+      "sources": [
+        "separation",
+        "solubility"
+      ],
+      "precipitateId": "pbso4",
+      "condition": "Pb²⁺とSO₄²⁻を含む水溶液を混合 難溶性の硫酸塩。K₂SO₄は通常この沈殿群に入れない。"
+    },
+    {
+      "id": "kw_precip_caco3",
+      "name": "炭酸カルシウム（沈殿）",
+      "formula": "CaCO3",
+      "color": "白色",
+      "phase": "沈殿",
+      "status": "active",
+      "categoryId": "cat_precipitate",
+      "tags": [
+        "硫酸塩・炭酸塩"
+      ],
+      "sources": [
+        "solubility",
+        "separation"
+      ],
+      "precipitateId": "caco3",
+      "condition": "Ca²⁺とCO₃²⁻を含む水溶液を混合 希酸でCO₂を発生して溶ける。炭酸塩と硫酸塩の見分けに注目。"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat_halogen",
+      "name": "ハロゲン",
+      "shortName": "ハロゲン",
+      "era": "無機化学",
+      "description": "ハロゲンの色を学習するための補助タグ。",
+      "iconName": "Flame",
+      "orderIndex": 1,
+      "isAvailable": true,
+      "groupName": "非金属元素"
+    },
+    {
+      "id": "cat_silver_halide",
+      "name": "ハロゲン化銀",
+      "shortName": "ハロゲン化銀",
+      "era": "無機化学",
+      "description": "ハロゲン化銀の色を学習するための補助タグ。",
+      "iconName": "Sparkles",
+      "orderIndex": 2,
+      "isAvailable": true,
+      "groupName": "非金属元素"
+    },
+    {
+      "id": "cat_flame",
+      "name": "炎色反応",
+      "shortName": "炎色反応",
+      "era": "無機化学",
+      "description": "炎色反応の色を学習するための補助タグ。",
+      "iconName": "FlameKindling",
+      "orderIndex": 3,
+      "isAvailable": true,
+      "groupName": "主要金属元素"
+    },
+    {
+      "id": "cat_chromate",
+      "name": "クロム酸塩",
+      "shortName": "クロム酸塩",
+      "era": "無機化学",
+      "description": "クロム酸塩の色を学習するための補助タグ。",
+      "iconName": "Beaker",
+      "orderIndex": 4,
+      "isAvailable": false,
+      "groupName": "遷移金属元素"
+    },
+    {
+      "id": "cat_sulfide",
+      "name": "硫化物沈殿",
+      "shortName": "硫化物沈殿",
+      "era": "無機化学",
+      "description": "硫化物沈殿の色を学習するための補助タグ。",
+      "iconName": "Biohazard",
+      "orderIndex": 5,
+      "isAvailable": false,
+      "groupName": "沈殿反応"
+    },
+    {
+      "id": "cat_copper",
+      "name": "銅の化合物",
+      "shortName": "銅の化合物",
+      "era": "無機化学",
+      "description": "銅の化合物の色を学習するための補助タグ。",
+      "iconName": "Coins",
+      "orderIndex": 6,
+      "isAvailable": false,
+      "groupName": "遷移金属元素"
+    },
+    {
+      "id": "cat_iron",
+      "name": "鉄",
+      "shortName": "鉄",
+      "era": "無機化学",
+      "description": "鉄の色",
+      "iconName": "Beaker",
+      "orderIndex": 7,
+      "isAvailable": false,
+      "groupName": "遷移金属元素"
+    },
+    {
+      "id": "cat_manganese",
+      "name": "マンガン",
+      "shortName": "マンガン",
+      "era": "無機化学",
+      "description": "マンガンの色",
+      "iconName": "Beaker",
+      "orderIndex": 8,
+      "isAvailable": false,
+      "groupName": "遷移金属元素"
+    },
+    {
+      "id": "cat_other",
+      "name": "その他",
+      "shortName": "その他",
+      "era": "無機化学",
+      "description": "分類の指定がなくても物質と色を学習できます。",
+      "iconName": "Beaker",
+      "orderIndex": 9,
+      "isAvailable": false,
+      "groupName": "基礎・その他"
+    },
+    {
+      "id": "cat_precipitate",
+      "name": "沈殿",
+      "shortName": "沈殿",
+      "era": "無機化学",
+      "description": "生成条件・色・再溶解をまとめて学習。",
+      "iconName": "Beaker",
+      "orderIndex": 10,
+      "isAvailable": false,
+      "groupName": "沈殿反応"
+    }
+  ],
+  "sources": {
+    "chromate": {
+      "title": "Washington大学：クロム酸・二クロム酸平衡",
+      "url": "https://chem.washington.edu/lecture-demos/chromate-dichromate-equilibrium"
+    },
+    "iodine": {
+      "title": "AgroParisTech：ヨウ素とヨウ化物",
+      "url": "https://chimactiv.agroparistech.fr/en/bases/titrage/savoir-plus/2"
+    },
+    "qa": {
+      "title": "Cambridge：定性分析表（pp.10–11）",
+      "url": "https://www.cambridgeinternational.org/images/164948-2016-specimen-paper-3.pdf"
+    },
+    "separation": {
+      "title": "Truman州立大学：イオンの定性分析",
+      "url": "https://chemlab.truman.edu/chemical-principles/inorganic-quantitative-analysis/"
+    },
+    "solubility": {
+      "title": "Oklahoma州立大学：溶解性の規則",
+      "url": "https://intro.chem.okstate.edu/ChemSource/Solubility/page%2014.htm"
+    },
+    "sulfide": {
+      "title": "有明高専紀要：硫化物沈殿と液性",
+      "url": "https://www.ariake-nct.ac.jp/wp3/wp-content/uploads/2021/08/kiyo-No.15.pdf"
+    },
+    "silver": {
+      "title": "RSC：ハロゲン化物の溶解性",
+      "url": "https://edu.rsc.org/experiments/solubility-trends-of-metal-halides/1888.article"
+    },
+    "agf": {
+      "title": "RSC：AgFとAgClの溶解性の違い",
+      "url": "https://edu.rsc.org/download?ac=136657"
+    },
+    "zinc": {
+      "title": "RSC：酸化亜鉛の加熱・冷却",
+      "url": "https://edu.rsc.org/experiments/reacting-zinc-and-copperii-oxide/723.article"
+    },
+    "chromium": {
+      "title": "Purdue大学：クロムの化学",
+      "url": "https://chemed.chem.purdue.edu/demos/demosheets/12.6.html"
+    },
+    "flame": {
+      "title": "東洋大学：炎色反応の教材研究",
+      "url": "https://toyo.repo.nii.ac.jp/record/13555/files/kogyogijutsu44_028-032.pdf"
+    },
+    "iron": {
+      "title": "Cole-Parmer：酸化鉄(III)のSDS",
+      "url": "https://pim-resources.coleparmer.com/sds/11521.pdf"
+    },
+    "ionColors": {
+      "title": "啓林館：金属イオンの溶液と沈殿（授業実践）",
+      "url": "https://org.shinko-keirin.co.jp/keirinkan/kou/science/kagaku-jissen_arch/201912/"
+    },
+    "cadmium": {
+      "title": "Sigma-Aldrich：硫化カドミウム",
+      "url": "https://www.sigmaaldrich.com/JP/ja/product/aldrich/217921"
+    },
+    "hydrate": {
+      "title": "UC San Diego：硫酸銅の脱水と水和",
+      "url": "https://biochemistry.ucsd.edu/undergraduate/teaching-labs/demos/demo51.html"
+    },
+    "lead": {
+      "title": "Washington大学：ヨウ化鉛の黄色沈殿",
+      "url": "https://chem.washington.edu/lecture-demos/lead-iodide-precipitate"
+    },
+    "permanganate": {
+      "title": "Wellesley大学：ハロゲンの実験",
+      "url": "https://sites.google.com/wellesley.edu/chemistry-105-lab-manual/labs/05-periodic-properties-of-the-halogens"
+    }
+  },
+  "reviewItems": [
+    {
+      "rows": "26",
+      "name": "二クロム酸イオン",
+      "formula": "Cr2O7^2-",
+      "original": "赤褐",
+      "proposed": "橙色（水溶液）",
+      "kind": "修正推奨",
+      "reason": "黄色のクロム酸イオンとの平衡で区別する。赤褐色の沈殿とは別に覚える。",
+      "sources": [
+        "chromate"
+      ],
+      "resolution": "橙色に訂正し演習へ反映。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "52",
+      "name": "ヨウ素イオン",
+      "original": "褐",
+      "proposed": "ヨウ化物イオン I⁻なら無色。褐色を残すなら「ヨウ素を含む水溶液」などに名称変更。",
+      "kind": "修正推奨",
+      "reason": "ヨウ化物イオンと、ヨウ素・三ヨウ化物イオンを含む褐色の溶液を混同しない。元の意図を確認する。",
+      "sources": [
+        "iodine"
+      ],
+      "resolution": "I⁻としてヨウ化物イオン・無色へ訂正。褐色のヨウ素溶液は別項目を追加。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "19 / 21",
+      "name": "K / Ca の炎色反応",
+      "original": "紫 / 橙",
+      "proposed": "K：赤紫色（紫色）、Ca：橙赤色",
+      "kind": "表記統一",
+      "reason": "誤答と断定するより、高校の標準的な色名に揃える。紫／赤紫などを別々の正解候補にしない。",
+      "sources": [
+        "flame"
+      ],
+      "resolution": "Kは赤紫色、Caは橙赤色へ統一。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "49",
+      "name": "三酸化二鉄（酸化鉄(III)）",
+      "formula": "Fe2O3",
+      "original": "赤",
+      "proposed": "赤褐色（固体・粉末の代表色）",
+      "kind": "表記統一",
+      "reason": "赤色とも表すが、受験用の代表表記は赤褐色に揃える案。結晶形・粒径で見え方が異なる。",
+      "sources": [
+        "iron"
+      ],
+      "resolution": "酸化鉄(III)・赤褐色へ統一。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "13",
+      "name": "フッ化銀",
+      "formula": "AgF",
+      "original": "無",
+      "proposed": "「沈殿しない」を主情報にし、固体色と溶液色を区別",
+      "kind": "条件追記",
+      "reason": "水に溶けるハロゲン化銀の例外。「無色の沈殿」として出題してはいけない。状態不明のまま無色の物質に固定しない。",
+      "sources": [
+        "agf"
+      ],
+      "resolution": "沈殿しない参考項目へ移動。色問題から除外。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "12",
+      "name": "ヨウ素",
+      "formula": "I2",
+      "original": "黒紫",
+      "proposed": "黒紫色（固体）と明記。溶液は別項目。",
+      "kind": "条件追記",
+      "reason": "水溶液の褐色と混同しないよう、物質の状態を名前に入れる。",
+      "sources": [
+        "iodine"
+      ],
+      "resolution": "固体と明記。溶液は別項目。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "28",
+      "name": "クロム(III)イオン",
+      "formula": "Cr^3+",
+      "original": "暗緑",
+      "proposed": "緑色系の水溶液という条件を明記。アクア錯イオンは紫色。",
+      "kind": "条件追記",
+      "reason": "配位子によって色が変わるため、Cr³⁺を一律に暗緑色と決めない。",
+      "sources": [
+        "chromium"
+      ],
+      "resolution": "緑色系の水溶液と条件を明記。配位子による色の違いを注記。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "41 / 45 / 46",
+      "name": "銅(II)・鉄(II)・鉄(III)の水酸化物",
+      "original": "青白 / 緑白 / 赤褐",
+      "proposed": "基本は維持。銅は淡青色も同義扱い、鉄(II)には空気酸化の注記。",
+      "kind": "条件追記",
+      "reason": "Fe(OH)₂は空気中で褐色系に変化する。作りたての沈殿と放置後を区別する。",
+      "sources": [
+        "qa"
+      ],
+      "resolution": "Cu(OH)₂は淡青色に統一（青白色も同義）。Fe(OH)₂に生成直後・空気酸化の注記。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "44",
+      "name": "鉄(III)イオン",
+      "formula": "Fe^3+",
+      "original": "黄褐",
+      "proposed": "通常の水溶液の色として維持。液性・濃度の影響を注記。",
+      "kind": "条件追記",
+      "reason": "水溶液の呈色と赤褐色の水酸化物沈殿を分ける。",
+      "sources": [
+        "ionColors"
+      ],
+      "resolution": "通常の水溶液と条件を明記。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "47 / 57",
+      "name": "酸化鉄 / 酸化マンガン",
+      "original": "黒 / 黒",
+      "proposed": "酸化鉄(II) FeO、二酸化マンガン MnO₂を意図しているか確認。",
+      "kind": "要確認",
+      "reason": "元素名だけでは酸化数や組成を特定できない。「酸化鉄」は既存のFe₃O₄との重複の可能性もある。",
+      "sources": [
+        "iron",
+        "permanganate"
+      ],
+      "resolution": "特定できない2項目は保留・出題対象外。",
+      "status": "一部保留"
+    },
+    {
+      "rows": "51",
+      "name": "酸化亜鉛",
+      "formula": "ZnO",
+      "original": "白",
+      "proposed": "白色（常温）／黄色（加熱時）",
+      "kind": "条件追記",
+      "reason": "温度で可逆的に色が変わるため、別条件として覚える。",
+      "sources": [
+        "zinc"
+      ],
+      "resolution": "常温の白色と加熱時の黄色を別項目として反映。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "33 / 34 / 40 / 41 / 42 / 56",
+      "name": "物質名・酸化数の表記",
+      "original": "硫化スズ・硫化カドニウム・銅イオン・水酸化銅・テトラアンミン銅Ⅱイオン・マンガンイオン",
+      "proposed": "硫化スズ(II)、硫化カドミウム、銅(II)イオン、水酸化銅(II)、テトラアンミン銅(II)イオン。淡桃色のMnはマンガン(II)イオンと明記。",
+      "kind": "表記統一",
+      "reason": "Cdの和名はカドミウム。SnSとSnS₂、Cu⁺とCu²⁺の混同を避ける。マンガンは酸化数を確認してから式を補う。",
+      "sources": [
+        "qa",
+        "cadmium"
+      ],
+      "resolution": "名称・酸化数を整理し、式を上下付きで表示。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "69",
+      "name": "塩化物沈殿の「塩素」",
+      "original": "Cl沈殿：銀・鉛・塩素",
+      "proposed": "塩素は対象金属ではない。水銀(I)の誤記か確認。",
+      "kind": "要確認",
+      "reason": "代表的な塩化物沈殿はAgCl、PbCl₂、Hg₂Cl₂。「銀杏汁」の意図も合わせて確認。",
+      "sources": [
+        "separation"
+      ],
+      "resolution": "「塩素」は沈殿項目に採用せず保留。確認済みのHg₂Cl₂は独立した参考例として収録。",
+      "status": "一部保留"
+    },
+    {
+      "rows": "70–74 / 94",
+      "name": "硫化物の分類",
+      "original": "Sn〜 / 非酸性S：Al・Sn・Fe・Ni",
+      "proposed": "「Sn〜」は展開せず確認。Alを硫化物の暗記群から分け、Zn・Mnなどを追加検討。",
+      "kind": "要確認",
+      "reason": "液性と酸化数が必要。Alは水溶液の系統分析では水酸化物として扱う。SnとZnを取り違えていないか確認する。",
+      "sources": [
+        "separation",
+        "sulfide"
+      ],
+      "resolution": "範囲・略記は保留。Alの水酸化物、Znの水酸化物を確定データとして収録。",
+      "status": "一部保留"
+    },
+    {
+      "rows": "75–79",
+      "name": "硫酸塩・炭酸塩",
+      "original": "SO4 / SO5 / SO6、CO3 / CO4。カリウムが沈殿欄にある。",
+      "proposed": "硫酸イオンSO₄²⁻／炭酸イオンCO₃²⁻へ統一する案。KはCaの誤記か確認。",
+      "kind": "修正推奨",
+      "reason": "通常の溶解性の規則ではK塩は水溶性。CaSO₄は難溶で濃度に注意し、BaSO₄などと完全に同一扱いしない。",
+      "sources": [
+        "solubility"
+      ],
+      "resolution": "SO₄²⁻／CO₃²⁻で正規化。確認済みのBaSO₄・PbSO₄・CaCO₃を収録し、Kの誤記は転記しない。",
+      "status": "反映済み"
+    },
+    {
+      "rows": "80 / 87–90",
+      "name": "水酸化物と過剰OH⁻",
+      "original": "Mg〜Cu / Zn・Al・Sn・Pb",
+      "proposed": "範囲記号ではなくイオンと沈殿式を個別に記載。過剰NaOHと過剰NH₃を別列に。",
+      "kind": "条件追記",
+      "reason": "「沈殿を作る」と「過剰試薬で再溶解する」は別の性質。Snは酸化数も必要。",
+      "sources": [
+        "qa",
+        "separation"
+      ],
+      "resolution": "水酸化物を個別化し、過剰NaOH／NH₃の挙動を明記。Snの酸化数未特定部分は保留。",
+      "status": "一部保留"
+    }
+  ],
+  "additions": [
+    {
+      "name": "過マンガン酸イオン（水溶液）",
+      "formula": "MnO4^-",
+      "color": "赤紫色（紫色）",
+      "reason": "Mn(II)の淡桃色との対比。酸化還元で重要。",
+      "sources": [
+        "permanganate"
+      ]
+    },
+    {
+      "name": "硫酸銅(II)五水和物",
+      "formula": "CuSO4·5H2O",
+      "color": "青色",
+      "reason": "結晶水と色の対応。無水物とセットで追加。",
+      "sources": [
+        "hydrate"
+      ]
+    },
+    {
+      "name": "無水硫酸銅(II)",
+      "formula": "CuSO4",
+      "color": "白色",
+      "reason": "水の検出と水和による青色への変化。",
+      "sources": [
+        "hydrate"
+      ]
+    },
+    {
+      "name": "ヨウ化鉛(II)",
+      "formula": "PbI2",
+      "color": "黄色の沈殿",
+      "reason": "ヨウ化銀との比較と沈殿の代表例。",
+      "sources": [
+        "lead"
+      ]
+    },
+    {
+      "name": "塩化鉛(II)",
+      "formula": "PbCl2",
+      "color": "白色の沈殿",
+      "reason": "熱水への溶解でAgClと区別。",
+      "sources": [
+        "separation"
+      ]
+    },
+    {
+      "name": "硫酸バリウム",
+      "formula": "BaSO4",
+      "color": "白色の沈殿",
+      "reason": "硫酸イオンの確認。",
+      "sources": [
+        "separation"
+      ]
+    },
+    {
+      "name": "水酸化アルミニウム",
+      "formula": "Al(OH)3",
+      "color": "白色の沈殿",
+      "reason": "過剰NaOHには溶け、過剰NH₃には溶けない。",
+      "sources": [
+        "qa"
+      ]
+    },
+    {
+      "name": "水酸化亜鉛",
+      "formula": "Zn(OH)2",
+      "color": "白色の沈殿",
+      "reason": "過剰NaOHにも過剰NH₃にも溶ける。",
+      "sources": [
+        "qa"
+      ]
+    },
+    {
+      "name": "水酸化マグネシウム",
+      "formula": "Mg(OH)2",
+      "color": "白色の沈殿",
+      "reason": "Al・Znとの再溶解性の比較。",
+      "sources": [
+        "qa"
+      ]
+    },
+    {
+      "name": "ヨウ素をヨウ化カリウム水溶液に溶かしたもの",
+      "formula": "I3^-",
+      "color": "褐色（濃度に依存）",
+      "reason": "無色のI⁻とは別項目。I₂ + I⁻ ⇄ I₃⁻の平衡を含む溶液。",
+      "sources": [
+        "iodine"
+      ]
+    }
+  ],
+  "precipitates": [
+    {
+      "id": "agcl",
+      "name": "塩化銀",
+      "formula": "AgCl",
+      "color": "白色",
+      "group": "ハロゲン化物",
+      "condition": "Ag⁺とCl⁻を含む水溶液を混合",
+      "equation": "Ag^+ + Cl^- → AgCl↓",
+      "after": "希アンモニア水で溶け、無色の銀アンミン錯イオンになる。",
+      "sources": [
+        "separation"
+      ],
+      "keywordId": "kw_chem_5"
+    },
+    {
+      "id": "agbr",
+      "name": "臭化銀",
+      "formula": "AgBr",
+      "color": "淡黄色",
+      "group": "ハロゲン化物",
+      "condition": "Ag⁺とBr⁻を含む水溶液を混合",
+      "equation": "Ag^+ + Br^- → AgBr↓",
+      "after": "希アンモニア水には溶けにくく、濃アンモニア水には溶ける。",
+      "sources": [
+        "silver"
+      ],
+      "keywordId": "kw_chem_6"
+    },
+    {
+      "id": "agi",
+      "name": "ヨウ化銀",
+      "formula": "AgI",
+      "color": "黄色",
+      "group": "ハロゲン化物",
+      "condition": "Ag⁺とI⁻を含む水溶液を混合",
+      "equation": "Ag^+ + I^- → AgI↓",
+      "after": "通常のアンモニア水に溶けない。AgFは水溶性で、この沈殿群に含めない。",
+      "sources": [
+        "silver",
+        "agf"
+      ],
+      "keywordId": "kw_chem_7"
+    },
+    {
+      "id": "pbcl2",
+      "name": "塩化鉛(II)",
+      "formula": "PbCl2",
+      "color": "白色",
+      "group": "ハロゲン化物",
+      "condition": "Pb²⁺とCl⁻を十分な濃度で混合",
+      "equation": "Pb^2+ + 2Cl^- → PbCl2↓",
+      "after": "熱水に溶けやすくなる。冷却すると再び析出しうる。",
+      "sources": [
+        "separation"
+      ],
+      "keywordId": "kw_add_5"
+    },
+    {
+      "id": "hg2cl2",
+      "name": "塩化水銀(I)",
+      "formula": "Hg2Cl2",
+      "color": "白色",
+      "group": "ハロゲン化物",
+      "condition": "Hg₂²⁺とCl⁻を含む水溶液を混合",
+      "equation": "Hg2^2+ + 2Cl^- → Hg2Cl2↓",
+      "after": "アンモニア水で黒〜灰色に変化。「水銀(II)」と区別する。",
+      "sources": [
+        "separation"
+      ],
+      "keywordId": "kw_precip_hg2cl2"
+    },
+    {
+      "id": "pbi2",
+      "name": "ヨウ化鉛(II)",
+      "formula": "PbI2",
+      "color": "黄色",
+      "group": "ハロゲン化物",
+      "condition": "Pb²⁺とI⁻を含む水溶液を混合",
+      "equation": "Pb^2+ + 2I^- → PbI2↓",
+      "after": "AgIと同じ黄色でも、陽イオンと化学式が異なる。",
+      "sources": [
+        "lead"
+      ],
+      "keywordId": "kw_add_4"
+    },
+    {
+      "id": "baso4",
+      "name": "硫酸バリウム",
+      "formula": "BaSO4",
+      "color": "白色",
+      "group": "硫酸塩・炭酸塩",
+      "condition": "Ba²⁺とSO₄²⁻を含む水溶液を混合",
+      "equation": "Ba^2+ + SO4^2- → BaSO4↓",
+      "after": "希酸にも溶けにくい。硫酸イオンの検出に用いる。",
+      "sources": [
+        "separation"
+      ],
+      "keywordId": "kw_add_6"
+    },
+    {
+      "id": "pbso4",
+      "name": "硫酸鉛(II)",
+      "formula": "PbSO4",
+      "color": "白色",
+      "group": "硫酸塩・炭酸塩",
+      "condition": "Pb²⁺とSO₄²⁻を含む水溶液を混合",
+      "equation": "Pb^2+ + SO4^2- → PbSO4↓",
+      "after": "難溶性の硫酸塩。K₂SO₄は通常この沈殿群に入れない。",
+      "sources": [
+        "separation",
+        "solubility"
+      ],
+      "keywordId": "kw_precip_pbso4"
+    },
+    {
+      "id": "caco3",
+      "name": "炭酸カルシウム",
+      "formula": "CaCO3",
+      "color": "白色",
+      "group": "硫酸塩・炭酸塩",
+      "condition": "Ca²⁺とCO₃²⁻を含む水溶液を混合",
+      "equation": "Ca^2+ + CO3^2- → CaCO3↓",
+      "after": "希酸でCO₂を発生して溶ける。炭酸塩と硫酸塩の見分けに注目。",
+      "sources": [
+        "solubility",
+        "separation"
+      ],
+      "keywordId": "kw_precip_caco3"
+    },
+    {
+      "id": "cuoh2",
+      "name": "水酸化銅(II)",
+      "formula": "Cu(OH)2",
+      "color": "青白色（淡青色）",
+      "group": "水酸化物",
+      "condition": "Cu²⁺に少量のNaOH水溶液、またはアンモニア水",
+      "equation": "Cu^2+ + 2OH^- → Cu(OH)2↓",
+      "after": "過剰NaOH：溶けない。過剰NH₃：溶けて深青色の錯イオンになる。",
+      "sources": [
+        "qa"
+      ],
+      "keywordId": "kw_chem_27_v2"
+    },
+    {
+      "id": "feoh2",
+      "name": "水酸化鉄(II)",
+      "formula": "Fe(OH)2",
+      "color": "緑白色（淡緑色）",
+      "group": "水酸化物",
+      "condition": "Fe²⁺にNaOH水溶液を加える（生成直後）",
+      "equation": "Fe^2+ + 2OH^- → Fe(OH)2↓",
+      "after": "過剰NaOH・NH₃では溶けない。空気酸化で褐色系に変化する。",
+      "sources": [
+        "qa"
+      ],
+      "keywordId": "kw_chem_4c203f3ba313"
+    },
+    {
+      "id": "feoh3",
+      "name": "水酸化鉄(III)",
+      "formula": "Fe(OH)3",
+      "color": "赤褐色",
+      "group": "水酸化物",
+      "condition": "Fe³⁺にNaOH水溶液、またはアンモニア水",
+      "equation": "Fe^3+ + 3OH^- → Fe(OH)3↓",
+      "after": "過剰NaOH・NH₃でも溶けない。水和酸化物を高校範囲ではこの式で表す。",
+      "sources": [
+        "qa"
+      ],
+      "keywordId": "kw_chem_e68fba4b9eea"
+    },
+    {
+      "id": "aloh3",
+      "name": "水酸化アルミニウム",
+      "formula": "Al(OH)3",
+      "color": "白色",
+      "group": "水酸化物",
+      "condition": "Al³⁺に少量のNaOH水溶液",
+      "equation": "Al^3+ + 3OH^- → Al(OH)3↓",
+      "after": "過剰NaOH：溶けて無色。過剰NH₃：溶けない。",
+      "sources": [
+        "qa"
+      ],
+      "keywordId": "kw_add_7"
+    },
+    {
+      "id": "znoh2",
+      "name": "水酸化亜鉛",
+      "formula": "Zn(OH)2",
+      "color": "白色",
+      "group": "水酸化物",
+      "condition": "Zn²⁺に少量のNaOH水溶液、またはアンモニア水",
+      "equation": "Zn^2+ + 2OH^- → Zn(OH)2↓",
+      "after": "過剰NaOH・過剰NH₃のどちらでも溶けて無色になる。",
+      "sources": [
+        "qa"
+      ],
+      "keywordId": "kw_add_8"
+    },
+    {
+      "id": "mgoh2",
+      "name": "水酸化マグネシウム",
+      "formula": "Mg(OH)2",
+      "color": "白色",
+      "group": "水酸化物",
+      "condition": "Mg²⁺にNaOH水溶液",
+      "equation": "Mg^2+ + 2OH^- → Mg(OH)2↓",
+      "after": "過剰NaOHでも溶けない。白色だけではAl・Znと区別できない。",
+      "sources": [
+        "qa"
+      ],
+      "keywordId": "kw_add_9"
+    }
+  ]
+}

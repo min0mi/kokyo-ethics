@@ -6,22 +6,11 @@ import {
   MatchingPair,
   QuizSessionConfig,
 } from '@/types';
-import { FIGURES } from '@/data/figures';
-import { KEYWORDS } from '@/data/keywords';
-import { CATEGORIES } from '@/data/categories';
+import { FIGURES } from '@/data/chemistry/figures';
+import { KEYWORDS } from '@/data/chemistry/keywords';
+import { CATEGORIES } from '@/data/chemistry/categories';
 
-export const AVAILABLE_CATEGORY_IDS: CategoryId[] = [
-  'greek',
-  'hebrew_christian',
-  'islam',
-  'indian_buddhism',
-  'chinese_philosophy',
-  'japan_ancient_kamakura',
-  'japan_muromachi_modern',
-  'western_modern',
-  'western_contemporary',
-  'adolescence_public',
-];
+export const AVAILABLE_CATEGORY_IDS: CategoryId[] = CATEGORIES.filter((cat) => cat.isAvailable).map((cat) => cat.id);
 
 function getCategoryGroup(catId: CategoryId): string {
   const cat = CATEGORIES.find((c) => c.id === catId);
@@ -113,11 +102,13 @@ export class QuestionGenerator {
         categoryId: kw.categoryId,
         figureId: figure.id,
         keywordId: kw.id,
-        prompt: `「${figure.name}」に対応する語句はどれか？`,
-        context: `${figure.eraDetail} / ${figure.mainConcept}`,
+        prompt: kw.categoryId === 'cat_flame'
+          ? `「${figure.name}」の炎色反応を示す元素はどれか？`
+          : `「${figure.name}」を示す物質はどれか？`,
+        context: kw.categoryId === 'cat_flame' ? `炎色反応：${figure.name}` : `色：${figure.name}`,
         options,
         correctAnswer,
-        explanation: `【正解】「${kw.name}」 ⇄ ${figure.name}\n${kw.definition}`,
+        explanation: `【正解】「${kw.name}」は${figure.name}を呈します。\n${kw.definition}`,
       };
 
       if (isValidQuestion(q)) questions.push(q);
@@ -161,7 +152,15 @@ export class QuestionGenerator {
         (f) => getCategoryGroup(f.categoryId) !== currentGroup && f.id !== figure.id
       ).map((f) => f.name);
 
+      const flameReactionColors = kw.categoryId === 'cat_flame'
+        ? targetKeywords
+            .filter((candidate) => candidate.id !== kw.id)
+            .map((candidate) => FIGURES.find((f) => f.id === candidate.figureId)?.name)
+            .filter((name): name is string => !!name)
+        : [];
+
       const rawPool = [
+        ...shuffle(flameReactionColors),
         ...shuffle(contrastFigNames),
         ...shuffle(sameCatFigs),
         ...shuffle(sameGroupFigs),
@@ -181,11 +180,13 @@ export class QuestionGenerator {
         categoryId: kw.categoryId,
         figureId: figure.id,
         keywordId: kw.id,
-        prompt: `「${kw.name}」に対応する人物は誰か？`,
-        context: kw.definition,
+        prompt: kw.categoryId === 'cat_flame'
+          ? `「${kw.name}」の炎色反応の色はどれか？`
+          : `物質「${kw.name}」の色はどれか？`,
+        context: kw.categoryId === 'cat_flame' ? `炎色反応：${kw.name}` : `物質：${kw.name}`,
         options,
         correctAnswer,
-        explanation: `【正解】${figure.name} ⇄ 「${kw.name}」\n${figure.mainConcept}`,
+        explanation: `【正解】「${kw.name}」の色は「${figure.name}」です。\n${figure.mainConcept}なども同じグループです。`,
       };
 
       if (isValidQuestion(q)) questions.push(q);
@@ -197,14 +198,12 @@ export class QuestionGenerator {
   static generateOddOneOut(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
     const targetFigures = FIGURES.filter((f) => {
-      if (categoryId && f.categoryId !== categoryId) return false;
-      if (!AVAILABLE_CATEGORY_IDS.includes(f.categoryId)) return false;
-      const kws = KEYWORDS.filter((k) => k.figureId === f.id && k.name.trim() !== '');
+      const kws = KEYWORDS.filter((k) => k.figureId === f.id && (!categoryId || k.categoryId === categoryId) && k.name.trim() !== '');
       return kws.length >= 3;
     });
 
     targetFigures.forEach((figure) => {
-      const myKeywords = KEYWORDS.filter((k) => k.figureId === figure.id && k.name.trim() !== '');
+      const myKeywords = KEYWORDS.filter((k) => k.figureId === figure.id && (!categoryId || k.categoryId === categoryId) && k.name.trim() !== '');
       if (myKeywords.length < 3) return;
 
       const ownKwNames = shuffle(myKeywords).slice(0, 3).map((k) => k.name);
@@ -227,17 +226,17 @@ export class QuestionGenerator {
       }
 
       candidateFigures = candidateFigures.filter((f) =>
-        KEYWORDS.some((k) => k.figureId === f.id && k.name.trim() !== '')
+        KEYWORDS.some((k) => k.figureId === f.id && (!categoryId || k.categoryId === categoryId) && k.name.trim() !== '')
       );
 
       if (candidateFigures.length === 0) return;
 
-      const randomOtherFig = shuffle(candidateFigures)[0];
-      const otherKws = KEYWORDS.filter((k) => k.figureId === randomOtherFig.id && k.name.trim() !== '');
+      const randomOtherFig = [...candidateFigures].sort((a, b) => a.id.localeCompare(b.id))[0];
+      const otherKws = KEYWORDS.filter((k) => k.figureId === randomOtherFig.id && (!categoryId || k.categoryId === categoryId) && k.name.trim() !== '');
       if (otherKws.length === 0) return;
 
       const myKwNamesAll = myKeywords.map((k) => k.name);
-      const validOddKws = shuffle(otherKws).filter((k) => !myKwNamesAll.includes(k.name));
+      const validOddKws = [...otherKws].sort((a, b) => a.id.localeCompare(b.id)).filter((k) => !myKwNamesAll.includes(k.name));
       if (validOddKws.length === 0) return;
 
       const oddKeyword = validOddKws[0];
@@ -248,16 +247,16 @@ export class QuestionGenerator {
       const options = shuffle([...ownKwNames, correctAnswer]);
 
       const q: ChoiceQuestion = {
-        id: `q_odd_${figure.id}_${oddKeyword.id}`,
+        id: `q_odd_${figure.id}_${[...myKeywords.map((k) => k.id), oddKeyword.id].sort().join('_')}`,
         type: 'odd_one_out',
-        categoryId: figure.categoryId,
+        categoryId: categoryId || oddKeyword.categoryId,
         figureId: figure.id,
         keywordId: oddKeyword.id,
-        prompt: `「${figure.name}」に対応【しない】語句はどれか？`,
-        context: `${figure.eraDetail} / ${figure.mainConcept}`,
+        prompt: `「${figure.name}」を呈する物質として【誤っているもの（当てはまらないもの）】はどれか？`,
+        context: `色：${figure.name}`,
         options,
         correctAnswer,
-        explanation: `【正解】「${oddKeyword.name}」は【${randomOtherFig.name}】に対応します。\n※ ${figure.name}の対応語句: ${myKeywords.map((k) => k.name).join('、')}`,
+        explanation: `【正解】「${oddKeyword.name}」は【${randomOtherFig.name}】を呈します。\n※ ${figure.name}の物質: ${myKeywords.map((k) => k.name).join('、')}`,
       };
 
       if (isValidQuestion(q)) questions.push(q);
@@ -269,18 +268,16 @@ export class QuestionGenerator {
   static generatePairValidation(categoryId?: CategoryId): ChoiceQuestion[] {
     const questions: ChoiceQuestion[] = [];
     const targetFigures = FIGURES.filter((f) => {
-      if (categoryId && f.categoryId !== categoryId) return false;
-      if (!AVAILABLE_CATEGORY_IDS.includes(f.categoryId)) return false;
-      const kws = KEYWORDS.filter((k) => k.figureId === f.id && k.name.trim() !== '');
+      const kws = KEYWORDS.filter((k) => k.figureId === f.id && (!categoryId || k.categoryId === categoryId) && k.name.trim() !== '');
       return kws.length > 0;
     });
 
     if (targetFigures.length < 4) return [];
 
     targetFigures.forEach((correctFig) => {
-      const correctKws = KEYWORDS.filter((k) => k.figureId === correctFig.id && k.name.trim() !== '');
+      const correctKws = KEYWORDS.filter((k) => k.figureId === correctFig.id && (!categoryId || k.categoryId === categoryId) && k.name.trim() !== '');
       if (correctKws.length === 0) return;
-      const correctKw = shuffle(correctKws)[0];
+      const correctKw = [...correctKws].sort((a, b) => a.id.localeCompare(b.id))[0];
 
       const correctPair = `${correctFig.name} ── ${correctKw.name}`;
 
@@ -311,7 +308,7 @@ export class QuestionGenerator {
         let donorFig = null;
 
         for (const donor of donorFigures) {
-          const donorKws = KEYWORDS.filter((k) => k.figureId === donor.id && k.name.trim() !== '');
+          const donorKws = KEYWORDS.filter((k) => k.figureId === donor.id && (!categoryId || k.categoryId === categoryId) && k.name.trim() !== '');
           const validKws = donorKws.filter((k) => !figRealKwNames.includes(k.name));
           if (validKws.length > 0) {
             const picked = shuffle(validKws)[0];
@@ -338,11 +335,11 @@ export class QuestionGenerator {
       const q: ChoiceQuestion = {
         id: `q_pair_${correctFig.id}_${correctKw.id}`,
         type: 'pair_validation',
-        categoryId: correctFig.categoryId,
+        categoryId: correctKw.categoryId,
         figureId: correctFig.id,
         keywordId: correctKw.id,
-        prompt: `人物と語句の組み合わせとして【正しいもの】はどれか？`,
-        context: `${correctFig.name} 関連`,
+        prompt: `物質とその呈する色の組み合わせとして【正しいもの】はどれか？`,
+        context: `物質と色の関係`,
         options,
         correctAnswer: correctPair,
         explanation: `【正解】${correctPair}\n\n[誤りの組み合わせ]\n${wrongNotes.join('\n')}`,
@@ -360,12 +357,11 @@ export class QuestionGenerator {
 
     targetCategories.forEach((catId) => {
       const figuresInCat = FIGURES.filter(
-        (f) => f.categoryId === catId &&
-          KEYWORDS.some((k) => k.figureId === f.id && k.name.trim() !== '')
+        (f) => KEYWORDS.some((k) => k.categoryId === catId && k.figureId === f.id && k.name.trim() !== '')
       );
       if (figuresInCat.length < 3) return;
 
-      const shuffledFigs = shuffle(figuresInCat);
+      const shuffledFigs = [...figuresInCat].sort((a, b) => a.id.localeCompare(b.id));
       for (let i = 0; i <= shuffledFigs.length - 3; i += 3) {
         const group = shuffledFigs.slice(i, i + 3);
         const pairs: MatchingPair[] = [];
@@ -374,10 +370,10 @@ export class QuestionGenerator {
         const usedKeywordNames = new Set<string>();
 
         group.forEach((fig) => {
-          const kws = KEYWORDS.filter((k) => k.figureId === fig.id && k.name.trim() !== '');
+          const kws = KEYWORDS.filter((k) => k.categoryId === catId && k.figureId === fig.id && k.name.trim() !== '');
           if (kws.length === 0) { valid = false; return; }
 
-          const availableKws = shuffle(kws).filter((k) => !usedKeywordNames.has(k.name));
+          const availableKws = [...kws].sort((a, b) => a.id.localeCompare(b.id)).filter((k) => !usedKeywordNames.has(k.name));
           if (availableKws.length === 0) { valid = false; return; }
 
           const chosenKw = availableKws[0];
@@ -395,10 +391,10 @@ export class QuestionGenerator {
           pairs.every((p) => p.left.trim() !== '' && p.right.trim() !== '')
         ) {
           questions.push({
-            id: `q_match_${catId}_${i}`,
+            id: `q_match_${catId}_${pairs.map((pair) => pair.id).sort().join('_')}`,
             type: 'matching_lines',
             categoryId: catId,
-            prompt: `左列の「人物」と、右列の対応する「語句」を線でつなげ。`,
+            prompt: `左列の「色」と、右列の対応する「物質」を正しく線でつなげ。`,
             context: `3組を選択（余り選択肢あり）`,
             pairs,
             explanation: `【正解の対応関係】\n${pairs.map((p) => `・${p.left} ⇄ ${p.right}`).join('\n')}`,
@@ -411,24 +407,19 @@ export class QuestionGenerator {
   }
 
   static getAllQuestions(categoryId?: CategoryId): Question[] {
+    if (!categoryId) return AVAILABLE_CATEGORY_IDS.flatMap((id) => this.getAllQuestions(id));
     return [
       ...this.generateFigureToKeyword(categoryId),
       ...this.generateKeywordToFigure(categoryId),
-      ...this.generateOddOneOut(categoryId),
-      ...this.generatePairValidation(categoryId),
-      ...this.generateMatchingQuestions(categoryId),
     ];
   }
 
   static generateCustomSession(config: QuizSessionConfig): Question[] {
     const pool: Question[] = [];
 
-    config.categoryIds.forEach((catId) => {
+    config.categoryIds.filter((catId) => AVAILABLE_CATEGORY_IDS.includes(catId)).forEach((catId) => {
       if (config.enabledTypes.figureToKeyword) pool.push(...this.generateFigureToKeyword(catId));
       if (config.enabledTypes.keywordToFigure) pool.push(...this.generateKeywordToFigure(catId));
-      if (config.enabledTypes.oddOneOut) pool.push(...this.generateOddOneOut(catId));
-      if (config.enabledTypes.pairValidation) pool.push(...this.generatePairValidation(catId));
-      if (config.enabledTypes.matching) pool.push(...this.generateMatchingQuestions(catId));
     });
 
     const shuffled = shuffle(pool);

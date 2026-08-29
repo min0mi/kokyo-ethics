@@ -16,7 +16,8 @@ export type CategoryId =
   | 'adolescence_public'
   | 'public_politics'
   | 'public_economy'
-  | 'public_international';
+  | 'public_international'
+  | (string & {});
 
 export interface Category {
   id: CategoryId;
@@ -62,6 +63,13 @@ export interface Keyword {
   commonTestPoint?: string; // 共通テストでの判断語句・ひっかけポイント
   distractorTags?: string[];
   contrastKeywordIds?: string[]; // 対比される用語
+  baseName?: string;
+  formula?: string;
+  phase?: string;
+  condition?: string;
+  precipitateId?: string;
+  sources?: string[];
+  tags?: string[];
 }
 
 export interface Book {
