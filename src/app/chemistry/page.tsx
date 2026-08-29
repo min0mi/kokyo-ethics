@@ -39,7 +39,7 @@ export default function HomePage() {
   const [categoryStats, setCategoryStats] = useState<Record<string, CategoryDetailedStats>>({});
   const [totalMasteredCount, setTotalMasteredCount] = useState(0);
   const [totalQuestionsCount, setTotalQuestionsCount] = useState(0);
-  const [gasStats, setGasStats] = useState<Record<string, { answered: number; correct: number; total: number }>>({});
+  const [gasStats, setGasStats] = useState<Record<string, { answered: number; correct: number; wrong: number; mastered: number; total: number }>>({});
 
   // 演習範囲ステート（全範囲 / 非金属元素 / 主要金属元素 / 遷移金属元素 / 沈殿反応）
   const [selectedScope, setSelectedScope] = useState<string>('all');
@@ -101,10 +101,10 @@ export default function HomePage() {
       '物質→原料': { prefix: 'gas-raw-', total: 14 }, '原料→物質': { prefix: 'raw-gas-', total: 14 }, '加熱の有無': { prefix: 'gas-heat-', total: 14 },
       '物質→捕集法': { prefix: 'gas-col-', total: 14 }, '捕集法→物質': { prefix: 'col-gas-', total: 14 }, '物質→乾燥剤': { prefix: 'gas-dry-', total: 8 }, '乾燥剤→物質': { prefix: 'dry-gas-', total: 14 },
     };
-    const nextGasStats: Record<string, { answered: number; correct: number; total: number }> = {};
+    const nextGasStats: Record<string, { answered: number; correct: number; wrong: number; mastered: number; total: number }> = {};
     Object.entries(gasPrefixes).forEach(([label, meta]) => {
       const rows = Object.entries(progressMap).filter(([id]) => id.startsWith(meta.prefix));
-      nextGasStats[label] = { total: meta.total, answered: rows.reduce((n, [, v]) => n + v.totalAttempts, 0), correct: rows.reduce((n, [, v]) => n + v.totalCorrect, 0) };
+      nextGasStats[label] = { total: meta.total, answered: rows.reduce((n, [, v]) => n + v.totalAttempts, 0), correct: rows.reduce((n, [, v]) => n + v.totalCorrect, 0), wrong: rows.filter(([, v]) => v.totalAttempts > v.totalCorrect).length, mastered: rows.filter(([, v]) => v.state === 'mastered').length };
     });
     setGasStats(nextGasStats);
   }, []);
@@ -353,7 +353,7 @@ export default function HomePage() {
             </section>
             <section className="rounded-xs border border-gray-300 bg-white p-4 shadow-xs">
               <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-2"><h2 className="text-sm font-black">製法暗記シリーズ</h2><span className="text-xs font-bold text-gray-600">進捗 {Math.round(Object.values(gasStats).reduce((n,s)=>n+(s.answered?Math.min(100,s.answered/s.total*100):0),0)/Math.max(Object.keys(gasStats).length,1))}%</span></div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{Object.entries(gasStats).map(([label,s])=>{const rate=Math.round(Math.min(100,s.answered/s.total*100));return <div key={label} className="rounded-xs border border-slate-200 bg-slate-50 p-3"><div className="flex items-center justify-between gap-2"><span className="text-xs font-bold">{label}</span><span className="text-[11px] font-bold tabular-nums">{s.correct}/{s.answered}正答</span></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200"><div className="h-full bg-sky-500" style={{width:`${rate}%`}} /></div><div className="mt-1 text-right text-[10px] text-gray-500">解答 {s.answered}問 ・ 進捗 {rate}%</div></div>})}</div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{Object.entries(gasStats).map(([label,s])=>{const rate=Math.round(Math.min(100,s.answered/s.total*100));return <div key={label} className="rounded-xs border border-slate-200 bg-slate-50 p-3"><div className="flex items-center justify-between gap-2"><span className="text-xs font-bold">{label}</span><span className="text-[11px] font-bold tabular-nums">{s.correct}/{s.answered}正答</span></div><div className="mt-2 flex h-1.5 overflow-hidden rounded-full bg-gray-200"><div className="h-full bg-green-600" style={{width:`${Math.min(100,s.mastered/s.total*100)}%`}} /><div className="h-full bg-blue-600" style={{width:`${Math.min(100,Math.max(0,(s.correct-s.mastered)/s.total*100))}%`}} /><div className="h-full bg-red-500" style={{width:`${Math.min(100,s.wrong/s.total*100)}%`}} /></div><div className="mt-1 flex justify-between text-[10px] text-gray-500"><span><b className="text-green-700">定着 {s.mastered}</b> ・ <b className="text-blue-600">正解 {s.correct}</b> ・ <b className="text-red-500">不正解 {s.wrong}</b></span><span>解答 {s.answered}問 ・ 進捗 {rate}%</span></div></div>})}</div>
             </section>
           </div>
           <div className="hidden bg-white border border-gray-300 rounded-xs overflow-hidden">
@@ -565,6 +565,7 @@ export default function HomePage() {
     </div>
   );
 }
+
 
 
 
