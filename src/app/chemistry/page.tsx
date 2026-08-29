@@ -16,6 +16,7 @@ const DailyLineChart = dynamic(
   { ssr: false, loading: () => <div className="p-4 text-center text-xs text-gray-400">グラフ読み込み中...</div> }
 );
 import { ShareButtons } from '@/components/share/ShareButtons';
+import { LearningStatusCard, LearningStatusItem } from '@/components/LearningStatusCard';
 
 const categoryChipTone = (groupName?: string) => {
   if (groupName === 'ハロゲン・ハロゲン化銀シリーズ') return 'border-cyan-200 bg-cyan-50 text-cyan-900 hover:border-cyan-400';
@@ -346,17 +347,7 @@ export default function HomePage() {
           </div>
 
           {/* ★ 2. シンプルな単元別対照表（単元名、定着率、ボタンのみ） ★ */}
-          <div className="space-y-4">
-            <section className="rounded-xs border border-gray-300 bg-white p-4 shadow-xs">
-              <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-2"><h2 className="text-sm font-black">色暗記シリーズ</h2><span className="text-xs font-bold text-gray-600">進捗 {Math.round((Object.values(categoryStats).reduce((n,s)=>n+s.studyRate,0)/Math.max(Object.keys(categoryStats).length,1)))}%</span></div>
-              <div className="h-2 overflow-hidden rounded-full bg-gray-200"><div className="h-full bg-amber-500" style={{width:`${Math.round(Object.values(categoryStats).reduce((n,s)=>n+s.studyRate,0)/Math.max(Object.keys(categoryStats).length,1))}%`}} /></div>
-            </section>
-            <section className="rounded-xs border border-gray-300 bg-white p-4 shadow-xs">
-              <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-2"><h2 className="text-sm font-black">製法暗記シリーズ</h2><span className="text-xs font-bold text-gray-600">進捗 {Math.round(Object.values(gasStats).reduce((n,s)=>n+(s.answered?Math.min(100,s.answered/s.total*100):0),0)/Math.max(Object.keys(gasStats).length,1))}%</span></div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{Object.entries(gasStats).map(([label,s])=>{const rate=Math.round(Math.min(100,s.answered/s.total*100));return <div key={label} className="rounded-xs border border-slate-200 bg-slate-50 p-3"><div className="flex items-center justify-between gap-2"><span className="text-xs font-bold">{label}</span><span className="text-[11px] font-bold tabular-nums">{s.correct}/{s.answered}正答</span></div><div className="mt-2 flex h-1.5 overflow-hidden rounded-full bg-gray-200"><div className="h-full bg-green-600" style={{width:`${Math.min(100,s.mastered/s.total*100)}%`}} /><div className="h-full bg-blue-600" style={{width:`${Math.min(100,Math.max(0,(s.correct-s.mastered)/s.total*100))}%`}} /><div className="h-full bg-red-500" style={{width:`${Math.min(100,s.wrong/s.total*100)}%`}} /></div><div className="mt-1 flex justify-between text-[10px] text-gray-500"><span><b className="text-green-700">定着 {s.mastered}</b> ・ <b className="text-blue-600">正解 {s.correct}</b> ・ <b className="text-red-500">不正解 {s.wrong}</b></span><span>解答 {s.answered}問 ・ 進捗 {rate}%</span></div></div>})}</div>
-            </section>
-          </div>
-          <div className="hidden bg-white border border-gray-300 rounded-xs overflow-hidden">
+          <div className="space-y-4">\n            <LearningStatusCard title="色暗記シリーズ" accent="amber" items={Object.entries(categoryStats).map(([label,s])=>({label,total:s.total,answered:s.mastered+s.correct+s.wrong,correct:s.correct,wrong:s.wrong,mastered:s.mastered}))} />\n            <LearningStatusCard title="製法暗記シリーズ" accent="sky" items={Object.entries(gasStats).map(([label,s])=>({label,...s}))} />\n          </div>\n          <div className="hidden bg-white border border-gray-300 rounded-xs overflow-hidden">
             <div className="bg-gray-100 px-3 py-1.5 border-b border-gray-300 flex items-center justify-between">
               <h2 className="text-xs font-bold text-gray-800">
                 シリーズ別の学習状況
@@ -565,6 +556,7 @@ export default function HomePage() {
     </div>
   );
 }
+
 
 
 
