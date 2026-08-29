@@ -9,7 +9,12 @@ import { SRSEngine, CategoryDetailedStats } from '@/lib/srs/srsEngine';
 import { UserDataStore } from '@/lib/storage/userDataStore';
 import { UserProfile, Question, QuizSessionConfig } from '@/types';
 import { AdBanner } from '@/components/ads/AdBanner';
-import { DailyLineChart } from '@/components/stats/DailyLineChart';
+import dynamic from 'next/dynamic';
+
+const DailyLineChart = dynamic(
+  () => import('@/components/stats/DailyLineChart').then((mod) => mod.DailyLineChart),
+  { ssr: false, loading: () => <div className="p-4 text-center text-xs text-gray-400">グラフ読み込み中...</div> }
+);
 import { ShareButtons } from '@/components/share/ShareButtons';
 
 export default function HomePage() {

@@ -53,7 +53,7 @@ export const Header: React.FC = () => {
         { href: '/chemistry', label: 'トップ' },
         { href: '/chemistry/dictionary', label: '物質・色対応表' },
         { href: '/chemistry/precipitates', label: '沈殿と条件' },
-        { href: '/stats?subject=chemistry', label: '学習進捗・グラフ' },
+        { href: '/chemistry/stats', label: '学習進捗・グラフ' },
         { href: '/contact', label: 'お問い合わせ・誤植報告' },
       ]
     : [
@@ -141,7 +141,7 @@ export const Header: React.FC = () => {
       <nav className="bg-gray-100 border-t border-gray-300 overflow-x-auto">
         <div className="max-w-7xl mx-auto px-2 flex items-center whitespace-nowrap text-xs font-semibold">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href || (pathname === '/stats' && link.href.startsWith('/stats'));
+            const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
