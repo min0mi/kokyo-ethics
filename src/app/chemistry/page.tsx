@@ -348,7 +348,7 @@ export default function HomePage() {
 
           {/* ★ 2. シンプルな単元別対照表（単元名、定着率、ボタンのみ） ★ */}
           <div className="space-y-3"><div><h2 className="text-sm font-black text-gray-900">シリーズ別の学習状況</h2><p className="mt-0.5 text-[11px] text-gray-500">正解・不正解・定着をシリーズごとに確認できます。</p></div><div className="space-y-4">
-            <LearningStatusCard title="色暗記シリーズ" items={Object.entries(categoryStats).map(([label,s])=>({label,total:s.total,answered:s.mastered+s.correct+s.wrong,correct:s.correct,wrong:s.wrong,mastered:s.mastered}))} />
+            <LearningStatusCard title="色暗記シリーズ" items={Object.entries(categoryStats).filter(([id])=>CATEGORIES.some(c=>c.id===id&&c.isAvailable)).map(([id,s])=>({label:CATEGORIES.find(c=>c.id===id)?.name||'色暗記項目',total:s.total,answered:s.mastered+s.correct+s.wrong,correct:s.correct,wrong:s.wrong,mastered:s.mastered}))} />
             <LearningStatusCard title="製法暗記シリーズ" items={Object.entries(gasStats).map(([label,s])=>({label,...s}))} />
           </div>
           </div>
