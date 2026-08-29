@@ -100,7 +100,7 @@ export default function HomePage() {
     setTotalMasteredCount(totalMastered);
     const gasPrefixes: Record<string, { prefix: string; total: number }> = {
       '物質→原料': { prefix: 'gas-raw-', total: 14 }, '原料→物質': { prefix: 'raw-gas-', total: 14 }, '加熱の有無': { prefix: 'gas-heat-', total: 14 },
-      '物質→捕集法': { prefix: 'gas-col-', total: 14 }, '捕集法→物質': { prefix: 'col-gas-', total: 14 }, '物質→乾燥剤': { prefix: 'gas-dry-', total: 8 }, '乾燥剤→物質': { prefix: 'dry-gas-', total: 14 },
+      '物質→捕集法': { prefix: 'gas-col-', total: 14 }, '捕集法→物質': { prefix: 'col-gas-', total: 14 },
     };
     const nextGasStats: Record<string, { answered: number; correct: number; wrong: number; mastered: number; total: number }> = {};
     Object.entries(gasPrefixes).forEach(([label, meta]) => {
@@ -250,7 +250,7 @@ export default function HomePage() {
               </div>
               <span className="font-bold text-gray-700 block text-[11px] mt-2">製法暗記シリーズ</span>
               <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-gray-50/70 p-2">
-                {[['all','全範囲'],['gas_to_raw','物質→原料'],['raw_to_gas','原料→物質'],['heat','加熱の有無'],['gas_to_collection','物質→捕集法'],['collection_to_gas','捕集法→物質'],['gas_to_drying','物質→乾燥剤'],['drying_to_gas','乾燥剤→物質']].map(([value,label]) => <button key={value} type="button" onClick={() => handleScopeChange(value)} aria-pressed={selectedScope === value} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-bold text-[11px] shadow-xs transition-all ${selectedScope === value ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-sky-200 bg-sky-50 text-sky-900 hover:border-sky-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedScope === value ? 'bg-white' : 'bg-current opacity-60'}`} />{label}</button>)}
+                {[['all','全範囲'],['gas_to_raw','物質→原料'],['raw_to_gas','原料→物質'],['heat','加熱の有無'],['gas_to_collection','物質→捕集法'],['collection_to_gas','捕集法→物質']].map(([value,label]) => <button key={value} type="button" onClick={() => handleScopeChange(value)} aria-pressed={selectedScope === value} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-bold text-[11px] shadow-xs transition-all ${selectedScope === value ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-sky-200 bg-sky-50 text-sky-900 hover:border-sky-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedScope === value ? 'bg-white' : 'bg-current opacity-60'}`} />{label}</button>)}
               </div>
             </div>
 
@@ -563,6 +563,7 @@ export default function HomePage() {
     </div>
   );
 }
+
 
 
 
