@@ -1,74 +1,95 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { UserDataStore } from '@/lib/storage/userDataStore';
 import { SRSEngine, CategoryDetailedStats } from '@/lib/srs/srsEngine';
-import { QuestionGenerator } from '@/lib/generator/questionGenerator';
-import { CATEGORIES } from '@/data/categories';
+import { QuestionGenerator as EthicsQuestionGenerator } from '@/lib/generator/questionGenerator';
+import { QuestionGenerator as ChemistryQuestionGenerator } from '@/lib/chemistry/questionGenerator';
+import { CATEGORIES as ETHICS_CATEGORIES } from '@/data/categories';
+import { CATEGORIES as CHEMISTRY_CATEGORIES } from '@/data/chemistry/categories';
 import { UserProfile } from '@/types';
 import { AdBanner } from '@/components/ads/AdBanner';
 import { DailyLineChart } from '@/components/stats/DailyLineChart';
 import { ShareButtons } from '@/components/share/ShareButtons';
 
-export default function StatsPage() {
+function StatsContent() {
+  const searchParams = useSearchParams();
+  const initialSubject = searchParams.get('subject') === 'chemistry' ? 'chemistry' : 'ethics';
+  const [activeSubject, setActiveSubject] = useState<'ethics' | 'chemistry'>(initialSubject);
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [counts, setCounts] = useState({
-    total: 0,
-    mastered: 0,
-    correct: 0,
-    wrong: 0,
-    new: 0,
-  });
-  const [categoryData, setCategoryData] = useState<
+
+  // 公共倫理データ
+  const [ethicsCounts, setEthicsCounts] = useState({ total: 0, mastered: 0, correct: 0, wrong: 0, new: 0 });
+  const [ethicsCategoryData, setEthicsCategoryData] = useState<
+    { name: string; era: string; groupName: string; stats: CategoryDetailedStats; isAvailable: boolean }[]
+  >([]);
+
+  // 無機化学データ
+  const [chemCounts, setChemCounts] = useState({ total: 0, mastered: 0, correct: 0, wrong: 0, new: 0 });
+  const [chemCategoryData, setChemCategoryData] = useState<
     { name: string; era: string; groupName: string; stats: CategoryDetailedStats; isAvailable: boolean }[]
   >([]);
 
   useEffect(() => {
     const p = UserDataStore.getProfile();
     const progressMap = UserDataStore.getProgressMap();
-    const allQs = QuestionGenerator.getAllQuestions();
-
     setProfile(p);
 
-    let mastered = 0;
-    let correct = 0;
-    let wrong = 0;
-    let unattempted = 0;
-
-    allQs.forEach((q) => {
+    // 1. 公共倫理の集計
+    const ethicsQs = EthicsQuestionGenerator.getAllQuestions();
+    let eMastered = 0, eCorrect = 0, eWrong = 0, eNew = 0;
+    ethicsQs.forEach((q) => {
       const prog = progressMap[q.id];
-      if (!prog || prog.totalAttempts === 0 || prog.state === 'new') {
-        unattempted += 1;
-      } else if (prog.state === 'mastered') {
-        mastered += 1;
-      } else if (prog.correctStreak > 0) {
-        correct += 1;
-      } else {
-        wrong += 1;
-      }
+      if (!prog || prog.totalAttempts === 0 || prog.state === 'new') eNew += 1;
+      else if (prog.state === 'mastered') eMastered += 1;
+      else if (prog.correctStreak > 0) eCorrect += 1;
+      else eWrong += 1;
     });
+    setEthicsCounts({ total: ethicsQs.length, mastered: eMastered, correct: eCorrect, wrong: eWrong, new: eNew });
 
-    setCounts({
-      total: allQs.length,
-      mastered,
-      correct,
-      wrong,
-      new: unattempted,
-    });
-
-    const catList = CATEGORIES.map((cat) => {
-      const catQs = allQs.filter((q) => q.categoryId === cat.id);
-      const res = SRSEngine.calculateCategoryStats(catQs, progressMap);
+    const ethicsCats = ETHICS_CATEGORIES.map((cat) => {
+      const catQs = ethicsQs.filter((q) => q.categoryId === cat.id);
       return {
         name: cat.name,
         era: cat.era,
         groupName: cat.groupName || '源流思想',
-        stats: res,
+        stats: SRSEngine.calculateCategoryStats(catQs, progressMap),
         isAvailable: !!cat.isAvailable,
       };
     });
-    setCategoryData(catList);
+    setEthicsCategoryData(ethicsCats);
+
+    // 2. 無機化学の集計
+    const chemQs = ChemistryQuestionGenerator.getAllQuestions();
+    let cMastered = 0, cCorrect = 0, cWrong = 0, cNew = 0;
+    chemQs.forEach((q) => {
+      const prog = progressMap[q.id];
+      if (!prog || prog.totalAttempts === 0 || prog.state === 'new') cNew += 1;
+      else if (prog.state === 'mastered') cMastered += 1;
+      else if (prog.correctStreak > 0) cCorrect += 1;
+      else cWrong += 1;
+    });
+    setChemCounts({ total: chemQs.length, mastered: cMastered, correct: cCorrect, wrong: cWrong, new: cNew });
+
+    const chemCats = CHEMISTRY_CATEGORIES.map((cat) => {
+      const catQs = chemQs.filter((q) => q.categoryId === cat.id);
+      return {
+        name: cat.name,
+        era: cat.era,
+        groupName: '色暗記シリーズ',
+        stats: SRSEngine.calculateCategoryStats(catQs, progressMap),
+        isAvailable: !!cat.isAvailable,
+      };
+    });
+    setChemCategoryData(chemCats);
   }, []);
+
+  const isChem = activeSubject === 'chemistry';
+  const currentCounts = isChem ? chemCounts : ethicsCounts;
+  const currentCategoryData = isChem ? chemCategoryData : ethicsCategoryData;
+  const subjectName = isChem ? '無機化学 (beta)' : '公共倫理';
 
   const overallAccuracy =
     profile && profile.totalAnswered > 0
@@ -115,31 +136,67 @@ export default function StatsPage() {
   return (
     <div className="max-w-5xl mx-auto px-3 py-5 space-y-4 text-xs text-gray-900">
       {/* ページヘッダー */}
-      <div className="border-b border-gray-300 pb-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-        <div>
-          <span className="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-300">
-            学習進捗・忘却曲線
-          </span>
-          <h1 className="text-xl font-bold text-gray-900 mt-1">
-            学習習熟度・忘却曲線分析
-          </h1>
-          <p className="text-xs text-gray-500 mt-0.5">
-            全{counts.total}問の学習進捗および SuperMemo-2 (SM-2) アルゴリズムに基づく記憶定着フェーズの可視化
-          </p>
+      <div className="border-b border-gray-300 pb-3 space-y-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div>
+            <span className="text-[11px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-300">
+              学習進捗・忘却曲線アナリティクス
+            </span>
+            <h1 className="text-xl font-bold text-gray-900 mt-1">
+              {subjectName} 習熟度 ＆ 忘却曲線分析
+            </h1>
+            <p className="text-xs text-gray-500 mt-0.5">
+              全{currentCounts.total}問の学習進捗および SM-2 アルゴリズムに基づく記憶定着可視化
+            </p>
+          </div>
+
+          {profile && (
+            <ShareButtons
+              text={`【${isChem ? '共テ無機化学パーフェクトマスター.com' : '公共倫理パーフェクトマスター.com'}】で学習中！\n連続学習: ${profile.streakDays}日 | 総解答数: ${profile.totalAnswered}問 | 定着完了: ${currentCounts.mastered}問\n#共通テスト ${isChem ? '#化学 #無機化学' : '#倫理 #公共'}`}
+              buttonLabel="𝕏 で進捗をシェア"
+            />
+          )}
         </div>
 
-        {profile && (
-          <ShareButtons
-            text={`【公共倫理パーフェクトマスター.com】で学習中！\n連続学習: ${profile.streakDays}日 | 総解答数: ${profile.totalAnswered}問 | 定着完了: ${counts.mastered}問\n#共通テスト #倫理 #公共`}
-            buttonLabel="𝕏 で進捗をシェア"
-          />
-        )}
+        {/* ★ 科目切り替えタブ ★ */}
+        <div className="flex items-center gap-2 border-t border-gray-200 pt-2">
+          <button
+            type="button"
+            onClick={() => setActiveSubject('ethics')}
+            className={`px-4 py-2 rounded-xs font-bold text-xs flex items-center gap-1.5 transition ${
+              !isChem
+                ? 'bg-red-600 text-white shadow-xs'
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
+            }`}
+          >
+            <span>🏛️ 公共倫理の進捗</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${!isChem ? 'bg-white text-red-700' : 'bg-gray-200 text-gray-700'}`}>
+              {ethicsCounts.mastered}/{ethicsCounts.total}問定着
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSubject('chemistry')}
+            className={`px-4 py-2 rounded-xs font-bold text-xs flex items-center gap-1.5 transition ${
+              isChem
+                ? 'bg-red-600 text-white shadow-xs'
+                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300'
+            }`}
+          >
+            <span>🧪 無機化学の進捗</span>
+            <span className="bg-amber-400 text-black text-[9px] px-1 py-0.2 rounded-xs font-black">beta</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isChem ? 'bg-white text-red-700' : 'bg-emerald-100 text-emerald-900'}`}>
+              {chemCounts.mastered}/{chemCounts.total}問定着
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* サマリーカード */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
         <div className="bg-white border border-gray-300 p-3 rounded-xs">
-          <span className="text-gray-500 block mb-1">総解答数</span>
+          <span className="text-gray-500 block mb-1">通算解答数</span>
           <strong className="text-lg text-gray-900">{profile?.totalAnswered || 0} 問</strong>
         </div>
 
@@ -149,8 +206,8 @@ export default function StatsPage() {
         </div>
 
         <div className="bg-white border border-gray-300 p-3 rounded-xs">
-          <span className="text-gray-500 block mb-1">定着完了 (30日+)</span>
-          <strong className="text-lg text-green-700">{counts.mastered} 問</strong>
+          <span className="text-gray-500 block mb-1">【{isChem ? '無機化学' : '公共倫理'}】定着</span>
+          <strong className="text-lg text-green-700">{currentCounts.mastered} 問</strong>
         </div>
 
         <div className="bg-white border border-gray-300 p-3 rounded-xs">
@@ -166,14 +223,14 @@ export default function StatsPage() {
         </div>
       </div>
 
-      {/* ★ 日別学習問題数の折れ線グラフ（全期間対応） ★ */}
+      {/* ★ 日別学習問題数の折れ線グラフ ★ */}
       <DailyLineChart initialDays={7} />
 
       {/* 記憶定着ステータス内訳 */}
       <div className="bg-white border border-gray-300 p-4 rounded-xs space-y-3 text-xs">
         <div className="flex justify-between items-center border-b border-gray-200 pb-2">
           <h2 className="font-bold text-gray-900 text-sm">
-            全体の記憶定着フェーズ内訳（全{counts.total}問）
+            【{subjectName}】記憶定着フェーズ内訳（全{currentCounts.total}問）
           </h2>
           <span className="text-[11px] bg-blue-50 text-blue-800 font-bold px-2 py-0.5 border border-blue-200 rounded-xs">
             SM-2 アルゴリズム
@@ -184,42 +241,42 @@ export default function StatsPage() {
         <div className="w-full bg-gray-200 h-3.5 rounded-xs flex overflow-hidden border border-gray-300">
           <div
             className="bg-green-600 h-full"
-            style={{ width: `${(counts.mastered / (counts.total || 1)) * 100}%` }}
-            title={`定着完了: ${counts.mastered}問`}
+            style={{ width: `${(currentCounts.mastered / (currentCounts.total || 1)) * 100}%` }}
+            title={`定着完了: ${currentCounts.mastered}問`}
           />
           <div
             className="bg-blue-600 h-full"
-            style={{ width: `${(counts.correct / (counts.total || 1)) * 100}%` }}
-            title={`正答中: ${counts.correct}問`}
+            style={{ width: `${(currentCounts.correct / (currentCounts.total || 1)) * 100}%` }}
+            title={`正答中: ${currentCounts.correct}問`}
           />
           <div
             className="bg-red-500 h-full"
-            style={{ width: `${(counts.wrong / (counts.total || 1)) * 100}%` }}
-            title={`誤答/要復習: ${counts.wrong}問`}
+            style={{ width: `${(currentCounts.wrong / (currentCounts.total || 1)) * 100}%` }}
+            title={`誤答/要復習: ${currentCounts.wrong}問`}
           />
           <div
             className="bg-gray-200 h-full"
-            style={{ width: `${(counts.new / (counts.total || 1)) * 100}%` }}
-            title={`未着手: ${counts.new}問`}
+            style={{ width: `${(currentCounts.new / (currentCounts.total || 1)) * 100}%` }}
+            title={`未着手: ${currentCounts.new}問`}
           />
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 bg-green-600 inline-block rounded-xs" />
-            <span className="font-bold text-green-900">定着完了 (30日+): {counts.mastered}問</span>
+            <span className="font-bold text-green-900">定着完了 (30日+): {currentCounts.mastered}問</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 bg-blue-600 inline-block rounded-xs" />
-            <span className="font-bold text-blue-900">正答中 (1〜14日): {counts.correct}問</span>
+            <span className="font-bold text-blue-900">正答中 (1〜14日): {currentCounts.correct}問</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 bg-red-500 inline-block rounded-xs" />
-            <span className="font-bold text-red-700">誤答・要復習: {counts.wrong}問</span>
+            <span className="font-bold text-red-700">誤答・要復習: {currentCounts.wrong}問</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 bg-gray-300 inline-block rounded-xs" />
-            <span className="text-gray-500">未学習: {counts.new}問</span>
+            <span className="text-gray-500">未学習: {currentCounts.new}問</span>
           </div>
         </div>
       </div>
@@ -231,7 +288,7 @@ export default function StatsPage() {
       <div className="bg-white border border-gray-300 p-4 rounded-xs space-y-3 text-xs">
         <div className="flex items-center justify-between border-b border-gray-200 pb-2">
           <h2 className="font-bold text-gray-900 text-sm">
-            単元別 学習率 ＆ 記憶定着内訳
+            【{subjectName}】単元別 学習率 ＆ 記憶定着内訳
           </h2>
           <span className="text-[10px] text-gray-500 font-normal">
             <span className="text-green-700 font-bold">■</span>定着 <span className="text-blue-600 font-bold">■</span>正答 <span className="text-red-500 font-bold">■</span>誤答
@@ -239,7 +296,7 @@ export default function StatsPage() {
         </div>
 
         <div className="space-y-3">
-          {categoryData.map((cat, idx) => {
+          {currentCategoryData.map((cat, idx) => {
             const st = cat.stats;
             return (
               <div key={idx} className="space-y-1 bg-gray-50/50 p-2.5 rounded-xs border border-gray-200">
@@ -363,5 +420,13 @@ export default function StatsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StatsPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-10 text-xs text-gray-500">統計データを読み込み中...</div>}>
+      <StatsContent />
+    </Suspense>
   );
 }
