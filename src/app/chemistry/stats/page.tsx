@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { Suspense } from 'react';
+import { StatsContent } from '@/components/stats/StatsContent';
 
 export default function ChemistryStatsPage() {
-  const router = useRouter();
-  useEffect(() => {
-    router.replace('/stats?subject=chemistry');
-  }, [router]);
-
-  return <div className="text-center py-10 text-xs text-gray-500">無機化学のアナリティクスへ移動中...</div>;
+  return (
+    <Suspense fallback={<div className="text-center py-10 text-xs text-gray-500">無機化学のアナリティクスを読み込み中...</div>}>
+      <StatsContent defaultSubject="chemistry" />
+    </Suspense>
+  );
 }
