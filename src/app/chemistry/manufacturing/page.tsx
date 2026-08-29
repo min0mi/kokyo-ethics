@@ -1,28 +1,23 @@
 'use client';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect,useMemo,useState } from 'react';
 import Link from 'next/link';
-import { GAS_PROCESSES, GAS_RAW } from '@/data/chemistry/gasProcesses';
+import { GAS_PROCESSES,GAS_RAW } from '@/data/chemistry/gasProcesses';
+import { GAS_DRYING_AGENTS,GAS_PROPERTIES } from '@/data/chemistry/gasProperties';
+import { UserDataStore } from '@/lib/storage/userDataStore';
 import { sounds } from '@/lib/sound';
-
-export default function ManufacturingPage() {
-  const params = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search);
-  const requested = Number(params.get('count') || 10);
-  const count = [5, 10, 14].includes(requested) ? requested : 10;
-  const modeParam = params.get('mode') || 'all';
-  const mode: 'raw' | 'heat' = modeParam === 'heat' ? 'heat' : 'raw';
-  const setMode = (_next: 'raw' | 'heat') => { void _next; };
-  const [index, setIndex] = useState(0);
-  const [picked, setPicked] = useState<string[]>([]);
-  const [heat, setHeat] = useState<boolean | null>(null);
-  const [result, setResult] = useState<boolean | null>(null);
-  const gas = GAS_PROCESSES[index % count];
-  const options = useMemo(() => {
-    const opposite = gas.raw.find((x) => x.startsWith('希'))?.replace('希', '濃') || gas.raw.find((x) => x.startsWith('濃'))?.replace('濃', '希');
-    return [...gas.raw, ...(opposite && !gas.raw.includes(opposite) ? [opposite] : []), ...GAS_RAW.filter((x) => !gas.raw.includes(x) && x !== opposite).slice(index % 5, index % 5 + (opposite ? 5 : 6))];
-  }, [gas, index]);
-  const judgeRaw = (selection: string[]) => { const correct = selection.length === gas.raw.length && selection.every((x) => gas.raw.includes(x)); setResult(correct); if (correct) { sounds.playCorrect(); window.setTimeout(() => { setIndex((i) => (i + 1) % count); setPicked([]); setHeat(null); setResult(null); }, 380); } else sounds.playWrong(); };
-  const toggleRaw = (x: string) => { setPicked((current) => { const next = current.includes(x) ? current.filter((y) => y !== x) : [...current, x]; if (next.length === gas.raw.length) judgeRaw(next); return next; }); };
-  useEffect(() => { const onKey = (e: KeyboardEvent) => { if (e.repeat || result !== null) return; const n = Number(e.key); if (mode === 'raw' && n >= 1 && n <= options.length) toggleRaw(options[n - 1]); if (mode === 'heat' && (n === 1 || n === 2)) { setHeat(n === 1); setResult((n === 1) === gas.heat); } }; window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey); }, [mode, result, options, gas]);
-  const next = () => { setIndex((index + 1) % count); setPicked([]); setHeat(null); setResult(null); };
-  return <main className="mx-auto max-w-3xl space-y-4 px-3 py-5 text-sm"><header className="rounded border bg-white p-4"><p className="text-xs font-bold text-blue-700">集中マスター・気体の製法シリーズ</p><h1 className="mt-1 text-xl font-bold">気体の実験的製法</h1><p className="mt-2 text-gray-600">{index + 1} / {count}問　数字キーで選択できます</p></header><div className="flex gap-2"><button onClick={() => { setMode('raw'); setResult(null); }} className={`rounded border px-3 py-2 ${mode === 'raw' ? 'bg-gray-900 text-white' : ''}`}>物質→原料</button><button onClick={() => { setMode('heat'); setResult(null); }} className={`rounded border px-3 py-2 ${mode === 'heat' ? 'bg-gray-900 text-white' : ''}`}>加熱の有無</button></div><section className="rounded border bg-white p-5"><h2 className="text-lg font-bold">{mode === 'raw' ? `${gas.name}（${gas.formula}）の原料をすべて選べ。` : `${gas.raw.join(' ＋ ')} から ${gas.name}（${gas.formula}）を発生させるとき、加熱は必要か？`}</h2>{mode === 'raw' ? <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{options.map((x, i) => <label key={x} className={`rounded border p-2 ${picked.includes(x) ? 'border-blue-700 bg-blue-50' : ''}`}><input type="checkbox" checked={picked.includes(x)} onChange={() => toggleRaw(x)} /><span className="ml-1">{i + 1}. {x}</span></label>)}</div> : <div className="mt-4 flex gap-2"><button onClick={() => { setHeat(true); setResult(gas.heat); }} className={`rounded border px-4 py-2 ${heat === true ? 'bg-blue-700 text-white' : ''}`}>1. 必要</button><button onClick={() => { setHeat(false); setResult(!gas.heat); }} className={`rounded border px-4 py-2 ${heat === false ? 'bg-blue-700 text-white' : ''}`}>2. 不要</button></div>}{result !== null && <p className={`mt-4 rounded p-3 font-bold ${result ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>{result ? '正解' : `不正解　正答：${mode === 'raw' ? gas.raw.join('、') : gas.heat ? '必要' : '不要'}`}</p>}<button onClick={next} className="mt-5 rounded border px-4 py-2">次の問題</button></section><Link href="/chemistry" className="text-blue-700 underline">集中マスターへ戻る</Link></main>;
+type Mode='all'|'gas_to_raw'|'raw_to_gas'|'heat'|'gas_to_collection'|'collection_to_gas'|'gas_to_drying'|'drying_to_gas';
+type Q={id:string;prompt:string;options:string[];answer:string;multi?:string[]};
+const C=['上方置換','下方置換','水上置換'];
+const labels:Record<Mode,string>={all:'全範囲',gas_to_raw:'物質→原料',raw_to_gas:'原料→物質',heat:'加熱の有無',gas_to_collection:'物質→捕集法',collection_to_gas:'捕集法→物質',gas_to_drying:'物質→乾燥剤',drying_to_gas:'乾燥剤→物質'};
+const gasText=(x:{name:string;formula:string})=>`${x.name}（${x.formula}）`;
+function makeQ(m:Mode,i:number):Q { const p=GAS_PROCESSES[i%GAS_PROCESSES.length], g=GAS_PROPERTIES.find(x=>x.formula===p.formula)!;
+ if(m==='gas_to_raw')return{id:`gas-raw-${p.formula}`,prompt:`${gasText(p)}の原料をすべて選べ。`,options:[...p.raw,...GAS_RAW.filter(x=>!p.raw.includes(x)).slice(i%5,i%5+6)],answer:p.raw[0],multi:p.raw};
+ if(m==='raw_to_gas'){const r=p.raw[0],ok=GAS_PROCESSES.filter(x=>x.raw.includes(r)).map(gasText),bad=GAS_PROCESSES.filter(x=>!x.raw.includes(r)).map(gasText);return{id:`raw-gas-${p.formula}`,prompt:`${r}を原料として発生する気体はどれか。`,options:[...ok,...bad].slice(0,4),answer:gasText(p)};}
+ if(m==='heat')return{id:`gas-heat-${p.formula}`,prompt:`${p.raw.join(' ＋ ')}から${gasText(p)}を発生させるとき、加熱は必要か？`,options:['必要','不要'],answer:p.heat?'必要':'不要'};
+ if(m==='gas_to_collection')return{id:`gas-col-${p.formula}`,prompt:`${gasText(p)}の捕集法はどれか。`,options:C,answer:g.collection};
+ if(m==='collection_to_gas'){const a=g.collection,cs=GAS_PROPERTIES.filter(x=>x.collection===a),t=cs[i%cs.length];return{id:`col-gas-${t.formula}`,prompt:`${a}で捕集する気体はどれか。`,options:[gasText(t),...GAS_PROPERTIES.filter(x=>x.collection!==a).slice(i%5,i%5+3).map(gasText)],answer:gasText(t)};}
+ if(m==='gas_to_drying'){const a=g.drying[0];return{id:`gas-dry-${p.formula}`,prompt:`${gasText(p)}の乾燥剤として使用できるものはどれか。`,options:[a,...GAS_DRYING_AGENTS.filter(x=>!g.drying.includes(x))].slice(0,4),answer:a};}
+ const a=GAS_DRYING_AGENTS[i%GAS_DRYING_AGENTS.length],cs=GAS_PROPERTIES.filter(x=>x.drying.includes(a)),t=cs[i%cs.length];return{id:`dry-gas-${a}-${t.formula}`,prompt:`${a}で乾燥できる気体はどれか。`,options:[gasText(t),...GAS_PROPERTIES.filter(x=>!x.drying.includes(a)).slice(i%5,i%5+3).map(gasText)],answer:gasText(t)};
 }
+export default function ManufacturingPage(){const qsp=new URLSearchParams(typeof window==='undefined'?'':window.location.search),n=Number(qsp.get('count')||10),count=[5,10,14].includes(n)?n:10;const initial=(qsp.get('mode')||'all') as Mode;const [mode]=useState<Mode>(labels[initial]?initial:'all');const [i,setI]=useState(0),[picked,setPicked]=useState<string[]>([]),[sel,setSel]=useState<string|null>(null),[result,setResult]=useState<boolean|null>(null);const q=useMemo(()=>makeQ(mode==='all'?(['gas_to_raw','raw_to_gas','heat','gas_to_collection','collection_to_gas','gas_to_drying','drying_to_gas'] as Mode[])[i%7]:mode,i),[mode,i]);const next=()=>{setI(x=>(x+1)%count);setPicked([]);setSel(null);setResult(null)};const submit=(v:string[])=>{if(result!==null)return;const ok=q.multi?v.length===q.multi.length&&v.every(x=>q.multi!.includes(x)):v[0]===q.answer;setResult(ok);UserDataStore.recordAnswer(q.id,ok,ok?4:1,2);ok?sounds.playCorrect():sounds.playWrong();if(ok)window.setTimeout(next,420)};useEffect(()=>{const h=(e:KeyboardEvent)=>{if(e.repeat||result!==null)return;const k=Number(e.key);if(k<1||k>q.options.length)return;const v=q.options[k-1];if(q.multi)setPicked(c=>{const z=c.includes(v)?c.filter(x=>x!==v):[...c,v];if(z.length===q.multi!.length)setTimeout(()=>submit(z),0);return z}); else {setSel(v);submit([v])}};addEventListener('keydown',h);return()=>removeEventListener('keydown',h)},[q,result]);return <main className="mx-auto max-w-3xl space-y-4 px-3 py-5 text-sm"><header className="rounded border bg-white p-4"><p className="text-xs font-bold text-blue-700">集中マスター・製法暗記シリーズ</p><h1 className="mt-1 text-xl font-bold">気体の製法シリーズ</h1><p className="mt-2 text-gray-600">{i+1} / {count}問　{labels[mode]}</p></header><section className="rounded border bg-white p-5"><h2 className="text-lg font-bold">{q.prompt}</h2><div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{q.options.map((x,j)=><button key={`${x}-${j}`} onClick={()=>q.multi?setPicked(c=>{const z=c.includes(x)?c.filter(y=>y!==x):[...c,x];if(z.length===q.multi!.length)submit(z);return z}):(setSel(x),submit([x]))} className={`rounded border p-3 text-left ${picked.includes(x)||sel===x?'border-blue-700 bg-blue-50':''}`}><b>{j+1}. </b>{x}</button>)}</div>{result!==null&&<p className={`mt-4 rounded p-3 font-bold ${result?'bg-green-50 text-green-800':'bg-red-50 text-red-800'}`}>{result?'正解':'不正解'}</p>}<button onClick={next} className="mt-5 rounded border px-4 py-2">次の問題</button></section><Link href="/chemistry" className="text-blue-700 underline">集中マスターへ戻る</Link></main>}
+

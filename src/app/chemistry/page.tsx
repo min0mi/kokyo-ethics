@@ -37,7 +37,7 @@ export default function HomePage() {
   // 演習範囲ステート（全範囲 / 非金属元素 / 主要金属元素 / 遷移金属元素 / 沈殿反応）
   const [selectedScope, setSelectedScope] = useState<string>('all');
   const [onlyWeak, setOnlyWeak] = useState<boolean>(false);
-  const [gasMode, setGasMode] = useState<'all' | 'raw_to_gas' | 'gas_to_raw' | 'heat'>('all');
+  const [gasMode, setGasMode] = useState<'all' | 'raw_to_gas' | 'gas_to_raw' | 'heat' | 'gas_to_collection' | 'collection_to_gas' | 'gas_to_drying' | 'drying_to_gas'>('all');
 
   // 演習設定ステート
   const [sessionConfig, setSessionConfig] = useState<QuizSessionConfig>({
@@ -231,7 +231,7 @@ export default function HomePage() {
               </div>
               <span className="font-bold text-gray-700 block text-[11px] mt-2">集中マスター：製法暗記シリーズ</span>
               <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-gray-50/70 p-2">
-                {[['all','全範囲'],['gas_to_raw','物質→原料'],['raw_to_gas','原料→物質'],['heat','加熱の有無']].map(([value,label]) => <button key={value} type="button" onClick={() => { handleScopeChange('gas'); setGasMode(value as typeof gasMode); }} aria-pressed={selectedScope === 'gas' && gasMode === value} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-bold text-[11px] shadow-xs transition-all ${selectedScope === 'gas' && gasMode === value ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-sky-200 bg-sky-50 text-sky-900 hover:border-sky-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedScope === 'gas' && gasMode === value ? 'bg-white' : 'bg-current opacity-60'}`} />{label}</button>)}
+                {[['all','全範囲'],['gas_to_raw','物質→原料'],['raw_to_gas','原料→物質'],['heat','加熱の有無'],['gas_to_collection','物質→捕集法'],['collection_to_gas','捕集法→物質'],['gas_to_drying','物質→乾燥剤'],['drying_to_gas','乾燥剤→物質']].map(([value,label]) => <button key={value} type="button" onClick={() => { handleScopeChange('gas'); setGasMode(value as typeof gasMode); }} aria-pressed={selectedScope === 'gas' && gasMode === value} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-bold text-[11px] shadow-xs transition-all ${selectedScope === 'gas' && gasMode === value ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-sky-200 bg-sky-50 text-sky-900 hover:border-sky-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedScope === 'gas' && gasMode === value ? 'bg-white' : 'bg-current opacity-60'}`} />{label}</button>)}
               </div>
             </div>
 
