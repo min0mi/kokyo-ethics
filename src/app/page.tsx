@@ -16,6 +16,7 @@ const DailyLineChart = dynamic(
   { ssr: false, loading: () => <div className="p-4 text-center text-xs text-gray-400">グラフ読み込み中...</div> }
 );
 import { ShareButtons } from '@/components/share/ShareButtons';
+import { LearningStatusCard } from '@/components/LearningStatusCard';
 
 export default function HomePage() {
   const router = useRouter();
@@ -311,8 +312,8 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* ★ 2. シンプルな単元別対照表（単元名、定着率、ボタンのみ） ★ */}
-          <div className="bg-white border border-gray-300 rounded-xs overflow-hidden">
+          <LearningStatusCard title="学習状況" items={Object.entries(categoryStats).map(([label,s])=>({label,total:s.total,answered:s.mastered+s.correct+s.wrong,correct:s.correct,wrong:s.wrong,mastered:s.mastered}))} />\n\n          {/* ★ 2. シンプルな単元別対照表（単元名、定着率、ボタンのみ） ★ */}
+          <div className="hidden bg-white border border-gray-300 rounded-xs overflow-hidden">
             <div className="bg-gray-100 px-3 py-1.5 border-b border-gray-300 flex items-center justify-between">
               <h2 className="text-xs font-bold text-gray-800">
                 単元別一覧
@@ -521,3 +522,4 @@ export default function HomePage() {
     </div>
   );
 }
+
