@@ -263,8 +263,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* 問題形式 */}
-            <div className="space-y-1">
+            {/* 色暗記シリーズの問題形式 */}
+            <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50/70 p-2">
               <span className="font-bold text-gray-700 block text-[11px]">
                 出題形式:
               </span>
