@@ -1,10 +1,8 @@
 ﻿import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: '公共倫理パーフェクトマスター.com | 共通テスト構造的暗記特訓',
@@ -76,7 +74,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className={`${inter.className} min-h-screen bg-[#f0f2f5] text-gray-900 flex flex-col antialiased`}>
+      <body className="min-h-screen bg-[#f0f2f5] text-gray-900 flex flex-col antialiased">
         <Header />
         <main className="flex-1 w-full">{children}</main>
         <Footer />
