@@ -29,6 +29,7 @@ const GAS_MODE_LABELS: Record<string, string> = {
   gas_to_collection: '物質→捕集法', collection_to_gas: '捕集法→物質',
   gas_to_drying: '物質→乾燥剤', drying_to_gas: '乾燥剤→物質',
 };
+const GAS_MODES = Object.keys(GAS_MODE_LABELS);
 
 export default function HomePage() {
   const router = useRouter();
@@ -59,7 +60,8 @@ export default function HomePage() {
 
   const handleScopeChange = (scope: string) => {
     setSelectedScope(scope);
-    if (scope === 'gas') {
+    if (scope === 'gas' || (scope !== 'all' && GAS_MODES.includes(scope))) {
+      if (GAS_MODES.includes(scope)) setGasMode(scope as typeof gasMode);
       setSessionConfig((prev) => ({ ...prev, categoryIds: [] }));
       return;
     }
@@ -117,7 +119,7 @@ export default function HomePage() {
   };
 
   const handleStartPracticeDirect = () => {
-    if (selectedScope === 'gas') {
+    if (GAS_MODES.includes(selectedScope)) {
       router.push(`/chemistry/manufacturing?count=${sessionConfig.questionCount}&mode=${gasMode}`);
       return;
     }
@@ -236,7 +238,7 @@ export default function HomePage() {
               </div>
               <span className="font-bold text-gray-700 block text-[11px] mt-2">集中マスター：製法暗記シリーズ</span>
               <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-gray-50/70 p-2">
-                {[['all','全範囲'],['gas_to_raw','物質→原料'],['raw_to_gas','原料→物質'],['heat','加熱の有無'],['gas_to_collection','物質→捕集法'],['collection_to_gas','捕集法→物質'],['gas_to_drying','物質→乾燥剤'],['drying_to_gas','乾燥剤→物質']].map(([value,label]) => <button key={value} type="button" onClick={() => { handleScopeChange('gas'); setGasMode(value as typeof gasMode); }} aria-pressed={selectedScope === 'gas' && gasMode === value} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-bold text-[11px] shadow-xs transition-all ${selectedScope === 'gas' && gasMode === value ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-sky-200 bg-sky-50 text-sky-900 hover:border-sky-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedScope === 'gas' && gasMode === value ? 'bg-white' : 'bg-current opacity-60'}`} />{label}</button>)}
+                {[['all','全範囲'],['gas_to_raw','物質→原料'],['raw_to_gas','原料→物質'],['heat','加熱の有無'],['gas_to_collection','物質→捕集法'],['collection_to_gas','捕集法→物質'],['gas_to_drying','物質→乾燥剤'],['drying_to_gas','乾燥剤→物質']].map(([value,label]) => <button key={value} type="button" onClick={() => handleScopeChange(value)} aria-pressed={selectedScope === value} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-bold text-[11px] shadow-xs transition-all ${selectedScope === value ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-sky-200 bg-sky-50 text-sky-900 hover:border-sky-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedScope === value ? 'bg-white' : 'bg-current opacity-60'}`} />{label}</button>)}
               </div>
             </div>
 
@@ -270,7 +272,7 @@ export default function HomePage() {
             </div>
 
             {/* 色暗記シリーズの問題形式 */}
-            {selectedScope !== 'gas' && <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50/70 p-2">
+            {!GAS_MODES.includes(selectedScope) && <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50/70 p-2">
               <span className="font-bold text-gray-700 block text-[11px]">
                 出題形式:
               </span>
@@ -328,7 +330,7 @@ export default function HomePage() {
               onClick={handleStartPracticeDirect}
               className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-center text-xs rounded-xs shadow-xs"
             >
-              【{selectedScope === 'gas' ? GAS_MODE_LABELS[gasMode] : selectedScope === 'all' ? '色暗記・全範囲' : FOCUS_SERIES.find((series) => series.id === selectedScope)?.name}】演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
+              【{GAS_MODES.includes(selectedScope) ? GAS_MODE_LABELS[selectedScope] : selectedScope === 'all' ? '色暗記・全範囲' : FOCUS_SERIES.find((series) => series.id === selectedScope)?.name}】演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
             </button>
           </div>
 
@@ -542,4 +544,6 @@ export default function HomePage() {
     </div>
   );
 }
+
+
 
