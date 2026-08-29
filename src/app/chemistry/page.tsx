@@ -231,7 +231,7 @@ export default function HomePage() {
               </div>
               <span className="font-bold text-gray-700 block text-[11px] mt-2">集中マスター：製法暗記シリーズ</span>
               <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-gray-50/70 p-2">
-                <button type="button" onClick={() => handleScopeChange('gas')} aria-pressed={selectedScope === 'gas'} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-bold text-[11px] shadow-xs transition-all ${selectedScope === 'gas' ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-sky-200 bg-sky-50 text-sky-900 hover:border-sky-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedScope === 'gas' ? 'bg-white' : 'bg-current opacity-60'}`} />気体の実験的製法</button>
+                {[['all','全範囲'],['gas_to_raw','物質→原料'],['raw_to_gas','原料→物質'],['heat','加熱の有無']].map(([value,label]) => <button key={value} type="button" onClick={() => { handleScopeChange('gas'); setGasMode(value as typeof gasMode); }} aria-pressed={selectedScope === 'gas' && gasMode === value} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-bold text-[11px] shadow-xs transition-all ${selectedScope === 'gas' && gasMode === value ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-sky-200 bg-sky-50 text-sky-900 hover:border-sky-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedScope === 'gas' && gasMode === value ? 'bg-white' : 'bg-current opacity-60'}`} />{label}</button>)}
               </div>
             </div>
 
@@ -289,7 +289,6 @@ export default function HomePage() {
                 ))}
               </div>
             </div>}
-            {selectedScope === 'gas' && <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50/70 p-2"><span className="font-bold text-gray-700 block text-[11px]">気体の製法シリーズ・出題形式</span><div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">{[['all','全範囲'],['gas_to_raw','物質→原料'],['raw_to_gas','原料→物質'],['heat','加熱の有無']].map(([value,label])=><label key={value} className="flex items-center gap-1.5 rounded-xs border border-gray-300 bg-white p-1.5 text-[11px] font-bold"><input type="radio" name="gasMode" checked={gasMode===value} onChange={()=>setGasMode(value as typeof gasMode)} />{label}</label>)}</div></div>}
 
             {/* 問題数の選択 */}
             <div className="space-y-1">
