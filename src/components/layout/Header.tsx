@@ -52,7 +52,6 @@ export const Header: React.FC = () => {
     ? [
         { href: '/chemistry', label: 'トップ' },
         { href: '/chemistry/dictionary', label: '物質・色対応表' },
-        { href: '/chemistry/precipitates', label: '沈殿と条件' },
         { href: '/chemistry/stats', label: '学習進捗・グラフ' },
         { href: '/contact', label: 'お問い合わせ・誤植報告' },
       ]
