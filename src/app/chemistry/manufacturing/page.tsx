@@ -10,7 +10,7 @@ export default function ManufacturingPage() {
   const count = [5, 10, 14].includes(requested) ? requested : 10;
   const modeParam = params.get('mode') || 'all';
   const mode: 'raw' | 'heat' = modeParam === 'heat' ? 'heat' : 'raw';
-  const setMode = (_next: 'raw' | 'heat') => {};
+  const setMode = (_next: 'raw' | 'heat') => { void _next; };
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<string[]>([]);
   const [heat, setHeat] = useState<boolean | null>(null);
