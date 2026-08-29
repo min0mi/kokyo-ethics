@@ -347,7 +347,7 @@ export default function HomePage() {
           </div>
 
           {/* ★ 2. シンプルな単元別対照表（単元名、定着率、ボタンのみ） ★ */}
-          <div className="space-y-3"><div><h2 className="text-sm font-black text-gray-900">シリーズ別の学習状況</h2><p className="mt-0.5 text-[11px] text-gray-500">正解・不正解・定着をシリーズごとに確認できます。</p></div><div className="space-y-4">\n            <LearningStatusCard title="色暗記シリーズ" items={Object.entries(categoryStats).map(([label,s])=>({label,total:s.total,answered:s.mastered+s.correct+s.wrong,correct:s.correct,wrong:s.wrong,mastered:s.mastered}))} />\n            <LearningStatusCard title="製法暗記シリーズ" items={Object.entries(gasStats).map(([label,s])=>({label,...s}))} />\n          </div>\n          </div>\n          <div className="hidden bg-white border border-gray-300 rounded-xs overflow-hidden">
+          <div className="space-y-3"><div><h2 className="text-sm font-black text-gray-900">シリーズ別の学習状況</h2><p className="mt-0.5 text-[11px] text-gray-500">正解・不正解・定着をシリーズごとに確認できます。</p></div><div className="space-y-4">\r\n            <LearningStatusCard title="色暗記シリーズ" items={Object.entries(categoryStats).map(([label,s])=>({label,total:s.total,answered:s.mastered+s.correct+s.wrong,correct:s.correct,wrong:s.wrong,mastered:s.mastered}))} />\r\n            <LearningStatusCard title="製法暗記シリーズ" items={Object.entries(gasStats).map(([label,s])=>({label,...s}))} />\n          </div>\n          </div>\n          <div className="hidden bg-white border border-gray-300 rounded-xs overflow-hidden">
             <div className="bg-gray-100 px-3 py-1.5 border-b border-gray-300 flex items-center justify-between">
               <h2 className="text-xs font-bold text-gray-800">
                 シリーズ別の学習状況
@@ -556,6 +556,7 @@ export default function HomePage() {
     </div>
   );
 }
+
 
 
 
