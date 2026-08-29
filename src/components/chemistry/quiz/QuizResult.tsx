@@ -27,7 +27,7 @@ export const QuizResult: React.FC<QuizResultProps> = ({
   const accuracy = Math.round((correctCount / totalQuestions) * 100) || 0;
   const timeStr = elapsedSeconds ? UserDataStore.formatStudyTime(elapsedSeconds) : '数秒';
 
-  const shareText = `【公共倫理パーフェクトマスター.com】で演習をクリア！\n正答率: ${accuracy}% (${correctCount}/${totalQuestions}問)\n学習時間: ${timeStr} (+${xpEarned}XP)\n#共通テスト #倫理 #公共 #大学受験`;
+  const shareText = `【共テ無機化学パーフェクトマスター.com】で演習をクリア！\n正答率: ${accuracy}% (${correctCount}/${totalQuestions}問)\n学習時間: ${timeStr} (+${xpEarned}XP)\n#共通テスト #化学 #無機化学 #大学受験`;
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -39,7 +39,7 @@ export const QuizResult: React.FC<QuizResultProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onRetry]);
-
+  
   return (
     <div className="w-full max-w-xl mx-auto bg-white border border-gray-300 rounded-xs p-6 space-y-4 text-center text-gray-900 shadow-xs">
       <div className="border-b border-gray-200 pb-2.5">
@@ -102,11 +102,11 @@ export const QuizResult: React.FC<QuizResultProps> = ({
           <span>もう一度解く (Space / Enter)</span>
         </button>
         <Link
-          href="/"
+          href="/chemistry"
           className="flex-1 py-2.5 bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 font-bold text-xs rounded-xs flex items-center justify-center gap-1 shadow-xs"
         >
           <Home className="w-3.5 h-3.5" />
-          <span>トップへ戻る</span>
+          <span>無機化学トップへ戻る</span>
         </Link>
       </div>
     </div>
