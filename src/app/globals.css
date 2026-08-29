@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 製法演習の形式はトップページで決めるため、演習中の切替欄は表示しない */
+main > header + div.flex.gap-2 { display: none; }
+
 /* Yahoo!風のシンプル・軽量・高視認性スタイル */
 body {
   background-color: #f0f2f5;
