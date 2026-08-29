@@ -16,7 +16,7 @@ const DailyLineChart = dynamic(
   { ssr: false, loading: () => <div className="p-4 text-center text-xs text-gray-400">グラフ読み込み中...</div> }
 );
 import { ShareButtons } from '@/components/share/ShareButtons';
-import { LearningStatusCard, LearningStatusItem } from '@/components/LearningStatusCard';
+import { LearningStatusCard } from '@/components/LearningStatusCard';
 
 const categoryChipTone = (groupName?: string) => {
   if (groupName === 'ハロゲン・ハロゲン化銀シリーズ') return 'border-cyan-200 bg-cyan-50 text-cyan-900 hover:border-cyan-400';
@@ -563,6 +563,7 @@ export default function HomePage() {
     </div>
   );
 }
+
 
 
 
