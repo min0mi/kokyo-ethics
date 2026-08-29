@@ -58,17 +58,15 @@ function DictionaryContent() {
         </div>
       ) : view === 'substance' ? (
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-          <div className="grid grid-cols-[minmax(0,1fr)_6rem] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2 text-sm font-bold sm:grid-cols-[minmax(0,1fr)_9rem]">
-            <span>化学式</span><span>色</span>
-          </div>
-          <ul className="divide-y divide-gray-100">
-            {filtered.map((kw) => (
-              <li key={kw.id} className="grid grid-cols-[minmax(0,1fr)_6rem] items-start gap-3 px-4 py-3 even:bg-gray-50/50 sm:grid-cols-[minmax(0,1fr)_9rem]">
-                <div className="min-w-0 break-words"><strong className="text-base"><ChemicalText text={kw.name} /></strong>{kw.condition && <p className="mt-1 text-xs leading-relaxed text-gray-600"><ChemicalText text={kw.condition} /></p>}</div>
-                <span className="rounded border border-gray-200 bg-white px-2 py-1 text-center text-sm font-bold">{colorMap.get(kw.figureId)?.name}</span>
-              </li>
+          <div className="grid grid-cols-4 border-b border-gray-200 bg-gray-50 text-sm font-bold"><span className="border-r px-3 py-2">化学式</span><span className="border-r px-3 py-2">色</span><span className="border-r px-3 py-2">化学式</span><span className="px-3 py-2">色</span></div>
+          <div className="divide-y divide-gray-100">
+            {Array.from({ length: Math.ceil(filtered.length / 2) }, (_, row) => filtered.slice(row * 2, row * 2 + 2)).map((pair, row) => (
+              <div key={row} className="grid grid-cols-4 even:bg-gray-50/50">
+                {pair.flatMap((kw) => [<div key={`${kw.id}-f`} className="min-w-0 border-r px-3 py-3 text-base font-bold break-words"><ChemicalText text={kw.name} /></div>, <div key={`${kw.id}-c`} className="border-r px-3 py-3 text-center font-bold last:border-r-0">{colorMap.get(kw.figureId)?.name}</div>])}
+                {pair.length === 1 && <><div /><div /></>}
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
