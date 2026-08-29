@@ -312,7 +312,9 @@ export default function HomePage() {
             </button>
           </div>
 
-          <div className="space-y-3"><div><h2 className="text-sm font-black text-gray-900">シリーズ別の学習状況</h2><p className="mt-0.5 text-[11px] text-gray-500">正解・不正解・定着をシリーズごとに確認できます。</p></div><LearningStatusCard title="学習状況" items={Object.entries(categoryStats).filter(([id])=>CATEGORIES.some(c=>c.id===id&&c.isAvailable)).map(([id,s])=>({label:CATEGORIES.find(c=>c.id===id)?.name||'学習項目',total:s.total,answered:s.mastered+s.correct+s.wrong,correct:s.correct,wrong:s.wrong,mastered:s.mastered}))} />`r`n          </div>\n          {/* ★ 2. シンプルな単元別対照表（単元名、定着率、ボタンのみ） ★ */}
+          <div className="space-y-3"><div><h2 className="text-sm font-black text-gray-900">シリーズ別の学習状況</h2><p className="mt-0.5 text-[11px] text-gray-500">正解・不正解・定着をシリーズごとに確認できます。</p></div><LearningStatusCard title="学習状況" items={Object.entries(categoryStats).filter(([id])=>CATEGORIES.some(c=>c.id===id&&c.isAvailable)).map(([id,s])=>({label:CATEGORIES.find(c=>c.id===id)?.name||'学習項目',total:s.total,answered:s.mastered+s.correct+s.wrong,correct:s.correct,wrong:s.wrong,mastered:s.mastered}))} />
+          </div>
+          {/* ★ 2. シンプルな単元別対照表（単元名、定着率、ボタンのみ） ★ */}
           <div className="hidden bg-white border border-gray-300 rounded-xs overflow-hidden">
             <div className="bg-gray-100 px-3 py-1.5 border-b border-gray-300 flex items-center justify-between">
               <h2 className="text-xs font-bold text-gray-800">
@@ -504,7 +506,9 @@ export default function HomePage() {
             {/* シェアボタン */}
             <div className="pt-1 border-t border-gray-100 flex justify-end">
               <ShareButtons
-                text={`【公共倫理パーフェクトマスター.com】で学習中！\n連続学習: ${profile?.streakDays || 1}日 | 解答数: ${profile?.totalAnswered || 0}問 | 定着数: ${totalMasteredCount}問\n#共通テスト #倫理 #公共`}
+                text={`【公共倫理パーフェクトマスター.com】で学習中！
+連続学習: ${profile?.streakDays || 1}日 | 解答数: ${profile?.totalAnswered || 0}問 | 定着数: ${totalMasteredCount}問
+#共通テスト #倫理 #公共`}
                 buttonLabel="𝕏 で記録をシェア"
               />
             </div>
@@ -522,6 +526,7 @@ export default function HomePage() {
     </div>
   );
 }
+
 
 
 
