@@ -24,6 +24,11 @@ const categoryChipTone = (groupName?: string) => {
   if (groupName === '重要金属シリーズ') return 'border-violet-200 bg-violet-50 text-violet-900 hover:border-violet-400';
   return 'border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-400';
 };
+const GAS_MODE_LABELS: Record<string, string> = {
+  all: '全範囲', gas_to_raw: '物質→原料', raw_to_gas: '原料→物質', heat: '加熱の有無',
+  gas_to_collection: '物質→捕集法', collection_to_gas: '捕集法→物質',
+  gas_to_drying: '物質→乾燥剤', drying_to_gas: '乾燥剤→物質',
+};
 
 export default function HomePage() {
   const router = useRouter();
@@ -323,7 +328,7 @@ export default function HomePage() {
               onClick={handleStartPracticeDirect}
               className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-center text-xs rounded-xs shadow-xs"
             >
-              【{selectedScope === 'all' ? '色暗記・全範囲' : selectedScope === 'gas' ? '製法暗記・気体' : FOCUS_SERIES.find((series) => series.id === selectedScope)?.name}】演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
+              【{selectedScope === 'gas' ? GAS_MODE_LABELS[gasMode] : selectedScope === 'all' ? '色暗記・全範囲' : FOCUS_SERIES.find((series) => series.id === selectedScope)?.name}】演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
             </button>
           </div>
 
