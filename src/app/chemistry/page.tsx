@@ -53,6 +53,10 @@ export default function HomePage() {
 
   const handleScopeChange = (scope: string) => {
     setSelectedScope(scope);
+    if (scope === 'gas') {
+      setSessionConfig((prev) => ({ ...prev, categoryIds: [] }));
+      return;
+    }
     if (scope === 'all') {
       setSessionConfig((prev) => ({ ...prev, categoryIds: AVAILABLE_CATEGORY_IDS }));
     } else {
@@ -107,6 +111,10 @@ export default function HomePage() {
   };
 
   const handleStartPracticeDirect = () => {
+    if (selectedScope === 'gas') {
+      router.push(`/chemistry/manufacturing?count=${sessionConfig.questionCount}`);
+      return;
+    }
     const params = new URLSearchParams();
     params.set('count', sessionConfig.questionCount.toString());
     params.set('f2k', sessionConfig.enabledTypes.figureToKeyword ? '1' : '0');
@@ -151,7 +159,6 @@ export default function HomePage() {
           >
             {dueQuestions.length > 0 ? '復習を開始する' : '演習を解く'}
           </Link>
-          <Link href="/chemistry/manufacturing" className="w-full sm:w-auto px-3.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-xs text-center shadow-xs shrink-0">気体の製法を暗記</Link>
         </div>
 
         {/* 物質・色検索バー（未入力Enter対応） */}
@@ -220,6 +227,10 @@ export default function HomePage() {
                     </button>
                   );
                 })}
+              </div>
+              <span className="font-bold text-gray-700 block text-[11px] mt-2">集中マスター：製法暗記シリーズ</span>
+              <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-gray-50/70 p-2">
+                <button type="button" onClick={() => handleScopeChange('gas')} aria-pressed={selectedScope === 'gas'} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-bold text-[11px] shadow-xs transition-all ${selectedScope === 'gas' ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-sky-200 bg-sky-50 text-sky-900 hover:border-sky-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${selectedScope === 'gas' ? 'bg-white' : 'bg-current opacity-60'}`} />気体の実験的製法</button>
               </div>
             </div>
 
@@ -311,7 +322,7 @@ export default function HomePage() {
               onClick={handleStartPracticeDirect}
               className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-black text-center text-xs rounded-xs shadow-xs"
             >
-              【{selectedScope === 'all' ? '色暗記・全範囲' : FOCUS_SERIES.find((series) => series.id === selectedScope)?.name}】演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
+              【{selectedScope === 'all' ? '色暗記・全範囲' : selectedScope === 'gas' ? '製法暗記・気体' : FOCUS_SERIES.find((series) => series.id === selectedScope)?.name}】演習を開始する（{sessionConfig.questionCount === 999 ? '全問題' : `${sessionConfig.questionCount}問`}）
             </button>
           </div>
 
