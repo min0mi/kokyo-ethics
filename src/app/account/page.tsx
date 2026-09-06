@@ -139,6 +139,23 @@ export default function AccountPage() {
     setMessage({ type: 'success', text: 'ログインしました。' });
   };
 
+  const handleGoogleLogin = async () => {
+    if (!supabase) return;
+    setLoading(true);
+    setMessage(null);
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/account/`,
+      },
+    });
+
+    if (error) {
+      setLoading(false);
+      setMessage({ type: 'error', text: `Googleログインに失敗しました：${error.message}` });
+    }
+  };
 
   const handleSaveNickname = async () => {
     if (!supabase || !user) return;
@@ -310,6 +327,23 @@ export default function AccountPage() {
           </form>
           <p className="text-[11px] text-gray-500 text-center">
             初回登録後に、ランキング用ニックネームを設定できます。
+          </p>
+          <div className="flex items-center gap-3 text-[11px] text-gray-400">
+            <span className="h-px flex-1 bg-gray-200" />
+            <span>または</span>
+            <span className="h-px flex-1 bg-gray-200" />
+          </div>
+          <button
+            type="button"
+            onClick={() => void handleGoogleLogin()}
+            disabled={loading}
+            className="w-full px-4 py-3 bg-white hover:bg-gray-50 border border-gray-400 rounded-xs font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            <span className="text-blue-600 font-black text-lg leading-none">G</span>
+            {loading ? 'Googleへ接続中…' : 'Googleで続ける'}
+          </button>
+          <p className="text-[11px] text-gray-500 text-center">
+            メールアドレスが確認済みの場合、既存のアカウントに自動で紐づきます。
           </p>
         </section>
       )}
