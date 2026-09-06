@@ -57,7 +57,7 @@ export const Header: React.FC = () => {
   return (
     <header className="w-full bg-white border-b-2 border-red-600 shadow-xs">
       {/* 最上段：ロゴ ＆ ユーザーステータス ＆ 科目切替 */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex flex-wrap items-center justify-start gap-3">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-baseline gap-1.5">
             <span className="text-xl sm:text-2xl font-black text-red-600 tracking-tight">
@@ -68,7 +68,7 @@ export const Header: React.FC = () => {
         </div>
 
         {/* この2つだけタイトル横に置く主要アクション */}
-        <div className="flex max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-red-100 bg-gradient-to-r from-red-50 via-white to-blue-50 p-1.5 shadow-sm">
+        <div className="flex max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-red-100 bg-gradient-to-r from-red-50 via-white to-blue-50 p-1.5 shadow-sm lg:ml-3">
             <Link
               href="/ranking"
               aria-label="全国ランキングを見る"
