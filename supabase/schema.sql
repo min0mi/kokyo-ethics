@@ -20,9 +20,11 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- RLS設定 (Profiles)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Public profiles are viewable by everyone."
+-- 公開ランキングは leaderboard ビュー経由で必要な項目だけ公開する。
+-- profiles テーブル本体は本人だけが読み取れるようにする。
+CREATE POLICY "Users can view own profile."
   ON public.profiles FOR SELECT
-  USING (true);
+  USING (auth.uid() = id);
 
 CREATE POLICY "Users can insert their own profile."
   ON public.profiles FOR INSERT
@@ -30,7 +32,8 @@ CREATE POLICY "Users can insert their own profile."
 
 CREATE POLICY "Users can update own profile."
   ON public.profiles FOR UPDATE
-  USING (auth.uid() = id);
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
 
 -- 2. 忘却曲線・学習進捗 (SRS Progress)
 CREATE TABLE IF NOT EXISTS public.user_progress (
@@ -93,3 +96,5 @@ FROM public.profiles
 ORDER BY xp DESC
 LIMIT 100;
 
+-- 公開するのは上記ビューの項目だけにし、profiles本体のRLSは維持する。
+ALTER VIEW public.leaderboard SET (security_invoker = false);
