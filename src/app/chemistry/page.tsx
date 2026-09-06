@@ -153,36 +153,8 @@ export default function HomePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 py-3 space-y-3">
-      {/* 最上段：復習アラート ＆ 検索バー */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
-        {/* 今日の復習ブロック */}
-        <div className="lg:col-span-2 bg-yellow-50 border border-yellow-400 p-2.5 rounded-xs flex flex-col sm:flex-row items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5">
-            <span className="bg-red-600 text-white text-[11px] font-bold px-1.5 py-0.5 rounded-xs shrink-0">
-              復習
-            </span>
-            <div className="text-xs text-gray-900">
-              <strong className="text-xs font-bold text-red-600">
-                本日の忘却曲線 復習キュー: {dueQuestions.length} 問
-              </strong>
-              <p className="text-gray-600 text-[11px] mt-0.5">
-                {dueQuestions.length > 0
-                  ? 'SM-2アルゴリズムにより本日復習期日に達した問題です。'
-                  : '今日の復習は完了しています。演習を進めましょう。'}
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href="/chemistry/practice?count=10"
-            className="w-full sm:w-auto px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xs text-center shadow-xs shrink-0"
-          >
-            {dueQuestions.length > 0 ? '復習を開始する' : '演習を解く'}
-          </Link>
-        </div>
-
-        {/* 物質・色検索バー（未入力Enter対応） */}
-        <div className="bg-white border border-gray-300 p-2.5 rounded-xs">
+      {/* 最上段：物質・色検索バー */}
+      <div className="bg-white border border-gray-300 p-2.5 rounded-xs">
           <form onSubmit={handleSearchSubmit} className="space-y-1">
             <label className="block text-[11px] font-bold text-gray-700">
               物質・色の検索 （空欄Enterで全体表示）
@@ -203,7 +175,6 @@ export default function HomePage() {
               </button>
             </div>
           </form>
-        </div>
       </div>
 
       {/* 2カラム構成：左側メイン / 右側サイドバー */}
@@ -217,6 +188,23 @@ export default function HomePage() {
                 共通テスト 無機化学 演習 (beta)
               </strong>
               <span className="text-[11px] text-gray-500">物質 ⇄ 色の対応関係特化</span>
+            </div>
+
+            {/* 復習キューは演習設定の入口に統合 */}
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-xs border border-yellow-300 bg-yellow-50 px-2.5 py-2">
+              <div className="min-w-0 flex items-center gap-2">
+                <span className="shrink-0 rounded-xs bg-red-600 px-1.5 py-0.5 text-[10px] font-bold text-white">今日の復習</span>
+                <strong className="text-[11px] font-bold text-red-700">{dueQuestions.length}問</strong>
+                <span className="hidden truncate text-[10px] text-gray-600 sm:inline">
+                  {dueQuestions.length > 0 ? '忘却曲線の復習期日です' : '今日の復習は完了しています'}
+                </span>
+              </div>
+              <Link
+                href="/chemistry/practice?count=10"
+                className="shrink-0 rounded-xs bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-xs hover:bg-red-700"
+              >
+                {dueQuestions.length > 0 ? '復習する' : '演習する'}
+              </Link>
             </div>
 
             {/* 出題範囲の選択（全範囲 / 非金属元素 / 主要金属元素 / 遷移金属元素 / 沈殿反応） */}
