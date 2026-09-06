@@ -1,82 +1,99 @@
-import React from 'react';
-import { Brain, Zap, Target, BookOpen } from 'lucide-react';
+import Link from 'next/link';
 
 export const metadata = {
-  title: '当サイトについて | 公共倫理パーフェクトマスター.com',
-  description: '公共倫理パーフェクトマスター.comの理念、構造的暗記システム、忘却曲線アルゴリズムについての解説です。',
+  title: '当サイトについて・運営者情報 | 公共倫理パーフェクトマスター.com',
+  description: '公共倫理パーフェクトマスター.comの目的、独自性、使い方、運営者情報について説明します。',
 };
+
+const cardClass = 'bg-white border border-gray-300 rounded-xs p-4 shadow-xs';
 
 export default function AboutPage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 space-y-10 text-gray-800">
-      {/* タイトル */}
-      <div className="space-y-3 pb-6 border-b border-gray-200">
-        <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full inline-block">
-          About Us
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">
-          「公共倫理パーフェクトマスター.com」について
-        </h1>
-        <p className="text-xs sm:text-sm text-gray-500">
-          大学入学共通テスト「公共、倫理」「倫理」を構造的にマスターするための特訓プラットフォーム
-        </p>
-      </div>
-
-      {/* 根幹テーマ */}
-      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-6 sm:p-8 border border-indigo-100 space-y-4">
-        <h2 className="text-lg sm:text-xl font-black text-indigo-950 flex items-center gap-2">
-          <Target className="w-5 h-5 text-indigo-600" />
-          単なる丸暗記から、思想の「構造的理解」へ
-        </h2>
-        <p className="text-xs sm:text-sm text-indigo-900/80 leading-relaxed">
-          共通テストの公共・倫理では、単に哲学者や用語の名前を暗記しているだけでは太刀打ちできません。
-          「誰が説いたのか」「どのような定義か」「どの著書に書かれているか」「なぜ他の思想家の概念と紛らわしいのか」という
-          <strong>立体的・構造的な相関関係</strong>を把握していることが求められます。
-        </p>
-        <p className="text-xs sm:text-sm text-indigo-900/80 leading-relaxed">
-          当サイトは、英単語アプリ「mikan」のような圧倒的なテンポ感と、「過去問道場」のような緻密な判断語句解説を融合させ、
-          ゲーム感覚で反射的に解けるレベルまで記憶を昇華させることを目指しています。
-        </p>
-      </div>
-
-      {/* 特徴3点 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-3">
-          <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
-            <Zap className="w-5 h-5 fill-amber-500" />
-          </div>
-          <h3 className="font-bold text-sm text-gray-900">交叉問題自動生成</h3>
-          <p className="text-xs text-gray-500 leading-relaxed">
-            同じ時代・流派の概念を交差させて誤選択肢を生成。本番で最も引っかかりやすい良質な選択肢を自動編成します。
+    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-5 space-y-4 text-gray-900">
+      <section className="bg-white border border-gray-400 rounded-xs p-4 sm:p-5 shadow-xs">
+        <div className="border-b border-gray-200 pb-3">
+          <span className="inline-block bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded-xs text-[11px] font-bold">
+            ABOUT THIS SITE
+          </span>
+          <h1 className="text-xl sm:text-2xl font-black mt-1.5">
+            当サイトについて・運営者情報
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">
+            公共・倫理の人物名と関連語句の対応関係を、見て確認し、問題で思い出しながら覚えるための学習サイトです。
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-3">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
-            <Brain className="w-5 h-5 text-indigo-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 mt-4">
+          <div className={cardClass}>
+            <h2 className="text-sm font-bold">人物 ⇄ 語句の対応に特化</h2>
+            <p className="text-xs text-gray-600 leading-relaxed mt-1.5">
+              人物から語句、語句から人物へ行き来しながら、名前と用語の組み合わせをシンプルに定着させます。
+            </p>
           </div>
-          <h3 className="font-bold text-sm text-gray-900">忘却曲線 (SM-2)</h3>
-          <p className="text-xs text-gray-500 leading-relaxed">
-            回答結果に応じて次回の復習日を動的にスケジューリング。「今日やるべき復習」で最短ルートの定着を実現。
+          <div className={cardClass}>
+            <h2 className="text-sm font-bold">頻出語句を幅広く収録</h2>
+            <p className="text-xs text-gray-600 leading-relaxed mt-1.5">
+              共通テストや主要な予想問題集で扱われる人物・語句を中心に、公共・倫理の学習範囲を幅広く整理しています。
+            </p>
+          </div>
+          <div className={cardClass}>
+            <h2 className="text-sm font-bold">短時間で繰り返し学習</h2>
+            <p className="text-xs text-gray-600 leading-relaxed mt-1.5">
+              対応表で確認したあと、演習と復習を繰り返します。毎日の学習に取り入れやすい構成を目指しています。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-to-use" className="bg-white border border-gray-300 rounded-xs p-4 shadow-xs scroll-mt-4">
+        <h2 className="text-sm font-black border-b border-gray-200 pb-2">使い方</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-3 text-xs">
+          <div className="border border-gray-200 bg-gray-50 rounded-xs p-3">
+            <strong className="text-red-700">1. 対応表で確認</strong>
+            <p className="text-gray-700 leading-relaxed mt-1">思想・人物対応表で、人物名と関連する語句を確認します。</p>
+          </div>
+          <div className="border border-gray-200 bg-gray-50 rounded-xs p-3">
+            <strong className="text-red-700">2. 問題で思い出す</strong>
+            <p className="text-gray-700 leading-relaxed mt-1">人物→語句、語句→人物などの問題を解いて、覚えているか確かめます。</p>
+          </div>
+          <div className="border border-gray-200 bg-gray-50 rounded-xs p-3">
+            <strong className="text-red-700">3. 間違いを復習</strong>
+            <p className="text-gray-700 leading-relaxed mt-1">間違えた問題や復習キューを、時間を置いてもう一度解きます。</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 mt-3">
+          <Link href="/dictionary" className="px-3 py-1.5 bg-gray-800 hover:bg-black text-white rounded-xs text-xs font-bold">対応表を見る</Link>
+          <Link href="/practice?count=10" className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xs text-xs font-bold">演習を始める</Link>
+          <Link href="/stats" className="px-3 py-1.5 border border-gray-300 hover:bg-gray-100 rounded-xs text-xs font-bold">学習進捗を見る</Link>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className={cardClass}>
+          <h2 className="text-sm font-black border-b border-gray-200 pb-2">教材との組み合わせ</h2>
+          <p className="text-xs text-gray-700 leading-relaxed mt-2">
+            当サイトは、人物と語句の対応関係を覚えるための補助教材です。教科書、資料集、過去問、予想問題集などと組み合わせ、詳しい背景や制度、出題の流れを確認しながら使うことで、より効果的に学習できます。
+          </p>
+          <p className="text-xs text-gray-700 leading-relaxed mt-2">
+            収録内容は共通テストや主要な予想問題集の頻出語句を中心に整理していますが、試験範囲や出題内容を完全に保証するものではありません。分からない内容は必ず教材や公式資料で確認してください。
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-3">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-emerald-600" />
-          </div>
-          <h3 className="font-bold text-sm text-gray-900">6種類の演習モード</h3>
-          <p className="text-xs text-gray-500 leading-relaxed">
-            4択スピード、深堀り道場、線つなぎマッチング、記述マスター、分類想起など、飽きずに多角的に鍛えられます。
+        <div className={cardClass}>
+          <h2 className="text-sm font-black border-b border-gray-200 pb-2">コンテンツ作成・著作権方針</h2>
+          <p className="text-xs text-gray-700 leading-relaxed mt-2">
+            問題文、解説、人物・用語の対応整理、デザインおよびプログラムは、運営者が学習目的に合わせて作成・編集しています。教科書、参考書、過去問題集など第三者の文章をそのまま転載しないよう努めています。
+          </p>
+          <p className="text-xs text-gray-700 leading-relaxed mt-2">
+            掲載内容について著作権上の問題や誤りがある場合は、<Link href="/contact" className="text-blue-700 hover:underline">お問い合わせ・誤植報告</Link>からご連絡ください。
           </p>
         </div>
-      </div>
+      </section>
 
-      {/* 運営者情報 */}
-      <div className="pt-6 border-t border-gray-200 space-y-4">
-        <h2 className="text-lg font-bold text-gray-900">運営者情報</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm border-collapse border border-gray-300">
+      <section className="bg-white border border-gray-300 rounded-xs p-4 shadow-xs">
+        <h2 className="text-sm font-black border-b border-gray-200 pb-2">運営者情報</h2>
+        <div className="overflow-x-auto mt-3">
+          <table className="w-full text-left text-xs border-collapse border border-gray-300">
             <tbody>
               <tr className="border-b border-gray-300">
                 <th className="p-3 bg-gray-50 font-bold border-r border-gray-300 w-1/4">運営者</th>
@@ -88,44 +105,16 @@ export default function AboutPage() {
               </tr>
               <tr className="border-b border-gray-300">
                 <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">サイトURL</th>
-                <td className="p-3">
-                  <a href="https://kokyo-ethics.com" className="text-indigo-600 hover:underline">
-                    https://kokyo-ethics.com
-                  </a>
-                </td>
-              </tr>
-              <tr className="border-b border-gray-300">
-                <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">お問い合わせ先</th>
-                <td className="p-3">
-                  <a href="/contact" className="text-indigo-600 hover:underline">
-                    お問い合わせフォーム
-                  </a>
-                  または上記メールアドレスよりご連絡ください。
-                </td>
+                <td className="p-3"><a href="https://kokyo-ethics.com" className="text-blue-700 hover:underline">https://kokyo-ethics.com</a></td>
               </tr>
               <tr>
-                <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">主な活動目的</th>
-                <td className="p-3">
-                  大学入学共通テストにおける「公共、倫理」および「倫理」科目の暗記・演習支援
-                </td>
+                <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">お問い合わせ</th>
+                <td className="p-3"><Link href="/contact" className="text-blue-700 hover:underline">お問い合わせ・誤植報告フォーム</Link>をご利用ください。</td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
-
-      {/* 著作権・コンテンツ作成方針 */}
-      <div className="pt-6 border-t border-gray-200 space-y-3">
-        <h2 className="text-lg font-bold text-gray-900">著作権・コンテンツ作成方針</h2>
-        <p className="text-xs sm:text-sm leading-relaxed text-gray-700">
-          当サイトの問題文、解説、人物・用語の対応整理、デザインおよびプログラムは、運営者が学習目的に合わせて作成・編集しています。
-          教科書、参考書、過去問題集など第三者の文章をそのまま転載しないよう努め、参考資料を確認しながら独自の説明にしています。
-        </p>
-        <p className="text-xs sm:text-sm leading-relaxed text-gray-700">
-          引用、画像、ロゴその他の第三者コンテンツを掲載する場合は、著作権法その他の関係法令を尊重し、必要に応じて出典や権利者を明示します。
-          掲載内容について著作権上の問題や誤りがある場合は、<a href="/contact" className="text-indigo-600 hover:underline">お問い合わせフォーム</a>からご連絡ください。
-        </p>
-      </div>
+      </section>
     </div>
   );
 }

@@ -28,7 +28,14 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-base font-bold text-gray-900">2. 広告配信について（Google AdSense等）</h2>
+          <h2 className="text-base font-bold text-gray-900">2. Googleログインについて</h2>
+          <p>
+            会員登録を選択した場合、当サイトではSupabaseを介してGoogleアカウントによる認証を行います。認証に必要なメールアドレス等の情報はGoogleから提供されますが、当サイト上で公開するのはランキング等に使用するニックネームと学習統計に限ります。Googleアカウントのパスワードを当サイトが取得・保存することはありません。
+          </p>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="text-base font-bold text-gray-900">3. 広告配信について（Google AdSense等）</h2>
           <p>
             当サイトでは、第三者配信の広告サービス「Google AdSense」を利用しています。
             広告配信事業者は、ユーザーの興味に応じた商品やサービスの広告を表示するため、当サイトや他サイトへのアクセスに関する情報「Cookie」（氏名、住所、メール アドレス、電話番号は含まれません）を使用することがあります。
@@ -48,21 +55,21 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-base font-bold text-gray-900">3. アクセス解析ツールについて</h2>
+          <h2 className="text-base font-bold text-gray-900">4. アクセス解析ツールについて</h2>
           <p>
             当サイトでは、サイトの利用状況を把握し、学習体験の向上に役立てるためにGoogle Analytics等のアクセス解析ツールを利用する場合があります。これらはトラフィックデータの収集のためにCookieを使用しています。このトラフィックデータは匿名で収集されており、個人を特定するものではありません。
           </p>
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-base font-bold text-gray-900">4. 免責事項</h2>
+          <h2 className="text-base font-bold text-gray-900">5. 免責事項</h2>
           <p>
             当サイトに掲載されている情報・解説・問題内容については、可能な限り正確を期しておりますが、共通テスト等の試験での得点や合否を保証するものではありません。当サイトの利用によって生じた損害等について、運営者は一切の責任を負いかねます。
           </p>
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-base font-bold text-gray-900">5. お問い合わせ窓口</h2>
+          <h2 className="text-base font-bold text-gray-900">6. お問い合わせ窓口</h2>
           <p>
             プライバシーポリシーに関するご質問やお問い合わせは、
             <a href="/contact" className="text-indigo-600 underline font-semibold">
@@ -75,4 +82,3 @@ export default function PrivacyPage() {
     </div>
   );
 }
-

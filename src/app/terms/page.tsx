@@ -39,14 +39,21 @@ export default function TermsPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-base font-bold text-gray-900">第3条（サービスの提供・変更・中断）</h2>
+          <h2 className="text-base font-bold text-gray-900">第3条（会員登録・ランキング）</h2>
+          <p>
+            会員登録はGoogleアカウントを利用して行います。登録者は、ニックネームや学習統計をランキングに表示することがあります。不正な方法によるスコアの操作や、他の利用者を誤認させるニックネームの使用は禁止します。
+          </p>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="text-base font-bold text-gray-900">第4条（サービスの提供・変更・中断）</h2>
           <p>
             当サイトは、利用者に事前通知することなく、当サービスの内容を変更、または提供を一時停止・終了することができるものとします。
           </p>
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-base font-bold text-gray-900">第4条（著作権）</h2>
+          <h2 className="text-base font-bold text-gray-900">第5条（著作権）</h2>
           <p>
             当サイトに掲載されている問題文、解説、デザイン、プログラム等の著作権は当サイト運営者または正当な権利者に帰属します。
           </p>
@@ -55,4 +62,3 @@ export default function TermsPage() {
     </div>
   );
 }
-

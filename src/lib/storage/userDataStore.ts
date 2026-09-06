@@ -3,6 +3,7 @@
 import { UserProfile, UserProgressItem, Badge } from '@/types';
 import { SRSEngine } from '@/lib/srs/srsEngine';
 import { BADGES } from '@/data/badges';
+import { syncProfileToCloud } from '@/lib/supabase/profileSync';
 
 const STORAGE_KEYS = {
   PROFILE: 'kokyo_user_profile',
@@ -68,6 +69,7 @@ export class UserDataStore {
     try {
       localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
       window.dispatchEvent(new Event('user_profile_updated'));
+      void syncProfileToCloud(profile);
     } catch (e) {
       console.error('Failed to save profile to localStorage:', e);
     }

@@ -72,13 +72,18 @@ git push -u origin main
 
 ## 🗄️ Supabase のセットアップ手順（任意）
 
-クラウド同期や本番DBを利用したい場合：
+Googleログイン、クラウド同期、ランキングを利用したい場合：
 1. [Supabase](https://supabase.com/) で新規プロジェクトを作成。
 2. 左メニューの **SQL Editor** を開き、プロジェクト内の `supabase/schema.sql` の内容を貼り付けて **Run** を実行。
-3. **Project Settings** -> **API** から以下を取得：
+3. **Authentication** -> **Providers** -> **Google** を有効にする。Google Cloudで発行したClient IDとClient Secretを入力する。
+4. Supabaseの **Authentication** -> **URL Configuration** に以下を追加する：
+   - `https://kokyo-ethics.com/account/`
+   - 開発時は `http://localhost:3000/account/`
+5. Google Cloud側のOAuthクライアントには、Supabaseが表示するCallback URL（通常は `https://<project-ref>.supabase.co/auth/v1/callback`）を登録する。
+6. **Project Settings** -> **API** から以下を取得：
    - `Project URL`
    - `anon / public API key`
-4. Vercel の Environment Variables（または `.env.local`）に設定：
+7. Cloudflare PagesなどのEnvironment Variables（または `.env.local`）に設定：
    - `NEXT_PUBLIC_SUPABASE_URL` = あなたのプロジェクトURL
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = あなたのanonキー
 
