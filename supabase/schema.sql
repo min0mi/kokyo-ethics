@@ -6,6 +6,7 @@
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   username TEXT NOT NULL DEFAULT '探求者',
+  ranking_visible BOOLEAN NOT NULL DEFAULT true,
   xp INTEGER NOT NULL DEFAULT 0,
   level INTEGER NOT NULL DEFAULT 1,
   streak_days INTEGER NOT NULL DEFAULT 1,
@@ -93,8 +94,24 @@ SELECT
   total_correct,
   ROUND((total_correct::NUMERIC / NULLIF(total_answered, 0)) * 100, 1) as accuracy
 FROM public.profiles
+WHERE ranking_visible = true
 ORDER BY xp DESC
 LIMIT 100;
 
 -- 公開するのは上記ビューの項目だけにし、profiles本体のRLSは維持する。
 ALTER VIEW public.leaderboard SET (security_invoker = false);
+
+-- 本人が自分のアカウントと関連データを削除できる退会用関数。
+CREATE OR REPLACE FUNCTION public.delete_my_account()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $
+BEGIN
+  DELETE FROM auth.users WHERE id = auth.uid();
+END;
+$;
+
+REVOKE ALL ON FUNCTION public.delete_my_account() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.delete_my_account() TO authenticated;
