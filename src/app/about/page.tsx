@@ -91,6 +91,24 @@ export default function AboutPage() {
       </section>
 
       <section className="bg-white border border-gray-300 rounded-xs p-4 shadow-xs">
+        <h2 className="text-sm font-black border-b border-gray-200 pb-2">更新履歴</h2>
+        <ol className="mt-3 space-y-3 text-xs text-gray-700">
+          <li className="grid grid-cols-[5.5rem_1fr] gap-2">
+            <time dateTime="2026-09-07" className="font-bold text-gray-500">2026.09.07</time>
+            <span>好きな思想家のプロフィール設定とランキング表示、更新履歴を追加しました。</span>
+          </li>
+          <li className="grid grid-cols-[5.5rem_1fr] gap-2">
+            <time dateTime="2026-09-07" className="font-bold text-gray-500">2026.09.07</time>
+            <span>サイトマップと演習ページの検索向け設定を改善しました。</span>
+          </li>
+          <li className="grid grid-cols-[5.5rem_1fr] gap-2">
+            <time dateTime="2026-09-06" className="font-bold text-gray-500">2026.09.06</time>
+            <span>会員登録・全国ランキングを追加し、復習欄を演習設定内に整理しました。</span>
+          </li>
+        </ol>
+      </section>
+
+      <section className="bg-white border border-gray-300 rounded-xs p-4 shadow-xs">
         <h2 className="text-sm font-black border-b border-gray-200 pb-2">運営者情報</h2>
         <div className="overflow-x-auto mt-3">
           <table className="w-full text-left text-xs border-collapse border border-gray-300">
