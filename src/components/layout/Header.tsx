@@ -51,8 +51,6 @@ export const Header: React.FC = () => {
     { href: '/dictionary', label: '思想・人物対応表' },
     { href: '/stats', label: '学習進捗・グラフ' },
     { href: '/badges', label: 'バッジ実績' },
-    { href: '/ranking', label: '全国ランキング' },
-    { href: '/account', label: profile?.isGuest ? '会員登録' : 'アカウント' },
     { href: '/contact', label: 'お問い合わせ・誤植報告' },
   ];
 
@@ -76,10 +74,28 @@ export const Header: React.FC = () => {
               共テまであと {daysUntilTest}日
             </div>
           )}
+          <Link
+            href="/ranking"
+            className={`px-2.5 py-1 border rounded-xs text-[11px] font-bold transition ${
+              pathname === '/ranking'
+                ? 'bg-red-600 text-white border-red-600'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100 hover:text-red-600'
+            }`}
+          >
+            全国ランキング
+          </Link>
+          <Link
+            href="/account"
+            className={`px-2.5 py-1 border rounded-xs text-[11px] font-bold transition ${
+              pathname === '/account'
+                ? 'bg-red-600 text-white border-red-600'
+                : 'bg-white text-red-600 border-red-300 hover:bg-red-50'
+            }`}
+          >
+            {profile?.isGuest ? '会員登録' : 'アカウント'}
+          </Link>
           {profile && (
             <div className="hidden md:flex items-center gap-2 bg-gray-100 px-2.5 py-1 rounded-xs border border-gray-300 text-[11px]">
-              <span className="font-bold text-gray-700">{profile.username}</span>
-              <span className="text-gray-400">|</span>
               <span className="text-orange-700 font-bold">
                 連続 {profile.streakDays}日
               </span>

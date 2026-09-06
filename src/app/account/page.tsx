@@ -8,8 +8,8 @@ import { UserDataStore } from '@/lib/storage/userDataStore';
 
 type Message = { type: 'error' | 'success'; text: string } | null;
 
-async function syncProfile(user: User) {
-  if (!supabase) return;
+async function syncProfile(user: User): Promise<string> {
+  if (!supabase) return '探求者';
 
   const localProfile = UserDataStore.getProfile();
   const { data: cloudProfile } = await supabase
@@ -19,10 +19,11 @@ async function syncProfile(user: User) {
     .maybeSingle();
 
   if (cloudProfile) {
+    const username = cloudProfile.username || '探求者';
     UserDataStore.saveProfile({
       ...localProfile,
       id: user.id,
-      username: cloudProfile.username || localProfile.username,
+      username,
       xp: cloudProfile.xp,
       level: cloudProfile.level,
       streakDays: cloudProfile.streak_days,
@@ -32,11 +33,10 @@ async function syncProfile(user: User) {
       totalCorrect: cloudProfile.total_correct,
       isGuest: false,
     });
-    return;
+    return username;
   }
 
-  const metadataName = user.user_metadata?.full_name || user.user_metadata?.name;
-  const username = String(metadataName || localProfile.username || '探求者').slice(0, 30);
+  const username = '探求者';
   const { error } = await supabase.from('profiles').insert({
     id: user.id,
     username,
@@ -52,11 +52,15 @@ async function syncProfile(user: User) {
   if (!error) {
     UserDataStore.saveProfile({ ...localProfile, id: user.id, username, isGuest: false });
   }
+  return username;
 }
 
 export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [nickname, setNickname] = useState('');
+  const [showNicknameForm, setShowNicknameForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [savingNickname, setSavingNickname] = useState(false);
   const [message, setMessage] = useState<Message>(null);
 
   useEffect(() => {
@@ -66,14 +70,27 @@ export default function AccountPage() {
     void supabase.auth.getUser().then(({ data, error }) => {
       if (!mounted || error || !data.user) return;
       setUser(data.user);
-      void syncProfile(data.user);
+      void syncProfile(data.user).then((username) => {
+        if (!mounted) return;
+        setNickname(username === '探求者' ? '' : username);
+        setShowNicknameForm(username === '探求者');
+      });
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
       const nextUser = session?.user || null;
       setUser(nextUser);
-      if (nextUser) void syncProfile(nextUser);
+      if (nextUser) {
+        void syncProfile(nextUser).then((username) => {
+          if (!mounted) return;
+          setNickname(username === '探求者' ? '' : username);
+          setShowNicknameForm(username === '探求者');
+        });
+      } else {
+        setNickname('');
+        setShowNicknameForm(false);
+      }
     });
 
     return () => {
@@ -98,6 +115,34 @@ export default function AccountPage() {
       setLoading(false);
       setMessage({ type: 'error', text: `Googleログインに失敗しました：${error.message}` });
     }
+  };
+
+  const handleSaveNickname = async () => {
+    if (!supabase || !user) return;
+    const trimmed = nickname.trim();
+    if (!trimmed || Array.from(trimmed).length > 20) {
+      setMessage({ type: 'error', text: 'ニックネームは1〜20文字で入力してください。' });
+      return;
+    }
+
+    setSavingNickname(true);
+    setMessage(null);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ username: trimmed })
+      .eq('id', user.id);
+    setSavingNickname(false);
+
+    if (error) {
+      setMessage({ type: 'error', text: `ニックネームの保存に失敗しました：${error.message}` });
+      return;
+    }
+
+    const localProfile = UserDataStore.getProfile();
+    UserDataStore.saveProfile({ ...localProfile, id: user.id, username: trimmed, isGuest: false });
+    setNickname(trimmed);
+    setShowNicknameForm(false);
+    setMessage({ type: 'success', text: 'ランキング用ニックネームを保存しました。' });
   };
 
   const handleLogout = async () => {
@@ -141,6 +186,45 @@ export default function AccountPage() {
           <p className="text-xs text-gray-600">
             このアカウントで、今後ランキングや複数端末での学習記録同期を利用できるようにします。
           </p>
+          {showNicknameForm ? (
+            <div className="border border-red-200 bg-red-50 p-4 rounded-xs space-y-3">
+              <div>
+                <h2 className="font-bold text-sm">ランキング用ニックネームを設定</h2>
+                <p className="text-[11px] text-gray-600 mt-1">
+                  Googleアカウント名は公開せず、ここで設定した名前だけをランキングに表示します。
+                </p>
+              </div>
+              <input
+                type="text"
+                value={nickname}
+                onChange={(event) => setNickname(event.target.value)}
+                maxLength={20}
+                placeholder="例：倫理マスター"
+                className="w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm outline-none focus:border-red-500"
+              />
+              <button
+                type="button"
+                onClick={handleSaveNickname}
+                disabled={savingNickname}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xs font-bold text-xs disabled:opacity-50"
+              >
+                {savingNickname ? '保存中…' : 'ニックネームを保存'}
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 px-3 py-2 rounded-xs">
+              <p className="text-xs text-gray-700">
+                ランキング名：<span className="font-bold">{nickname}</span>
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowNicknameForm(true)}
+                className="text-[11px] text-red-600 underline whitespace-nowrap"
+              >
+                変更
+              </button>
+            </div>
+          )}
           <button
             type="button"
             onClick={handleLogout}
@@ -162,7 +246,7 @@ export default function AccountPage() {
             {loading ? 'Googleへ移動中…' : 'Googleでログイン・会員登録'}
           </button>
           <p className="text-[11px] text-gray-500 text-center">
-            初回ログイン時に会員登録も完了します。表示名は後から変更できるようにする予定です。
+            初回ログイン時に会員登録が完了し、ランキング用ニックネームを設定できます。
           </p>
         </section>
       )}
