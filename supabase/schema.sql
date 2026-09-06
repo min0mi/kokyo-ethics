@@ -6,6 +6,7 @@
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   username TEXT NOT NULL DEFAULT '探求者',
+  favorite_figure_id TEXT,
   ranking_visible BOOLEAN NOT NULL DEFAULT true,
   xp INTEGER NOT NULL DEFAULT 0,
   level INTEGER NOT NULL DEFAULT 1,
@@ -17,6 +18,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- 既存プロジェクトにも好きな思想家の項目を追加する。
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS favorite_figure_id TEXT;
 
 -- RLS設定 (Profiles)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
@@ -92,7 +97,8 @@ SELECT
   level,
   streak_days,
   total_correct,
-  ROUND((total_correct::NUMERIC / NULLIF(total_answered, 0)) * 100, 1) as accuracy
+  ROUND((total_correct::NUMERIC / NULLIF(total_answered, 0)) * 100, 1) as accuracy,
+  favorite_figure_id
 FROM public.profiles
 WHERE ranking_visible = true
 ORDER BY xp DESC
