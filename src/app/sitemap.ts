@@ -5,6 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const routes = [
     '',
+    '/practice',
     '/practice/speed',
     '/practice/standard',
     '/practice/matching',
