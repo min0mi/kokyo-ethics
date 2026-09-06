@@ -273,7 +273,8 @@ export default function AccountPage() {
       return;
     }
     await supabase.auth.signOut();
-    UserDataStore.clearLearningData();
+    localStorage.removeItem('kokyo_user_profile');
+    localStorage.removeItem('kokyo_user_progress_map');
     setUser(null);
     setNickname('');
     setShowNicknameForm(false);
