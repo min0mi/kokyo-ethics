@@ -7,14 +7,15 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase/client';
 import { UserDataStore } from '@/lib/storage/userDataStore';
 
 type Message = { type: 'error' | 'success'; text: string } | null;
+type CloudProfile = { username: string; rankingVisible: boolean };
 
-async function syncProfile(user: User): Promise<string> {
-  if (!supabase) return '探求者';
+async function syncProfile(user: User): Promise<CloudProfile> {
+  if (!supabase) return { username: '探求者', rankingVisible: true };
 
   const localProfile = UserDataStore.getProfile();
   const { data: cloudProfile } = await supabase
     .from('profiles')
-    .select('username, xp, level, streak_days, last_active_date, unlocked_badges, total_answered, total_correct')
+    .select('username, ranking_visible, xp, level, streak_days, last_active_date, unlocked_badges, total_answered, total_correct')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -33,13 +34,14 @@ async function syncProfile(user: User): Promise<string> {
       totalCorrect: cloudProfile.total_correct,
       isGuest: false,
     });
-    return username;
+    return { username, rankingVisible: cloudProfile.ranking_visible !== false };
   }
 
   const username = '探求者';
   const { error } = await supabase.from('profiles').insert({
     id: user.id,
     username,
+    ranking_visible: true,
     xp: localProfile.xp,
     level: localProfile.level,
     streak_days: localProfile.streakDays,
@@ -52,15 +54,21 @@ async function syncProfile(user: User): Promise<string> {
   if (!error) {
     UserDataStore.saveProfile({ ...localProfile, id: user.id, username, isGuest: false });
   }
-  return username;
+  return { username, rankingVisible: true };
 }
 
 export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [nickname, setNickname] = useState('');
   const [showNicknameForm, setShowNicknameForm] = useState(false);
+  const [rankingVisible, setRankingVisible] = useState(true);
+  const [isRecoveryMode, setIsRecoveryMode] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [savingNickname, setSavingNickname] = useState(false);
+  const [savingRankingVisibility, setSavingRankingVisibility] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const [message, setMessage] = useState<Message>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -73,26 +81,30 @@ export default function AccountPage() {
     void supabase.auth.getUser().then(({ data, error }) => {
       if (!mounted || error || !data.user) return;
       setUser(data.user);
-      void syncProfile(data.user).then((username) => {
+      void syncProfile(data.user).then(({ username, rankingVisible: visible }) => {
         if (!mounted) return;
         setNickname(username === '探求者' ? '' : username);
         setShowNicknameForm(username === '探求者');
+        setRankingVisible(visible);
       });
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
+      if (event === 'PASSWORD_RECOVERY') setIsRecoveryMode(true);
       const nextUser = session?.user || null;
       setUser(nextUser);
       if (nextUser) {
-        void syncProfile(nextUser).then((username) => {
+        void syncProfile(nextUser).then(({ username, rankingVisible: visible }) => {
           if (!mounted) return;
           setNickname(username === '探求者' ? '' : username);
           setShowNicknameForm(username === '探求者');
+          setRankingVisible(visible);
         });
       } else {
         setNickname('');
         setShowNicknameForm(false);
+        setRankingVisible(true);
       }
     });
 
@@ -137,6 +149,52 @@ export default function AccountPage() {
       return;
     }
     setMessage({ type: 'success', text: 'ログインしました。' });
+  };
+
+
+  const handlePasswordReset = async () => {
+    if (!supabase) return;
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+      setMessage({ type: 'error', text: 'パスワード再設定に使うメールアドレスを入力してください。' });
+      return;
+    }
+    setLoading(true);
+    setMessage(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+      redirectTo: window.location.origin + '/account/',
+    });
+    setLoading(false);
+    if (error) {
+      setMessage({ type: 'error', text: '再設定メールの送信に失敗しました：' + error.message });
+      return;
+    }
+    setMessage({ type: 'success', text: 'パスワード再設定用のメールを送信しました。' });
+  };
+
+  const handlePasswordUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
+    if (!supabase) return;
+    event.preventDefault();
+    if (newPassword.length < 6) {
+      setMessage({ type: 'error', text: '新しいパスワードは6文字以上で入力してください。' });
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setMessage({ type: 'error', text: '新しいパスワードが一致していません。' });
+      return;
+    }
+    setLoading(true);
+    setMessage(null);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setLoading(false);
+    if (error) {
+      setMessage({ type: 'error', text: 'パスワードの変更に失敗しました：' + error.message });
+      return;
+    }
+    setNewPassword('');
+    setConfirmNewPassword('');
+    setIsRecoveryMode(false);
+    setMessage({ type: 'success', text: 'パスワードを変更しました。' });
   };
 
   const handleGoogleLogin = async () => {
@@ -185,6 +243,43 @@ export default function AccountPage() {
     setMessage({ type: 'success', text: 'ランキング用ニックネームを保存しました。' });
   };
 
+
+  const handleSaveRankingVisibility = async () => {
+    if (!supabase || !user) return;
+    setSavingRankingVisibility(true);
+    setMessage(null);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ ranking_visible: rankingVisible })
+      .eq('id', user.id);
+    setSavingRankingVisibility(false);
+    if (error) {
+      setMessage({ type: 'error', text: 'ランキング設定の保存に失敗しました：' + error.message });
+      return;
+    }
+    setMessage({ type: 'success', text: rankingVisible ? 'ランキングへの参加を有効にしました。' : 'ランキングから非表示にしました。' });
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!supabase || !user) return;
+    const confirmed = window.confirm('アカウントと学習記録を削除します。この操作は元に戻せません。続行しますか？');
+    if (!confirmed) return;
+    setDeletingAccount(true);
+    setMessage(null);
+    const { error } = await supabase.rpc('delete_my_account');
+    setDeletingAccount(false);
+    if (error) {
+      setMessage({ type: 'error', text: '退会処理に失敗しました：' + error.message });
+      return;
+    }
+    await supabase.auth.signOut();
+    UserDataStore.clearLearningData();
+    setUser(null);
+    setNickname('');
+    setShowNicknameForm(false);
+    setMessage({ type: 'success', text: 'アカウントと学習記録を削除しました。' });
+  };
+
   const handleLogout = async () => {
     if (!supabase) return;
     setLoading(true);
@@ -206,7 +301,7 @@ export default function AccountPage() {
         </span>
         <h1 className="text-2xl font-black mt-2">学習記録を保存する</h1>
         <p className="text-xs text-gray-500 mt-1">
-          メールアドレスで登録すると、学習記録をアカウントに紐付けられます。
+          メールアドレスまたはGoogleで登録すると、学習記録をアカウントに紐付けられます。
         </p>
       </div>
 
@@ -216,6 +311,26 @@ export default function AccountPage() {
           <p className="text-xs text-gray-700">
             管理者による認証設定が完了すると、会員登録を利用できます。
           </p>
+        </section>
+      ) : isRecoveryMode ? (
+        <section className="bg-white border border-gray-300 p-5 rounded-xs space-y-4">
+          <div>
+            <h2 className="font-bold">新しいパスワードを設定</h2>
+            <p className="text-xs text-gray-600 mt-1">新しいパスワードを入力して、変更を確定してください。</p>
+          </div>
+          <form onSubmit={handlePasswordUpdate} className="space-y-3">
+            <label className="block text-xs font-bold">
+              新しいパスワード（6文字以上）
+              <input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" minLength={6} required className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm outline-none focus:border-red-500" />
+            </label>
+            <label className="block text-xs font-bold">
+              新しいパスワード（確認）
+              <input type="password" value={confirmNewPassword} onChange={(event) => setConfirmNewPassword(event.target.value)} autoComplete="new-password" minLength={6} required className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm outline-none focus:border-red-500" />
+            </label>
+            <button type="submit" disabled={loading} className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xs font-bold text-sm disabled:opacity-50">
+              {loading ? '変更中…' : 'パスワードを変更'}
+            </button>
+          </form>
         </section>
       ) : user ? (
         <section className="bg-white border border-gray-300 p-5 rounded-xs space-y-4">
@@ -265,6 +380,19 @@ export default function AccountPage() {
               </button>
             </div>
           )}
+          <div className="border-t border-gray-200 pt-4 space-y-2">
+            <div>
+              <h2 className="font-bold text-sm">ランキング設定</h2>
+              <p className="text-[11px] text-gray-600 mt-1">OFFにすると、全国ランキングからあなたの名前と成績を非表示にします。</p>
+            </div>
+            <label className="flex items-center gap-2 text-xs text-gray-700">
+              <input type="checkbox" checked={rankingVisible} onChange={(event) => setRankingVisible(event.target.checked)} className="h-4 w-4 accent-red-600" />
+              全国ランキングに参加する
+            </label>
+            <button type="button" onClick={handleSaveRankingVisibility} disabled={savingRankingVisibility} className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xs font-bold text-xs disabled:opacity-50">
+              {savingRankingVisibility ? '保存中…' : 'ランキング設定を保存'}
+            </button>
+          </div>
           <button
             type="button"
             onClick={handleLogout}
@@ -272,6 +400,14 @@ export default function AccountPage() {
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xs font-bold text-xs disabled:opacity-50"
           >
             {loading ? '処理中…' : 'ログアウト'}
+          </button>
+          <button
+            type="button"
+            onClick={handleDeleteAccount}
+            disabled={deletingAccount}
+            className="block text-[11px] text-red-700 underline disabled:opacity-50"
+          >
+            {deletingAccount ? '退会処理中…' : '退会してデータを削除'}
           </button>
         </section>
       ) : (
@@ -317,6 +453,11 @@ export default function AccountPage() {
                 className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm outline-none focus:border-red-500"
               />
             </label>
+            {!isSignUp && (
+              <button type="button" onClick={handlePasswordReset} disabled={loading} className="text-[11px] text-red-700 underline disabled:opacity-50">
+                パスワードを忘れた場合はこちら
+              </button>
+            )}
             <button
               type="submit"
               disabled={loading}
