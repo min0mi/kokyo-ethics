@@ -1,34 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Script from 'next/script';
 import type { User } from '@supabase/supabase-js';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client';
 import { UserDataStore } from '@/lib/storage/userDataStore';
 
 type Message = { type: 'error' | 'success'; text: string } | null;
-
-const GOOGLE_CLIENT_ID = '886799927016-5dmvu2ukjgam8srp62tv92nbj9nv10um.apps.googleusercontent.com';
-
-type GoogleCredentialResponse = { credential: string };
-type GoogleAccountsId = {
-  initialize: (options: {
-    client_id: string;
-    callback: (response: GoogleCredentialResponse) => void;
-    ux_mode?: 'popup' | 'redirect';
-    use_fedcm_for_button?: boolean;
-    button_auto_select?: boolean;
-  }) => void;
-  renderButton: (parent: HTMLElement, options: Record<string, string | number>) => void;
-  prompt: (callback?: (notification: { isNotDisplayed: () => boolean; isSkippedMoment: () => boolean }) => void) => void;
-};
-
-declare global {
-  interface Window {
-    google?: { accounts?: { id?: GoogleAccountsId } };
-  }
-}
 
 async function syncProfile(user: User): Promise<string> {
   if (!supabase) return '探求者';
@@ -84,8 +62,9 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(false);
   const [savingNickname, setSavingNickname] = useState(false);
   const [message, setMessage] = useState<Message>(null);
-  const [showGoogleFallback, setShowGoogleFallback] = useState(false);
-  const googleButtonRef = useRef<HTMLDivElement>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -123,82 +102,43 @@ export default function AccountPage() {
     };
   }, []);
 
-  const handleGoogleCredential = async (response: GoogleCredentialResponse) => {
-    if (!supabase || !response.credential) return;
-    setLoading(true);
-    setMessage(null);
-
-    const { error } = await supabase.auth.signInWithIdToken({
-      provider: 'google',
-      token: response.credential,
-    });
-
-    setLoading(false);
-    if (error) {
-      setMessage({ type: 'error', text: `Googleログインに失敗しました：${error.message}` });
+  const handleEmailAuth = async (event: React.FormEvent<HTMLFormElement>) => {
+    if (!supabase) return;
+    event.preventDefault();
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+      setMessage({ type: 'error', text: 'メールアドレスを正しく入力してください。' });
+      return;
     }
-  };
-
-  const handleGooglePrompt = () => {
-    const googleId = window.google?.accounts?.id;
-    if (!googleId) {
-      void handleGoogleLogin();
+    if (password.length < 6) {
+      setMessage({ type: 'error', text: 'パスワードは6文字以上で入力してください。' });
       return;
     }
 
     setLoading(true);
     setMessage(null);
-    googleId.prompt((notification) => {
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        setLoading(false);
-        setShowGoogleFallback(true);
-        setMessage({ type: 'error', text: '自動起動できないため、Google公式ボタンを表示しました。' });
-      }
-    });
-  };
 
-  const initializeGoogleButton = () => {
-    const googleId = window.google?.accounts?.id;
-    const button = googleButtonRef.current;
-    if (!googleId || !button || !supabase) return;
+    const result = isSignUp
+      ? await supabase.auth.signUp({
+          email: trimmedEmail,
+          password,
+          options: { emailRedirectTo: `${window.location.origin}/account/` },
+        })
+      : await supabase.auth.signInWithPassword({ email: trimmedEmail, password });
 
-    button.replaceChildren();
-    googleId.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleCredential,
-      ux_mode: 'popup',
-      use_fedcm_for_button: false,
-      button_auto_select: false,
-    });
-    googleId.renderButton(button, {
-      type: 'standard',
-      theme: 'outline',
-      size: 'large',
-      text: 'continue_with',
-      shape: 'rectangular',
-      width: 400,
-      logo_alignment: 'left',
-    });
-  };
-
-  const handleGoogleLogin = async () => {
-    if (!supabase) return;
-    setLoading(true);
-    setMessage(null);
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/account/`,
-        scopes: 'openid',
-      },
-    });
-
-    if (error) {
-      setLoading(false);
-      setMessage({ type: 'error', text: `Googleログインに失敗しました：${error.message}` });
+    setLoading(false);
+    if (result.error) {
+      setMessage({ type: 'error', text: `${isSignUp ? '会員登録' : 'ログイン'}に失敗しました：${result.error.message}` });
+      return;
     }
+    if (isSignUp && !result.data.session) {
+      setMessage({ type: 'success', text: '確認メールを送信しました。メール内のリンクを開いて登録を完了してください。' });
+      setPassword('');
+      return;
+    }
+    setMessage({ type: 'success', text: 'ログインしました。' });
   };
+
 
   const handleSaveNickname = async () => {
     if (!supabase || !user) return;
@@ -249,7 +189,7 @@ export default function AccountPage() {
         </span>
         <h1 className="text-2xl font-black mt-2">学習記録を保存する</h1>
         <p className="text-xs text-gray-500 mt-1">
-          Googleアカウントでログインすると、学習記録をアカウントに紐付けられます。
+          メールアドレスで登録すると、学習記録をアカウントに紐付けられます。
         </p>
       </div>
 
@@ -257,7 +197,7 @@ export default function AccountPage() {
         <section className="bg-amber-50 border border-amber-300 p-5 rounded-xs space-y-2">
           <h2 className="font-bold">現在は準備中です</h2>
           <p className="text-xs text-gray-700">
-            管理者による認証設定が完了すると、Googleログインを利用できます。
+            管理者による認証設定が完了すると、会員登録を利用できます。
           </p>
         </section>
       ) : user ? (
@@ -274,7 +214,7 @@ export default function AccountPage() {
               <div>
                 <h2 className="font-bold text-sm">ランキング用ニックネームを設定</h2>
                 <p className="text-[11px] text-gray-600 mt-1">
-                  Googleアカウント名は公開せず、ここで設定した名前だけをランキングに表示します。
+                  メールアドレスは公開せず、ここで設定した名前だけをランキングに表示します。
                 </p>
               </div>
               <input
@@ -319,27 +259,57 @@ export default function AccountPage() {
         </section>
       ) : (
         <section className="bg-white border border-gray-300 p-5 rounded-xs space-y-4">
-          <Script
-            src="https://accounts.google.com/gsi/client"
-            strategy="afterInteractive"
-            onLoad={initializeGoogleButton}
-          />
-          <div
-            ref={googleButtonRef}
-            className={showGoogleFallback ? 'flex min-h-11 justify-center' : 'hidden'}
-            aria-hidden={!showGoogleFallback}
-          />
-          <button
-            type="button"
-            onClick={handleGooglePrompt}
-            disabled={loading}
-            className="w-full px-4 py-3 bg-white hover:bg-gray-50 border border-gray-400 rounded-xs font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <span className="text-blue-600 font-black text-lg leading-none">G</span>
-            {loading ? 'Googleへ接続中…' : 'Googleでログイン・会員登録'}
-          </button>
+          <div className="flex border-b border-gray-200">
+            <button
+              type="button"
+              onClick={() => { setIsSignUp(false); setMessage(null); }}
+              className={`flex-1 pb-2 text-xs font-bold ${!isSignUp ? 'border-b-2 border-red-600 text-red-700' : 'text-gray-500'}`}
+            >
+              ログイン
+            </button>
+            <button
+              type="button"
+              onClick={() => { setIsSignUp(true); setMessage(null); }}
+              className={`flex-1 pb-2 text-xs font-bold ${isSignUp ? 'border-b-2 border-red-600 text-red-700' : 'text-gray-500'}`}
+            >
+              新規登録
+            </button>
+          </div>
+          <form onSubmit={handleEmailAuth} className="space-y-3">
+            <label className="block text-xs font-bold">
+              メールアドレス
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="email"
+                placeholder="example@email.com"
+                required
+                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm outline-none focus:border-red-500"
+              />
+            </label>
+            <label className="block text-xs font-bold">
+              パスワード（6文字以上）
+              <input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                required
+                minLength={6}
+                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm outline-none focus:border-red-500"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xs font-bold text-sm disabled:opacity-50"
+            >
+              {loading ? '処理中…' : isSignUp ? 'メールアドレスで新規登録' : 'メールアドレスでログイン'}
+            </button>
+          </form>
           <p className="text-[11px] text-gray-500 text-center">
-            初回ログイン時に会員登録が完了し、ランキング用ニックネームを設定できます。
+            初回登録後に、ランキング用ニックネームを設定できます。
           </p>
         </section>
       )}
