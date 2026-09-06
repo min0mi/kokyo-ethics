@@ -1,12 +1,31 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import type { User } from '@supabase/supabase-js';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client';
 import { UserDataStore } from '@/lib/storage/userDataStore';
 
 type Message = { type: 'error' | 'success'; text: string } | null;
+
+const GOOGLE_CLIENT_ID = '886799927016-5dmvu2ukjgam8srp62tv92nbj9nv10um.apps.googleusercontent.com';
+
+type GoogleCredentialResponse = { credential: string };
+type GoogleAccountsId = {
+  initialize: (options: {
+    client_id: string;
+    callback: (response: GoogleCredentialResponse) => void;
+    ux_mode?: 'popup' | 'redirect';
+  }) => void;
+  renderButton: (parent: HTMLElement, options: Record<string, string | number>) => void;
+};
+
+declare global {
+  interface Window {
+    google?: { accounts?: { id?: GoogleAccountsId } };
+  }
+}
 
 async function syncProfile(user: User): Promise<string> {
   if (!supabase) return '探求者';
@@ -62,6 +81,8 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(false);
   const [savingNickname, setSavingNickname] = useState(false);
   const [message, setMessage] = useState<Message>(null);
+  const [googleReady, setGoogleReady] = useState(false);
+  const googleButtonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!supabase) return;
@@ -99,6 +120,45 @@ export default function AccountPage() {
     };
   }, []);
 
+  const handleGoogleCredential = async (response: GoogleCredentialResponse) => {
+    if (!supabase || !response.credential) return;
+    setLoading(true);
+    setMessage(null);
+
+    const { error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: response.credential,
+    });
+
+    setLoading(false);
+    if (error) {
+      setMessage({ type: 'error', text: `Googleログインに失敗しました：${error.message}` });
+    }
+  };
+
+  const initializeGoogleButton = () => {
+    const googleId = window.google?.accounts?.id;
+    const button = googleButtonRef.current;
+    if (!googleId || !button || !supabase) return;
+
+    button.replaceChildren();
+    googleId.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      ux_mode: 'popup',
+    });
+    googleId.renderButton(button, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      text: 'continue_with',
+      shape: 'rectangular',
+      width: 400,
+      logo_alignment: 'left',
+    });
+    setGoogleReady(true);
+  };
+
   const handleGoogleLogin = async () => {
     if (!supabase) return;
     setLoading(true);
@@ -107,7 +167,8 @@ export default function AccountPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/account/`, scopes: 'openid',
+        redirectTo: `${window.location.origin}/account/`,
+        scopes: 'openid',
       },
     });
 
@@ -236,15 +297,23 @@ export default function AccountPage() {
         </section>
       ) : (
         <section className="bg-white border border-gray-300 p-5 rounded-xs space-y-4">
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={loading}
-            className="w-full px-4 py-3 bg-white hover:bg-gray-50 border border-gray-400 rounded-xs font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <span className="text-blue-600 font-black text-lg leading-none">G</span>
-            {loading ? 'Googleへ移動中…' : 'Googleでログイン・会員登録'}
-          </button>
+          <Script
+            src="https://accounts.google.com/gsi/client"
+            strategy="afterInteractive"
+            onLoad={initializeGoogleButton}
+          />
+          <div ref={googleButtonRef} className="flex min-h-11 justify-center" />
+          {!googleReady && (
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="w-full px-4 py-3 bg-white hover:bg-gray-50 border border-gray-400 rounded-xs font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <span className="text-blue-600 font-black text-lg leading-none">G</span>
+              {loading ? 'Googleへ移動中…' : 'Googleでログイン・会員登録'}
+            </button>
+          )}
           <p className="text-[11px] text-gray-500 text-center">
             初回ログイン時に会員登録が完了し、ランキング用ニックネームを設定できます。
           </p>
