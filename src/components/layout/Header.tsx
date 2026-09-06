@@ -57,7 +57,7 @@ export const Header: React.FC = () => {
   return (
     <header className="w-full bg-white border-b-2 border-red-600 shadow-xs">
       {/* 最上段：ロゴ ＆ ユーザーステータス ＆ 科目切替 */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-baseline gap-1.5">
             <span className="text-xl sm:text-2xl font-black text-red-600 tracking-tight">
@@ -67,14 +67,8 @@ export const Header: React.FC = () => {
           </Link>
         </div>
 
-        {/* ユーザーステータス ＆ 科目切り替え */}
-        <div className="flex w-full items-center justify-end gap-2.5 text-xs flex-wrap xl:w-auto">
-          {daysUntilTest !== null && (
-            <div className="bg-red-50 text-red-700 px-2.5 py-1 border border-red-300 rounded-xs font-black text-[11px] select-none">
-              共テまであと {daysUntilTest}日
-            </div>
-          )}
-          <div className="flex max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-red-100 bg-gradient-to-r from-red-50 via-white to-blue-50 p-1.5 shadow-sm">
+        {/* この2つだけタイトル横に置く主要アクション */}
+        <div className="flex max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-red-100 bg-gradient-to-r from-red-50 via-white to-blue-50 p-1.5 shadow-sm">
             <Link
               href="/ranking"
               aria-label="全国ランキングを見る"
@@ -112,7 +106,17 @@ export const Header: React.FC = () => {
                 <span>{profile?.isGuest ? '会員登録' : 'アカウント'}</span>
               </span>
             </Link>
-          </div>
+        </div>
+      </div>
+
+      {/* タイトル下：学習状況と設定 */}
+      <div className="border-t border-gray-100 bg-white">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-1.5 flex items-center justify-end gap-2.5 text-xs flex-wrap">
+          {daysUntilTest !== null && (
+            <div className="bg-red-50 text-red-700 px-2.5 py-1 border border-red-300 rounded-xs font-black text-[11px] select-none">
+              共テまであと {daysUntilTest}日
+            </div>
+          )}
           {profile && (
             <div className="hidden md:flex items-center gap-2 bg-gray-100 px-2.5 py-1 rounded-xs border border-gray-300 text-[11px]">
               <span className="text-orange-700 font-bold">
@@ -130,7 +134,6 @@ export const Header: React.FC = () => {
           >
             音: {isMuted ? '切' : '入'}
           </button>
-
         </div>
       </div>
 
