@@ -74,26 +74,45 @@ export const Header: React.FC = () => {
               共テまであと {daysUntilTest}日
             </div>
           )}
-          <Link
-            href="/ranking"
-            className={`px-2.5 py-1 border rounded-xs text-[11px] font-bold transition ${
-              pathname === '/ranking'
-                ? 'bg-red-600 text-white border-red-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100 hover:text-red-600'
-            }`}
-          >
-            全国ランキング
-          </Link>
-          <Link
-            href="/account"
-            className={`px-2.5 py-1 border rounded-xs text-[11px] font-bold transition ${
-              pathname === '/account'
-                ? 'bg-red-600 text-white border-red-600'
-                : 'bg-white text-red-600 border-red-300 hover:bg-red-50'
-            }`}
-          >
-            {profile?.isGuest ? '会員登録' : 'アカウント'}
-          </Link>
+          <div className="flex items-center gap-1.5 rounded-xl border border-red-100 bg-gradient-to-r from-red-50 via-white to-blue-50 p-1.5 shadow-sm">
+            <Link
+              href="/ranking"
+              aria-label="全国ランキングを見る"
+              className={`group inline-flex min-h-11 items-center gap-2 rounded-lg border-2 px-3.5 py-2 text-xs font-black leading-tight transition hover:-translate-y-0.5 hover:shadow-md ${
+                pathname === '/ranking'
+                  ? 'border-slate-900 bg-slate-900 text-white shadow-[0_3px_0_#0f172a]'
+                  : 'border-slate-800 bg-slate-800 text-white shadow-[0_3px_0_#0f172a] hover:bg-slate-700'
+              }`}
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 shrink-0 fill-none stroke-current stroke-2">
+                <path d="M8 21h8M12 17v4M6 4h12v4a6 6 0 0 1-12 0V4Z" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M6 6H3v1a4 4 0 0 0 4 4M18 6h3v1a4 4 0 0 1-4 4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="flex flex-col items-start">
+                <span className="text-[9px] font-bold tracking-[0.14em] text-white/65">学習仲間</span>
+                <span>全国ランキング</span>
+              </span>
+            </Link>
+            <Link
+              href="/account"
+              aria-label={profile?.isGuest ? '会員登録する' : 'アカウントを開く'}
+              className={`group inline-flex min-h-11 items-center gap-2 rounded-lg border-2 px-3.5 py-2 text-xs font-black leading-tight transition hover:-translate-y-0.5 hover:shadow-md ${
+                pathname === '/account'
+                  ? 'border-red-700 bg-red-700 text-white shadow-[0_3px_0_#991b1b]'
+                  : 'border-red-600 bg-red-600 text-white shadow-[0_3px_0_#991b1b] hover:bg-red-500'
+              }`}
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 shrink-0 fill-none stroke-current stroke-2">
+                <circle cx="12" cy="8" r="3.5" />
+                <path d="M5 20a7 7 0 0 1 14 0" strokeLinecap="round" />
+                <path d="M19 4v4M17 6h4" strokeLinecap="round" />
+              </svg>
+              <span className="flex flex-col items-start">
+                <span className="text-[9px] font-bold tracking-[0.14em] text-white/70">学習を保存</span>
+                <span>{profile?.isGuest ? '会員登録' : 'アカウント'}</span>
+              </span>
+            </Link>
+          </div>
           {profile && (
             <div className="hidden md:flex items-center gap-2 bg-gray-100 px-2.5 py-1 rounded-xs border border-gray-300 text-[11px]">
               <span className="text-orange-700 font-bold">
