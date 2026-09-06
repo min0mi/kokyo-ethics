@@ -82,6 +82,7 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(false);
   const [savingNickname, setSavingNickname] = useState(false);
   const [message, setMessage] = useState<Message>(null);
+  const [showGoogleFallback, setShowGoogleFallback] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -148,7 +149,8 @@ export default function AccountPage() {
     googleId.prompt((notification) => {
       if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
         setLoading(false);
-        setMessage({ type: 'error', text: 'Googleログインを起動できませんでした。もう一度お試しください。' });
+        setShowGoogleFallback(true);
+        setMessage({ type: 'error', text: '自動起動できないため、Google公式ボタンを表示しました。' });
       }
     });
   };
@@ -318,7 +320,11 @@ export default function AccountPage() {
             strategy="afterInteractive"
             onLoad={initializeGoogleButton}
           />
-          <div ref={googleButtonRef} className="hidden" aria-hidden="true" />
+          <div
+            ref={googleButtonRef}
+            className={showGoogleFallback ? 'flex min-h-11 justify-center' : 'hidden'}
+            aria-hidden={!showGoogleFallback}
+          />
           <button
             type="button"
             onClick={handleGooglePrompt}
