@@ -21,6 +21,8 @@ export const Footer: React.FC = () => {
           <Link href="/terms" className="hover:underline hover:text-blue-700">利用規約</Link>
           <span>|</span>
           <Link href="/contact" className="hover:underline hover:text-blue-700">お問い合わせ・誤植報告</Link>
+          <span>|</span>
+          <Link href="/guide" className="hover:underline hover:text-blue-700">使い方</Link>
         </div>
 
         <p className="text-[11px] text-gray-500">

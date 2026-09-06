@@ -52,6 +52,7 @@ export const Header: React.FC = () => {
     { href: '/stats', label: '学習進捗・グラフ' },
     { href: '/badges', label: 'バッジ実績' },
     { href: '/contact', label: 'お問い合わせ・誤植報告' },
+    { href: '/guide', label: '使い方' },
   ];
 
   return (
