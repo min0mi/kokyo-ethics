@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { AdBanner } from '@/components/ads/AdBanner';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client';
+import { FIGURES } from '@/data/figures';
+
+const figureNames = new Map(FIGURES.map((figure) => [figure.id, figure.name]));
 
 type LeaderboardRow = {
   id: string;
@@ -11,6 +14,7 @@ type LeaderboardRow = {
   level: number;
   total_correct: number;
   accuracy: number | null;
+  favorite_figure_id: string | null;
 };
 
 export default function RankingPage() {
@@ -31,7 +35,7 @@ export default function RankingPage() {
       const [{ data: ranking, error: rankingError }, { data: userData }] = await Promise.all([
         client
           .from('leaderboard')
-          .select('id, username, xp, level, total_correct, accuracy')
+          .select('id, username, xp, level, total_correct, accuracy, favorite_figure_id')
           .order('xp', { ascending: false })
           .limit(100),
         client.auth.getUser(),
@@ -71,7 +75,7 @@ export default function RankingPage() {
       {!isSupabaseConfigured ? (
         <div className="bg-amber-50 border border-amber-300 p-6 rounded-xs text-center space-y-2">
           <p className="font-bold text-gray-700 text-sm">ランキングは現在準備中です。</p>
-          <p className="text-gray-500 text-[11px]">Googleログインとデータベースの設定後に利用できます。</p>
+          <p className="text-gray-500 text-[11px]">会員登録とデータベースの設定後に利用できます。</p>
         </div>
       ) : loading ? (
         <div className="bg-white border border-gray-300 p-6 rounded-xs text-center text-gray-500">
@@ -84,7 +88,7 @@ export default function RankingPage() {
       ) : rows.length === 0 ? (
         <div className="bg-white border border-gray-300 p-6 rounded-xs text-center space-y-2">
           <p className="font-bold text-gray-700 text-sm">まだランキング参加者はいません。</p>
-          <p className="text-gray-500 text-[11px]">Googleログインして問題を解くと、ここに表示されます。</p>
+          <p className="text-gray-500 text-[11px]">会員登録して問題を解くと、ここに表示されます。</p>
         </div>
       ) : (
         <div className="bg-white border border-gray-300 rounded-xs overflow-hidden">
@@ -98,6 +102,9 @@ export default function RankingPage() {
           <div>
             {rows.map((row, index) => {
               const isMe = row.id === currentUserId;
+              const favoriteFigureName = row.favorite_figure_id
+                ? figureNames.get(row.favorite_figure_id)
+                : null;
               return (
                 <div
                   key={row.id}
@@ -106,9 +113,16 @@ export default function RankingPage() {
                   <span className={`font-black ${index < 3 ? 'text-red-600' : 'text-gray-500'}`}>
                     {index + 1}
                   </span>
-                  <span className="font-bold truncate">
-                    {row.username || '探求者'}
-                    {isMe && <span className="ml-1 text-[10px] text-red-600">あなた</span>}
+                  <span className="min-w-0">
+                    <span className="block font-bold truncate">
+                      {row.username || '探求者'}
+                      {isMe && <span className="ml-1 text-[10px] text-red-600">あなた</span>}
+                    </span>
+                    {favoriteFigureName && (
+                      <span className="block mt-0.5 text-[10px] font-normal text-gray-500 truncate">
+                        好きな思想家：{favoriteFigureName}
+                      </span>
+                    )}
                   </span>
                   <span className="text-right font-bold text-blue-700">{row.xp.toLocaleString()}</span>
                   <span className="text-right text-gray-700">Lv.{row.level}</span>
