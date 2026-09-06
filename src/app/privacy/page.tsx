@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         </div>
         <div>
           <h1 className="text-2xl font-black text-gray-900">プライバシーポリシー</h1>
-          <p className="text-xs text-gray-500">最終改定日: 2026年8月27日</p>
+          <p className="text-xs text-gray-500">最終改定日: 2026年9月7日</p>
         </div>
       </div>
 
@@ -23,14 +23,14 @@ export default function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-base font-bold text-gray-900">1. 個人情報の収集・利用目的について</h2>
           <p>
-            「公共倫理パーフェクトマスター.com」（以下、「当サイト」）では、ユーザーの学習進捗の保存、ランキング機能の提供、お問い合わせへの対応等のために、必要最小限の利用データ（ニックネーム、学習履歴データ、IPアドレス、Cookie等）を取得・利用する場合があります。
+            「公共倫理パーフェクトマスター.com」（以下、「当サイト」）では、ユーザーの学習進捗の保存、ランキング機能の提供、お問い合わせへの対応等のために、必要最小限の利用データ（メールアドレス、ニックネーム、好きな思想家、学習履歴データ、IPアドレス、Cookie等）を取得・利用する場合があります。
           </p>
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-base font-bold text-gray-900">2. Googleログインについて</h2>
+          <h2 className="text-base font-bold text-gray-900">2. 会員登録・ログインについて</h2>
           <p>
-            会員登録を選択した場合、当サイトではSupabaseを介してGoogleアカウントによる認証を行います。認証に必要なメールアドレス等の情報はGoogleから提供されますが、当サイト上で公開するのはランキング等に使用するニックネームと学習統計に限ります。Googleアカウントのパスワードを当サイトが取得・保存することはありません。
+            会員登録を選択した場合、当サイトではSupabaseを介してメールアドレスまたはGoogleアカウントによる認証を行います。当サイト上で公開するのは、ランキング参加を有効にしたユーザーのニックネーム、学習統計、および任意で設定した好きな思想家に限ります。メールアドレスやGoogleアカウントのパスワードは公開しません。また、Googleアカウントのパスワードを当サイトが取得・保存することはありません。
           </p>
         </section>
 
