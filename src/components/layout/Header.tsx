@@ -68,13 +68,13 @@ export const Header: React.FC = () => {
         </div>
 
         {/* ユーザーステータス ＆ 科目切り替え */}
-        <div className="flex items-center gap-2.5 text-xs flex-wrap">
+        <div className="flex w-full items-center justify-end gap-2.5 text-xs flex-wrap xl:w-auto">
           {daysUntilTest !== null && (
             <div className="bg-red-50 text-red-700 px-2.5 py-1 border border-red-300 rounded-xs font-black text-[11px] select-none">
               共テまであと {daysUntilTest}日
             </div>
           )}
-          <div className="flex items-center gap-1.5 rounded-xl border border-red-100 bg-gradient-to-r from-red-50 via-white to-blue-50 p-1.5 shadow-sm">
+          <div className="flex max-w-full shrink-0 items-center gap-1.5 rounded-xl border border-red-100 bg-gradient-to-r from-red-50 via-white to-blue-50 p-1.5 shadow-sm">
             <Link
               href="/ranking"
               aria-label="全国ランキングを見る"
