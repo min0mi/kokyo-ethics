@@ -5,17 +5,32 @@ import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client';
 import { UserDataStore } from '@/lib/storage/userDataStore';
+import { FIGURES } from '@/data/figures';
+import { CATEGORIES } from '@/data/categories';
 
 type Message = { type: 'error' | 'success'; text: string } | null;
-type CloudProfile = { username: string; rankingVisible: boolean };
+type CloudProfile = { username: string; rankingVisible: boolean; favoriteFigureId: string };
+
+const availableCategoryIds = new Set(
+  CATEGORIES.filter((category) => category.isAvailable).map((category) => category.id)
+);
+const selectableFigures = FIGURES.filter((figure) => availableCategoryIds.has(figure.categoryId));
+const figuresByCategory = CATEGORIES.filter((category) => category.isAvailable)
+  .map((category) => ({
+    category,
+    figures: selectableFigures
+      .filter((figure) => figure.categoryId === category.id)
+      .sort((a, b) => a.name.localeCompare(b.name, 'ja')),
+  }))
+  .filter(({ figures }) => figures.length > 0);
 
 async function syncProfile(user: User): Promise<CloudProfile> {
-  if (!supabase) return { username: '探求者', rankingVisible: true };
+  if (!supabase) return { username: '探求者', rankingVisible: true, favoriteFigureId: '' };
 
   const localProfile = UserDataStore.getProfile();
   const { data: cloudProfile } = await supabase
     .from('profiles')
-    .select('username, ranking_visible, xp, level, streak_days, last_active_date, unlocked_badges, total_answered, total_correct')
+    .select('username, ranking_visible, favorite_figure_id, xp, level, streak_days, last_active_date, unlocked_badges, total_answered, total_correct')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -25,6 +40,7 @@ async function syncProfile(user: User): Promise<CloudProfile> {
       ...localProfile,
       id: user.id,
       username,
+      favoriteFigureId: cloudProfile.favorite_figure_id || undefined,
       xp: cloudProfile.xp,
       level: cloudProfile.level,
       streakDays: cloudProfile.streak_days,
@@ -34,13 +50,18 @@ async function syncProfile(user: User): Promise<CloudProfile> {
       totalCorrect: cloudProfile.total_correct,
       isGuest: false,
     });
-    return { username, rankingVisible: cloudProfile.ranking_visible !== false };
+    return {
+      username,
+      rankingVisible: cloudProfile.ranking_visible !== false,
+      favoriteFigureId: cloudProfile.favorite_figure_id || '',
+    };
   }
 
   const username = '探求者';
   const { error } = await supabase.from('profiles').insert({
     id: user.id,
     username,
+    favorite_figure_id: localProfile.favoriteFigureId || null,
     ranking_visible: true,
     xp: localProfile.xp,
     level: localProfile.level,
@@ -54,7 +75,7 @@ async function syncProfile(user: User): Promise<CloudProfile> {
   if (!error) {
     UserDataStore.saveProfile({ ...localProfile, id: user.id, username, isGuest: false });
   }
-  return { username, rankingVisible: true };
+  return { username, rankingVisible: true, favoriteFigureId: localProfile.favoriteFigureId || '' };
 }
 
 export default function AccountPage() {
@@ -62,12 +83,14 @@ export default function AccountPage() {
   const [nickname, setNickname] = useState('');
   const [showNicknameForm, setShowNicknameForm] = useState(false);
   const [rankingVisible, setRankingVisible] = useState(true);
+  const [favoriteFigureId, setFavoriteFigureId] = useState('');
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [savingNickname, setSavingNickname] = useState(false);
   const [savingRankingVisibility, setSavingRankingVisibility] = useState(false);
+  const [savingFavoriteFigure, setSavingFavoriteFigure] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [message, setMessage] = useState<Message>(null);
   const [email, setEmail] = useState('');
@@ -81,11 +104,12 @@ export default function AccountPage() {
     void supabase.auth.getUser().then(({ data, error }) => {
       if (!mounted || error || !data.user) return;
       setUser(data.user);
-      void syncProfile(data.user).then(({ username, rankingVisible: visible }) => {
+      void syncProfile(data.user).then(({ username, rankingVisible: visible, favoriteFigureId: favoriteId }) => {
         if (!mounted) return;
         setNickname(username === '探求者' ? '' : username);
         setShowNicknameForm(username === '探求者');
         setRankingVisible(visible);
+        setFavoriteFigureId(favoriteId);
       });
     });
 
@@ -95,16 +119,18 @@ export default function AccountPage() {
       const nextUser = session?.user || null;
       setUser(nextUser);
       if (nextUser) {
-        void syncProfile(nextUser).then(({ username, rankingVisible: visible }) => {
+        void syncProfile(nextUser).then(({ username, rankingVisible: visible, favoriteFigureId: favoriteId }) => {
           if (!mounted) return;
           setNickname(username === '探求者' ? '' : username);
           setShowNicknameForm(username === '探求者');
           setRankingVisible(visible);
+          setFavoriteFigureId(favoriteId);
         });
       } else {
         setNickname('');
         setShowNicknameForm(false);
         setRankingVisible(true);
+        setFavoriteFigureId('');
       }
     });
 
@@ -260,6 +286,39 @@ export default function AccountPage() {
     setMessage({ type: 'success', text: rankingVisible ? 'ランキングへの参加を有効にしました。' : 'ランキングから非表示にしました。' });
   };
 
+  const handleSaveFavoriteFigure = async () => {
+    if (!supabase || !user) return;
+    if (favoriteFigureId && !selectableFigures.some((figure) => figure.id === favoriteFigureId)) {
+      setMessage({ type: 'error', text: '一覧から思想家を選択してください。' });
+      return;
+    }
+
+    setSavingFavoriteFigure(true);
+    setMessage(null);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ favorite_figure_id: favoriteFigureId || null })
+      .eq('id', user.id);
+    setSavingFavoriteFigure(false);
+
+    if (error) {
+      setMessage({ type: 'error', text: '好きな思想家の保存に失敗しました：' + error.message });
+      return;
+    }
+
+    const localProfile = UserDataStore.getProfile();
+    UserDataStore.saveProfile({
+      ...localProfile,
+      id: user.id,
+      favoriteFigureId: favoriteFigureId || undefined,
+      isGuest: false,
+    });
+    setMessage({
+      type: 'success',
+      text: favoriteFigureId ? '好きな思想家を保存しました。' : '好きな思想家の設定を解除しました。',
+    });
+  };
+
   const handleDeleteAccount = async () => {
     if (!supabase || !user) return;
     const confirmed = window.confirm('アカウントと学習記録を削除します。この操作は元に戻せません。続行しますか？');
@@ -277,6 +336,7 @@ export default function AccountPage() {
     localStorage.removeItem('kokyo_user_progress_map');
     setUser(null);
     setNickname('');
+    setFavoriteFigureId('');
     setShowNicknameForm(false);
     setMessage({ type: 'success', text: 'アカウントと学習記録を削除しました。' });
   };
@@ -291,6 +351,7 @@ export default function AccountPage() {
       return;
     }
     setUser(null);
+    setFavoriteFigureId('');
     setMessage({ type: 'success', text: 'ログアウトしました。' });
   };
 
@@ -381,6 +442,38 @@ export default function AccountPage() {
               </button>
             </div>
           )}
+          <div className="border-t border-gray-200 pt-4 space-y-2">
+            <div>
+              <h2 className="font-bold text-sm">好きな思想家</h2>
+              <p className="text-[11px] text-gray-600 mt-1">
+                任意で1人選べます。ランキング参加中はニックネームの下に表示されます。
+              </p>
+            </div>
+            <select
+              value={favoriteFigureId}
+              onChange={(event) => setFavoriteFigureId(event.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm outline-none focus:border-red-500"
+            >
+              <option value="">選択しない</option>
+              {figuresByCategory.map(({ category, figures }) => (
+                <optgroup key={category.id} label={category.name}>
+                  {figures.map((figure) => (
+                    <option key={figure.id} value={figure.id}>
+                      {figure.name}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={handleSaveFavoriteFigure}
+              disabled={savingFavoriteFigure}
+              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xs font-bold text-xs disabled:opacity-50"
+            >
+              {savingFavoriteFigure ? '保存中…' : '好きな思想家を保存'}
+            </button>
+          </div>
           <div className="border-t border-gray-200 pt-4 space-y-2">
             <div>
               <h2 className="font-bold text-sm">ランキング設定</h2>
