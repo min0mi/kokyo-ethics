@@ -13,8 +13,6 @@ export const Header: React.FC = () => {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [daysUntilTest, setDaysUntilTest] = useState<number | null>(null);
 
-  const isChemistry = pathname?.startsWith('/chemistry');
-
   useEffect(() => {
     const p = UserDataStore.getProfile();
     setProfile(p);
@@ -48,38 +46,24 @@ export const Header: React.FC = () => {
     if (!next) sounds.playTap();
   };
 
-  const navLinks = isChemistry
-    ? [
-        { href: '/chemistry', label: 'トップ' },
-        { href: '/chemistry/dictionary', label: '物質・色対応表' },
-        { href: '/chemistry/stats', label: '学習進捗・グラフ' },
-        { href: '/contact', label: 'お問い合わせ・誤植報告' },
-      ]
-    : [
-        { href: '/', label: 'トップ' },
-        { href: '/dictionary', label: '思想・人物対応表' },
-        { href: '/stats', label: '学習進捗・グラフ' },
-        { href: '/badges', label: 'バッジ実績' },
-        { href: '/contact', label: 'お問い合わせ・誤植報告' },
-      ];
+  const navLinks = [
+    { href: '/', label: 'トップ' },
+    { href: '/dictionary', label: '思想・人物対応表' },
+    { href: '/stats', label: '学習進捗・グラフ' },
+    { href: '/badges', label: 'バッジ実績' },
+    { href: '/contact', label: 'お問い合わせ・誤植報告' },
+  ];
 
   return (
     <header className="w-full bg-white border-b-2 border-red-600 shadow-xs">
       {/* 最上段：ロゴ ＆ ユーザーステータス ＆ 科目切替 */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-3">
-          <Link href={isChemistry ? "/chemistry" : "/"} className="flex items-baseline gap-1.5">
+          <Link href="/" className="flex items-baseline gap-1.5">
             <span className="text-xl sm:text-2xl font-black text-red-600 tracking-tight">
-              {isChemistry ? '共テ無機化学パーフェクトマスター.com' : '公共倫理パーフェクトマスター.com'}
+              公共倫理パーフェクトマスター.com
             </span>
-            {isChemistry && (
-              <span className="bg-amber-400 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider ml-0.5 shadow-xs">
-                beta
-              </span>
-            )}
-            <span className="hidden sm:inline-block text-[11px] text-gray-500 font-normal ml-1">
-              {isChemistry ? '[物質・色 構造的暗記特訓]' : '[共通テスト構造的暗記特訓]'}
-            </span>
+            <span className="hidden sm:inline-block text-[11px] text-gray-500 font-normal ml-1">[共通テスト構造的暗記特訓]</span>
           </Link>
         </div>
 
@@ -110,29 +94,6 @@ export const Header: React.FC = () => {
             音: {isMuted ? '切' : '入'}
           </button>
 
-          {/* 科目切替ボタン（右上） */}
-          <div className="flex items-center gap-1 border-l border-gray-300 pl-2">
-            <Link
-              href="/"
-              className={`px-2 py-1 rounded-xs text-[11px] font-bold transition flex items-center gap-1 ${
-                !isChemistry
-                  ? 'bg-red-600 text-white shadow-xs'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
-              }`}
-            >
-              公共倫理
-            </Link>
-            <Link
-              href="/chemistry"
-              className={`px-2 py-1 rounded-xs text-[11px] font-bold transition flex items-center gap-1 ${
-                isChemistry
-                  ? 'bg-red-600 text-white shadow-xs'
-                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300'
-              }`}
-            >
-              無機化学 <span className="bg-amber-400 text-black text-[9px] px-1 py-0.2 rounded-xs font-black">beta</span>
-            </Link>
-          </div>
         </div>
       </div>
 

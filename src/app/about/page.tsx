@@ -113,7 +113,19 @@ export default function AboutPage() {
           </table>
         </div>
       </div>
+
+      {/* 著作権・コンテンツ作成方針 */}
+      <div className="pt-6 border-t border-gray-200 space-y-3">
+        <h2 className="text-lg font-bold text-gray-900">著作権・コンテンツ作成方針</h2>
+        <p className="text-xs sm:text-sm leading-relaxed text-gray-700">
+          当サイトの問題文、解説、人物・用語の対応整理、デザインおよびプログラムは、運営者が学習目的に合わせて作成・編集しています。
+          教科書、参考書、過去問題集など第三者の文章をそのまま転載しないよう努め、参考資料を確認しながら独自の説明にしています。
+        </p>
+        <p className="text-xs sm:text-sm leading-relaxed text-gray-700">
+          引用、画像、ロゴその他の第三者コンテンツを掲載する場合は、著作権法その他の関係法令を尊重し、必要に応じて出典や権利者を明示します。
+          掲載内容について著作権上の問題や誤りがある場合は、<a href="/contact" className="text-indigo-600 hover:underline">お問い合わせフォーム</a>からご連絡ください。
+        </p>
+      </div>
     </div>
   );
 }
-
