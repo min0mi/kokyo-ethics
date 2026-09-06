@@ -107,11 +107,9 @@ export const Header: React.FC = () => {
               </span>
             </Link>
         </div>
-      </div>
 
-      {/* タイトル下：学習状況と設定 */}
-      <div className="border-t border-gray-100 bg-white">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-1.5 flex items-center justify-end gap-2.5 text-xs flex-wrap">
+        {/* 主要アクション以外の情報・設定 */}
+        <div className="flex items-center gap-2.5 text-xs flex-wrap">
           {daysUntilTest !== null && (
             <div className="bg-red-50 text-red-700 px-2.5 py-1 border border-red-300 rounded-xs font-black text-[11px] select-none">
               共テまであと {daysUntilTest}日
