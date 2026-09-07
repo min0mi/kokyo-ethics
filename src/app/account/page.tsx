@@ -9,7 +9,13 @@ import { FIGURES } from '@/data/figures';
 import { CATEGORIES } from '@/data/categories';
 
 type Message = { type: 'error' | 'success'; text: string } | null;
-type CloudProfile = { username: string; rankingVisible: boolean; favoriteFigureId: string };
+type CloudProfile = { username: string; rankingVisible: boolean; epithetPrefix: string; epithetFigureId: string };
+
+const EPITHET_PREFIXES = [
+  'どこまでも', 'ひたすら', '静かに', 'まっすぐに', 'いつでも',
+  'やっぱり', 'とことん', 'じっくり', '自由に', '深く',
+  '永遠に', '密かに', 'あえて', 'かなり', 'きっと',
+];
 
 const availableCategoryIds = new Set(
   CATEGORIES.filter((category) => category.isAvailable).map((category) => category.id)
@@ -25,12 +31,12 @@ const figuresByCategory = CATEGORIES.filter((category) => category.isAvailable)
   .filter(({ figures }) => figures.length > 0);
 
 async function syncProfile(user: User): Promise<CloudProfile> {
-  if (!supabase) return { username: '探求者', rankingVisible: true, favoriteFigureId: '' };
+  if (!supabase) return { username: '探求者', rankingVisible: true, epithetPrefix: '', epithetFigureId: '' };
 
   const localProfile = UserDataStore.getProfile();
   const { data: cloudProfile } = await supabase
     .from('profiles')
-    .select('username, ranking_visible, favorite_figure_id, xp, level, streak_days, last_active_date, unlocked_badges, total_answered, total_correct')
+    .select('username, ranking_visible, epithet_prefix, epithet_figure_id, xp, level, streak_days, last_active_date, unlocked_badges, total_answered, total_correct')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -40,7 +46,8 @@ async function syncProfile(user: User): Promise<CloudProfile> {
       ...localProfile,
       id: user.id,
       username,
-      favoriteFigureId: cloudProfile.favorite_figure_id || undefined,
+      epithetPrefix: cloudProfile.epithet_prefix || undefined,
+      epithetFigureId: cloudProfile.epithet_figure_id || undefined,
       xp: cloudProfile.xp,
       level: cloudProfile.level,
       streakDays: cloudProfile.streak_days,
@@ -53,7 +60,8 @@ async function syncProfile(user: User): Promise<CloudProfile> {
     return {
       username,
       rankingVisible: cloudProfile.ranking_visible !== false,
-      favoriteFigureId: cloudProfile.favorite_figure_id || '',
+      epithetPrefix: cloudProfile.epithet_prefix || '',
+      epithetFigureId: cloudProfile.epithet_figure_id || '',
     };
   }
 
@@ -61,7 +69,8 @@ async function syncProfile(user: User): Promise<CloudProfile> {
   const { error } = await supabase.from('profiles').insert({
     id: user.id,
     username,
-    favorite_figure_id: localProfile.favoriteFigureId || null,
+    epithet_prefix: localProfile.epithetPrefix || null,
+    epithet_figure_id: localProfile.epithetFigureId || null,
     ranking_visible: true,
     xp: localProfile.xp,
     level: localProfile.level,
@@ -75,7 +84,7 @@ async function syncProfile(user: User): Promise<CloudProfile> {
   if (!error) {
     UserDataStore.saveProfile({ ...localProfile, id: user.id, username, isGuest: false });
   }
-  return { username, rankingVisible: true, favoriteFigureId: localProfile.favoriteFigureId || '' };
+  return { username, rankingVisible: true, epithetPrefix: localProfile.epithetPrefix || '', epithetFigureId: localProfile.epithetFigureId || '' };
 }
 
 export default function AccountPage() {
@@ -83,14 +92,15 @@ export default function AccountPage() {
   const [nickname, setNickname] = useState('');
   const [showNicknameForm, setShowNicknameForm] = useState(false);
   const [rankingVisible, setRankingVisible] = useState(true);
-  const [favoriteFigureId, setFavoriteFigureId] = useState('');
+  const [epithetPrefix, setEpithetPrefix] = useState('どこまでも');
+  const [epithetFigureId, setEpithetFigureId] = useState('');
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [savingNickname, setSavingNickname] = useState(false);
   const [savingRankingVisibility, setSavingRankingVisibility] = useState(false);
-  const [savingFavoriteFigure, setSavingFavoriteFigure] = useState(false);
+  const [savingEpithet, setSavingEpithet] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [message, setMessage] = useState<Message>(null);
   const [email, setEmail] = useState('');
@@ -104,12 +114,13 @@ export default function AccountPage() {
     void supabase.auth.getUser().then(({ data, error }) => {
       if (!mounted || error || !data.user) return;
       setUser(data.user);
-      void syncProfile(data.user).then(({ username, rankingVisible: visible, favoriteFigureId: favoriteId }) => {
+      void syncProfile(data.user).then(({ username, rankingVisible: visible, epithetPrefix: prefix, epithetFigureId: figureId }) => {
         if (!mounted) return;
         setNickname(username === '探求者' ? '' : username);
         setShowNicknameForm(username === '探求者');
         setRankingVisible(visible);
-        setFavoriteFigureId(favoriteId);
+        setEpithetPrefix(prefix || 'どこまでも');
+        setEpithetFigureId(figureId);
       });
     });
 
@@ -119,12 +130,13 @@ export default function AccountPage() {
       const nextUser = session?.user || null;
       setUser(nextUser);
       if (nextUser) {
-        void syncProfile(nextUser).then(({ username, rankingVisible: visible, favoriteFigureId: favoriteId }) => {
+        void syncProfile(nextUser).then(({ username, rankingVisible: visible, epithetPrefix: prefix, epithetFigureId: figureId }) => {
           if (!mounted) return;
           setNickname(username === '探求者' ? '' : username);
           setShowNicknameForm(username === '探求者');
           setRankingVisible(visible);
-          setFavoriteFigureId(favoriteId);
+          setEpithetPrefix(prefix || 'どこまでも');
+        setEpithetFigureId(figureId);
         });
       } else {
         setNickname('');
@@ -286,23 +298,30 @@ export default function AccountPage() {
     setMessage({ type: 'success', text: rankingVisible ? 'ランキングへの参加を有効にしました。' : 'ランキングから非表示にしました。' });
   };
 
-  const handleSaveFavoriteFigure = async () => {
+  const handleSaveEpithet = async () => {
     if (!supabase || !user) return;
-    if (favoriteFigureId && !selectableFigures.some((figure) => figure.id === favoriteFigureId)) {
-      setMessage({ type: 'error', text: '一覧から思想家を選択してください。' });
+    if (epithetFigureId && !selectableFigures.some((figure) => figure.id === epithetFigureId)) {
+      setMessage({ type: 'error', text: '一覧から人物名を選択してください。' });
+      return;
+    }
+    if (epithetFigureId && !EPITHET_PREFIXES.includes(epithetPrefix)) {
+      setMessage({ type: 'error', text: '副詞を一覧から選択してください。' });
       return;
     }
 
-    setSavingFavoriteFigure(true);
+    setSavingEpithet(true);
     setMessage(null);
     const { error } = await supabase
       .from('profiles')
-      .update({ favorite_figure_id: favoriteFigureId || null })
+      .update({
+        epithet_prefix: epithetFigureId ? epithetPrefix : null,
+        epithet_figure_id: epithetFigureId || null,
+      })
       .eq('id', user.id);
-    setSavingFavoriteFigure(false);
+    setSavingEpithet(false);
 
     if (error) {
-      setMessage({ type: 'error', text: '好きな思想家の保存に失敗しました：' + error.message });
+      setMessage({ type: 'error', text: `二つ名の保存に失敗しました：${error.message}` });
       return;
     }
 
@@ -310,12 +329,13 @@ export default function AccountPage() {
     UserDataStore.saveProfile({
       ...localProfile,
       id: user.id,
-      favoriteFigureId: favoriteFigureId || undefined,
+      epithetPrefix: epithetFigureId ? epithetPrefix : undefined,
+      epithetFigureId: epithetFigureId || undefined,
       isGuest: false,
     });
     setMessage({
       type: 'success',
-      text: favoriteFigureId ? '好きな思想家を保存しました。' : '好きな思想家の設定を解除しました。',
+      text: epithetFigureId ? '二つ名を保存しました。' : '二つ名の設定を解除しました。',
     });
   };
 
@@ -444,34 +464,33 @@ export default function AccountPage() {
           )}
           <div className="border-t border-gray-200 pt-4 space-y-2">
             <div>
-              <h2 className="font-bold text-sm">好きな思想家</h2>
+              <h2 className="font-bold text-sm">二つ名</h2>
               <p className="text-[11px] text-gray-600 mt-1">
-                任意で1人選べます。ランキング参加中はニックネームの下に表示されます。
+                副詞と人物名を組み合わせて、ランキングに表示する二つ名を作れます。
               </p>
             </div>
-            <select
-              value={favoriteFigureId}
-              onChange={(event) => setFavoriteFigureId(event.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm outline-none focus:border-red-500"
-            >
-              <option value="">選択しない</option>
-              {figuresByCategory.map(({ category, figures }) => (
-                <optgroup key={category.id} label={category.name}>
-                  {figures.map((figure) => (
-                    <option key={figure.id} value={figure.id}>
-                      {figure.name}
-                    </option>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label className="text-[11px] font-bold text-gray-700">
+                副詞
+                <select value={epithetPrefix} onChange={(event) => setEpithetPrefix(event.target.value)} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm font-normal outline-none focus:border-red-500">
+                  {EPITHET_PREFIXES.map((prefix) => <option key={prefix} value={prefix}>{prefix}</option>)}
+                </select>
+              </label>
+              <label className="text-[11px] font-bold text-gray-700">
+                人物名
+                <select value={epithetFigureId} onChange={(event) => setEpithetFigureId(event.target.value)} className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xs bg-white text-sm font-normal outline-none focus:border-red-500">
+                  <option value="">設定しない</option>
+                  {figuresByCategory.map(({ category, figures }) => (
+                    <optgroup key={category.id} label={category.name}>
+                      {figures.map((figure) => <option key={figure.id} value={figure.id}>{figure.name}</option>)}
+                    </optgroup>
                   ))}
-                </optgroup>
-              ))}
-            </select>
-            <button
-              type="button"
-              onClick={handleSaveFavoriteFigure}
-              disabled={savingFavoriteFigure}
-              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xs font-bold text-xs disabled:opacity-50"
-            >
-              {savingFavoriteFigure ? '保存中…' : '好きな思想家を保存'}
+                </select>
+              </label>
+            </div>
+            {epithetFigureId && <p className="text-sm font-black text-red-700">{epithetPrefix}{selectableFigures.find((figure) => figure.id === epithetFigureId)?.name}</p>}
+            <button type="button" onClick={handleSaveEpithet} disabled={savingEpithet} className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xs font-bold text-xs disabled:opacity-50">
+              {savingEpithet ? '保存中…' : '二つ名を保存'}
             </button>
           </div>
           <div className="border-t border-gray-200 pt-4 space-y-2">
