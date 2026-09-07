@@ -14,8 +14,7 @@ type LeaderboardRow = {
   level: number;
   total_correct: number;
   accuracy: number | null;
-  epithet_prefix: string | null;
-  epithet_figure_id: string | null;
+  favorite_figure_id: string | null;
 };
 
 export default function RankingPage() {
@@ -36,7 +35,7 @@ export default function RankingPage() {
       const [{ data: ranking, error: rankingError }, { data: userData }] = await Promise.all([
         client
           .from('leaderboard')
-          .select('id, username, xp, level, total_correct, accuracy, epithet_prefix, epithet_figure_id')
+          .select('id, username, xp, level, total_correct, accuracy, favorite_figure_id')
           .order('xp', { ascending: false })
           .limit(100),
         client.auth.getUser(),
@@ -103,8 +102,8 @@ export default function RankingPage() {
           <div>
             {rows.map((row, index) => {
               const isMe = row.id === currentUserId;
-              const epithetFigureName = row.epithet_figure_id
-                ? figureNames.get(row.epithet_figure_id)
+              const favoriteFigureName = row.favorite_figure_id
+                ? figureNames.get(row.favorite_figure_id)
                 : null;
               return (
                 <div
@@ -119,9 +118,9 @@ export default function RankingPage() {
                       {row.username || '探求者'}
                       {isMe && <span className="ml-1 text-[10px] text-red-600">あなた</span>}
                     </span>
-                    {epithetFigureName && row.epithet_prefix && (
+                    {favoriteFigureName && (
                       <span className="block mt-0.5 text-[10px] font-normal text-gray-500 truncate">
-                        {row.epithet_prefix}{epithetFigureName}
+                        好きな思想家：{favoriteFigureName}
                       </span>
                     )}
                   </span>
