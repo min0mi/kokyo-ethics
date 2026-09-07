@@ -113,6 +113,7 @@ SELECT
   streak_days,
   total_correct,
   ROUND((total_correct::NUMERIC / NULLIF(total_answered, 0)) * 100, 1) as accuracy,
+  favorite_figure_id,
   epithet_prefix,
   epithet_figure_id
 FROM public.profiles
