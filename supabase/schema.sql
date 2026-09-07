@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   username TEXT NOT NULL DEFAULT '探求者',
   favorite_figure_id TEXT,
+  epithet_prefix TEXT,
+  epithet_figure_id TEXT,
   ranking_visible BOOLEAN NOT NULL DEFAULT true,
   xp INTEGER NOT NULL DEFAULT 0,
   level INTEGER NOT NULL DEFAULT 1,
@@ -22,6 +24,17 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- 既存プロジェクトにも好きな思想家の項目を追加する。
 ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS favorite_figure_id TEXT;
+
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS epithet_prefix TEXT,
+  ADD COLUMN IF NOT EXISTS epithet_figure_id TEXT;
+
+-- 旧設定は人物部分として引き継ぎ、接頭語は「どこまでも」にする。
+UPDATE public.profiles
+SET epithet_prefix = COALESCE(epithet_prefix, 'どこまでも'),
+    epithet_figure_id = COALESCE(epithet_figure_id, favorite_figure_id)
+WHERE favorite_figure_id IS NOT NULL
+  AND epithet_figure_id IS NULL;
 
 -- RLS設定 (Profiles)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
@@ -89,7 +102,9 @@ CREATE POLICY "Questions are viewable by everyone"
   USING (true);
 
 -- 4. ランキング用ビュー / 集計関数
-CREATE OR REPLACE VIEW public.leaderboard AS
+DROP VIEW IF EXISTS public.leaderboard;
+
+CREATE VIEW public.leaderboard AS
 SELECT 
   id,
   username,
@@ -98,7 +113,8 @@ SELECT
   streak_days,
   total_correct,
   ROUND((total_correct::NUMERIC / NULLIF(total_answered, 0)) * 100, 1) as accuracy,
-  favorite_figure_id
+  epithet_prefix,
+  epithet_figure_id
 FROM public.profiles
 WHERE ranking_visible = true
 ORDER BY xp DESC
