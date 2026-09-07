@@ -95,7 +95,7 @@ export default function AboutPage() {
         <ol className="mt-3 space-y-3 text-xs text-gray-700">
           <li className="grid grid-cols-[5.5rem_1fr] gap-2">
             <time dateTime="2026-09-07" className="font-bold text-gray-500">2026.09.07</time>
-            <span>好きな思想家のプロフィール設定とランキング表示、更新履歴を追加しました。</span>
+            <span>プロフィールの二つ名設定とランキング表示、更新履歴を追加しました。</span>
           </li>
           <li className="grid grid-cols-[5.5rem_1fr] gap-2">
             <time dateTime="2026-09-07" className="font-bold text-gray-500">2026.09.07</time>
