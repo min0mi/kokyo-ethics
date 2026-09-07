@@ -92,12 +92,13 @@ export default function RankingPage() {
         </div>
       ) : (
         <div className="bg-white border border-gray-300 rounded-xs overflow-hidden">
-          <div className="grid grid-cols-[3rem_1fr_5rem_4rem_5rem] gap-2 px-3 py-2 bg-gray-100 border-b border-gray-300 text-[11px] font-bold text-gray-600">
+          <div className="grid grid-cols-[2.5rem_minmax(0,1fr)_7.5rem] sm:grid-cols-[3rem_minmax(0,1fr)_5rem_4rem_5rem] gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-gray-100 border-b border-gray-300 text-[11px] font-bold text-gray-600">
             <span>順位</span>
             <span>ニックネーム</span>
-            <span className="text-right">XP</span>
-            <span className="text-right">レベル</span>
-            <span className="text-right">正答数</span>
+            <span className="text-right sm:hidden">XP / Lv. / 正答</span>
+            <span className="hidden sm:block text-right">XP</span>
+            <span className="hidden sm:block text-right">レベル</span>
+            <span className="hidden sm:block text-right">正答数</span>
           </div>
           <div>
             {rows.map((row, index) => {
@@ -108,7 +109,7 @@ export default function RankingPage() {
               return (
                 <div
                   key={row.id}
-                  className={`grid grid-cols-[3rem_1fr_5rem_4rem_5rem] gap-2 items-center px-3 py-3 border-b last:border-b-0 border-gray-200 ${isMe ? 'bg-red-50' : ''}`}
+                  className={`grid grid-cols-[2.5rem_minmax(0,1fr)_7.5rem] sm:grid-cols-[3rem_minmax(0,1fr)_5rem_4rem_5rem] gap-1 sm:gap-2 items-center px-2 sm:px-3 py-3 border-b last:border-b-0 border-gray-200 ${isMe ? 'bg-red-50' : ''}`}
                 >
                   <span className={`font-black ${index < 3 ? 'text-red-600' : 'text-gray-500'}`}>
                     {index + 1}
@@ -124,9 +125,16 @@ export default function RankingPage() {
                       </span>
                     )}
                   </span>
-                  <span className="text-right font-bold text-blue-700">{row.xp.toLocaleString()}</span>
-                  <span className="text-right text-gray-700">Lv.{row.level}</span>
-                  <span className="text-right text-gray-700">{row.total_correct.toLocaleString()}</span>
+                  <span className="text-right text-[10px] text-gray-700 whitespace-nowrap sm:hidden">
+                    <span className="font-bold text-blue-700">{row.xp.toLocaleString()} XP</span>
+                    <span className="mx-0.5 text-gray-400">·</span>
+                    <span>Lv.{row.level}</span>
+                    <span className="mx-0.5 text-gray-400">·</span>
+                    <span>{row.total_correct.toLocaleString()}問</span>
+                  </span>
+                  <span className="hidden sm:block text-right font-bold text-blue-700">{row.xp.toLocaleString()}</span>
+                  <span className="hidden sm:block text-right text-gray-700">Lv.{row.level}</span>
+                  <span className="hidden sm:block text-right text-gray-700">{row.total_correct.toLocaleString()}</span>
                 </div>
               );
             })}
