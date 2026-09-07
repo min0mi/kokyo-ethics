@@ -194,8 +194,7 @@ export interface DailyCount {
 export interface UserProfile {
   id: string;
   username: string;
-  epithetPrefix?: string;
-  epithetFigureId?: string;
+  favoriteFigureId?: string;
   xp: number;
   level: number;
   streakDays: number;
