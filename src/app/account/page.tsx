@@ -142,7 +142,7 @@ export default function AccountPage() {
         setNickname('');
         setShowNicknameForm(false);
         setRankingVisible(true);
-        setFavoriteFigureId('');
+        setEpithetFigureId('');
       }
     });
 
@@ -356,7 +356,7 @@ export default function AccountPage() {
     localStorage.removeItem('kokyo_user_progress_map');
     setUser(null);
     setNickname('');
-    setFavoriteFigureId('');
+    setEpithetFigureId('');
     setShowNicknameForm(false);
     setMessage({ type: 'success', text: 'アカウントと学習記録を削除しました。' });
   };
@@ -371,7 +371,7 @@ export default function AccountPage() {
       return;
     }
     setUser(null);
-    setFavoriteFigureId('');
+    setEpithetFigureId('');
     setMessage({ type: 'success', text: 'ログアウトしました。' });
   };
 
