@@ -115,7 +115,7 @@ export default function AboutPage() {
             <tbody>
               <tr className="border-b border-gray-300">
                 <th className="p-3 bg-gray-50 font-bold border-r border-gray-300 w-1/4">運営者</th>
-                <td className="p-3">minor</td>
+                <td className="p-3">西澤禎一</td>
               </tr>
               <tr className="border-b border-gray-300">
                 <th className="p-3 bg-gray-50 font-bold border-r border-gray-300">メールアドレス</th>
