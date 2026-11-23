@@ -94,6 +94,10 @@ export default function AboutPage() {
         <h2 className="text-sm font-black border-b border-gray-200 pb-2">更新履歴</h2>
         <ol className="mt-3 space-y-3 text-xs text-gray-700">
           <li className="grid grid-cols-[5.5rem_1fr] gap-2">
+            <time dateTime="2026-11-23" className="font-bold text-gray-500">2026.11.23</time>
+            <span>林羅山の用語「尊心持敬」を「存心持敬」に修正しました。</span>
+          </li>
+          <li className="grid grid-cols-[5.5rem_1fr] gap-2">
             <time dateTime="2026-09-07" className="font-bold text-gray-500">2026.09.07</time>
             <span>好きな思想家のプロフィール設定とランキング表示、更新履歴を追加しました。</span>
           </li>
