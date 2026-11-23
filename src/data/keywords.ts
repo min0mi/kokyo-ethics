@@ -2092,7 +2092,7 @@ export const KEYWORDS: Keyword[] = [
   },
   {
     id: 'kw_fig_9220498_233',
-    name: '尊心持敬',
+    name: '存心持敬',
     reading: '',
     categoryId: 'japan_muromachi_modern',
     figureId: 'fig_9220498',
