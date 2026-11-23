@@ -766,7 +766,7 @@ export const FIGURES: Figure[] = [
     englishName: '',
     categoryId: 'japan_muromachi_modern',
     eraDetail: '',
-    mainConcept: '上下定分の理、尊心持敬、三徳（智、仁、勇）、大義名分論、仁は敬なり',
+    mainConcept: '上下定分の理、存心持敬、三徳（智、仁、勇）、大義名分論、仁は敬なり',
     summary: '江戸初期の朱子学者。徳川家康以降の歴代将軍に仕え幕府の教学・儀礼を整備。「上下定分の理」「存心持敬」を説き武士道道徳の基礎を築いた。',
     books: ["三徳弁", "春鑑抄"],
     contrastFigureIds: [],
